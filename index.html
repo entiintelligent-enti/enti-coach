@@ -42,6 +42,9 @@
   .ex-row-custom { border-style: dashed; border-color: #3A4048; }
   .ex-custom-tip { font-size: 11px; color: #8993A1; margin-top: 3px; line-height: 1.4; }
   .suggest-btn { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: #181C22; border: 1px dashed #2A3A38; border-radius: 10px; padding: 11px 0; color: #4DD8C7; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 14px; }
+  .ai-gen-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #4DD8C7; border: none; border-radius: 12px; padding: 13px 0; color: #12151A; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+  .ai-revert-btn { display: block; background: none; border: none; color: #5C6470; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; text-decoration: underline; margin: -6px auto 0; }
+  .ai-badge { color: #4DD8C7; }
   .mark-all-btn { width: 100%; background: #181C22; border: 1px solid #232830; border-radius: 10px; padding: 10px 0; color: #8993A1; font-size: 12.5px; font-weight: 600; cursor: pointer; margin-top: 14px; }
   .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .metric-cell { background: #181C22; border: 1px solid #232830; border-radius: 10px; padding: 12px; }
@@ -197,7 +200,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "1.9.0";
+const APP_VERSION = "2.0.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -284,6 +287,19 @@ const DAY_TYPES = {
 };
 const SPLIT_ORDER = ["upper_push", "lower_quad", "upper_pull", "lower_hip"];
 const FULL_BODY_ORDER = ["full_body_a", "full_body_b"];
+function effectiveDayInfo(entry, dayType) {
+  const base = DAY_TYPES[dayType];
+  if (entry && entry.aiWorkout && entry.aiWorkout.exercises && entry.aiWorkout.exercises.length) {
+    return {
+      label: entry.aiWorkout.label || base.label,
+      sub: entry.aiWorkout.sub || base.sub,
+      cardio: entry.aiWorkout.cardio || base.cardio,
+      exercises: entry.aiWorkout.exercises,
+      isAI: true,
+    };
+  }
+  return base;
+}
 const DEFAULT_TRAINING_DAYS = [0, 1, 3, 4];
 const ADAPTATION_WEEKS = { yeni: 4, ara_verdi: 3, devam: 0 };
 const WEEKDAYS = [
@@ -424,6 +440,54 @@ SADECE şu JSON formatında yanıt ver, başka hiçbir şey ekleme, markdown fen
   const parsed = JSON.parse(clean);
   return { kcal: Number(parsed.kcal)||0, protein: Number(parsed.protein)||0, carbs: Number(parsed.carbs)||0, fat: Number(parsed.fat)||0, advice: String(parsed.advice||"") };
 }
+function buildTrainingHistoryLines(trainingDays, dateStr, days) {
+  const lines = [];
+  for (let i = days; i >= 1; i--) {
+    const d = addDays(dateStr, -i);
+    const e = logs[d];
+    const dt = dayTypeForDate(d, trainingDays, computePhase(profile, d), profile.trainingDayOverrides || {});
+    const info = effectiveDayInfo(e, dt);
+    const totalEx = info.exercises.length;
+    const doneEx = e ? info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length : 0;
+    const trained = (totalEx > 0 && doneEx === totalEx) || !!(e && e.manualComplete);
+    const nutrition = e && (e.calories != null || e.protein != null) ? ` (${e.calories ?? "?"} kcal, ${e.protein ?? "?"}g protein)` : "";
+    lines.push(`${d}: ${trained ? `antrenman yaptı — ${info.label}` : "antrenman yapmadı"}${nutrition}`);
+  }
+  return lines.join("\n");
+}
+
+async function generateTodayWorkout(dayCtx, historyLines) {
+  const statusInfo = TRAINING_STATUS[profile.trainingStatus] || TRAINING_STATUS.yeni;
+  const statusLine = profile.trainingStatus === "ara_verdi" && profile.breakMonths
+    ? `${statusInfo.label} (yaklaşık ${profile.breakMonths} aydır ara vermişti)` : statusInfo.label;
+  const targets = computeNutritionTargets(profile);
+
+  const systemPrompt = `Sen Enti Coach'sun, deneyimli bir antrenman koçusun. Kullanıcının GERÇEK geçmişine ve bugünkü durumuna göre BUGÜN İÇİN kişiye özel bir antrenman planı oluşturacaksın — sabit bir programı tekrarlama, gerçekten analiz et.
+
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, yağ oranı %${profile.bodyFatPct}.
+ANTRENMAN GEÇMİŞİ (genel): ${statusLine}.
+BUGÜN (${dayCtx.dateLabel}): program fazı ${dayCtx.phase === "adaptation" ? "adaptasyon (hafif ağırlık, form odaklı)" : "split (normal yoğunluk)"}.
+BUGÜNE KADAR ALINAN BESLENME: ${dayCtx.calories != null ? `${dayCtx.calories} kcal` : "henüz girilmedi"}, ${dayCtx.protein != null ? `${dayCtx.protein}g protein` : "henüz girilmedi"}. Günlük hedef: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein.
+
+SON GÜNLERİN GERÇEK KAYDI (en eski en üstte):
+${historyLines || "Kayıt yok — ilk kullanım."}
+
+TALİMATLAR:
+- Yukarıdaki geçmişi dikkatle oku: art arda kaç gündür antrenman YAPILMADIĞINI, hangi kas gruplarının son zamanlarda çalışıldığını/çalışılmadığını, bugünkü beslenmenin antrenmana yetip yetmeyeceğini değerlendir.
+- Uzun süre ara verilmişse (örn. 5+ gün) daha hafif/toparlanma odaklı bir gün öner, agresif yükleme önerme.
+- Son günlerde belirli bir bölge çalışılmadıysa bugün ona öncelik ver.
+- Bugün beslenme çok düşükse, bunu antrenman yoğunluğuna yansıt ve "sub" alanında kısaca belirt.
+- 4-6 hareket seç, adaptasyon fazındaysa hafif ağırlık ve temel hareketler kullan.
+- SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir açıklama, markdown fence ekleme:
+{"label": "kısa başlık", "sub": "1 cümlelik gerekçe", "cardio": "opsiyonel kardiyo notu veya null", "exercises": [{"name": "Hareket adı", "scheme": "3 × 10-12", "tip": "1 cümlelik Türkçe form ipucu"}]}`;
+
+  const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: "Bugün için antrenmanımı planla." }] }]);
+  const clean = raw.replace(/```json|```/g, "").trim();
+  const parsed = JSON.parse(clean);
+  const exercises = (parsed.exercises || []).map((ex, i) => ({ id: `ai-${Date.now()}-${i}`, name: ex.name, scheme: ex.scheme, tip: ex.tip }));
+  return { label: parsed.label, sub: parsed.sub, cardio: parsed.cardio || null, exercises };
+}
+
 async function suggestExtraExercises(dayInfo, profile, phase, existingNames) {
   const statusInfo = TRAINING_STATUS[profile.trainingStatus] || TRAINING_STATUS.yeni;
   const systemPrompt = `Sen Enti Coach'sun, deneyimli bir antrenman koçusun.
@@ -514,8 +578,9 @@ function computeStreak() {
     const e = logs[cursor];
     if (e && e.manualComplete) { count++; cursor = addDays(cursor, -1); continue; }
     if (dt === "rest") { cursor = addDays(cursor, -1); continue; }
-    const total = DAY_TYPES[dt].exercises.length;
-    const done = e ? DAY_TYPES[dt].exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length : 0;
+    const info = effectiveDayInfo(e, dt);
+    const total = info.exercises.length;
+    const done = e ? info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length : 0;
     if (total > 0 && done === total) { count++; cursor = addDays(cursor, -1); } else break;
   }
   return count;
@@ -525,8 +590,8 @@ function todayContext() {
   const ov = profile?.trainingDayOverrides || {};
   const phase = computePhase(profile, today);
   const dt = dayTypeForDate(today, td, phase, ov);
-  const info = DAY_TYPES[dt];
   const e = getEntry(today);
+  const info = effectiveDayInfo(e, dt);
   const doneEx = info.exercises.filter(ex => e.doneExercises[ex.id]).length;
   return { dateLabel: turkishDate(today), dayLabel: info.label, phase, totalEx: info.exercises.length, doneEx, calories: e.calories, protein: e.protein, water: e.water, sleep: e.sleep, streak: computeStreak() };
 }
@@ -721,8 +786,8 @@ function renderCalendarHtml() {
     const dateStr = cellDateStr(calViewMonth, day);
     const phase = computePhase(profile, dateStr);
     const dayType = dayTypeForDate(dateStr, trainingDays, phase, overrides);
-    const dayInfo = DAY_TYPES[dayType];
     const dayEntry = logs[dateStr];
+    const dayInfo = effectiveDayInfo(dayEntry, dayType);
     const totalEx = dayInfo.exercises.length;
     const doneEx = dayEntry ? dayInfo.exercises.filter(e => dayEntry.doneExercises && dayEntry.doneExercises[e.id]).length : 0;
     const completed = (totalEx > 0 && doneEx === totalEx) || !!(dayEntry && dayEntry.manualComplete);
@@ -981,8 +1046,11 @@ function attachNutritionHandlers(entry, targets) {
 let suggestLoading = false;
 let suggestError = false;
 
+let aiGenLoading = false;
+let aiGenError = false;
+
 function renderTraining(entry, phase, weeksRemaining) {
-  const dayInfo = DAY_TYPES[entry.dayType];
+  const dayInfo = effectiveDayInfo(entry, entry.dayType);
   const totalEx = dayInfo.exercises.length;
   const doneEx = dayInfo.exercises.filter(e => entry.doneExercises[e.id]).length;
   const customExercises = entry.customExercises || [];
@@ -1023,10 +1091,15 @@ function renderTraining(entry, phase, weeksRemaining) {
     </div>` : "";
 
   return `
+    <button class="ai-gen-btn" id="aiGenBtn" ${aiGenLoading ? "disabled" : ""}>
+      ✨ ${aiGenLoading ? "planlanıyor…" : dayInfo.isAI ? "Yeniden Oluştur" : "Bugünkü Antrenmanımı AI ile Oluştur"}
+    </button>
+    ${aiGenError ? `<div class="chat-error">Plan oluşturulamadı (Gemini API key gerekli olabilir), tekrar dener misin?</div>` : ""}
+    ${dayInfo.isAI ? `<button class="ai-revert-btn" id="aiRevertBtn">Standart programa dön</button>` : ""}
     ${phaseBanner}
     <section class="card">
       <div class="card-head-row">
-        <div><div class="card-eyebrow">${String(totalEx + customExercises.length).padStart(2,"0")} HAREKET</div><div class="card-title">${dayInfo.label}</div><div class="card-sub">${dayInfo.sub}</div></div>
+        <div><div class="card-eyebrow">${String(totalEx + customExercises.length).padStart(2,"0")} HAREKET${dayInfo.isAI ? ` <span class="ai-badge">· AI PLANI</span>` : ""}</div><div class="card-title">${dayInfo.label}</div><div class="card-sub">${dayInfo.sub}</div></div>
       </div>
       ${totalEx > 0 ? `<div class="progress-track"><div class="progress-fill" style="width:${(doneEx/totalEx)*100}%"></div></div>` : ""}
       ${dayInfo.cardio ? `<div class="cardio-note">🏃 ${dayInfo.cardio}</div>` : ""}
@@ -1042,9 +1115,37 @@ function renderTraining(entry, phase, weeksRemaining) {
 }
 
 function attachTrainingHandlers(entry) {
+  const aiGenBtn = document.getElementById("aiGenBtn");
+  if (aiGenBtn) aiGenBtn.addEventListener("click", async () => {
+    if (!getGeminiKey()) { aiGenError = true; render(); return; }
+    aiGenLoading = true; aiGenError = false;
+    render();
+    try {
+      const trainingDays = profile.trainingDays || DEFAULT_TRAINING_DAYS;
+      const dayCtx = {
+        dateLabel: turkishDate(activeDate),
+        phase: computePhase(profile, activeDate),
+        calories: entry.calories,
+        protein: entry.protein,
+      };
+      const historyLines = buildTrainingHistoryLines(trainingDays, activeDate, 7);
+      const aiWorkout = await generateTodayWorkout(dayCtx, historyLines);
+      updateEntry(activeDate, { aiWorkout, doneExercises: {}, customExercises: [] });
+    } catch (e) {
+      aiGenError = true;
+    } finally {
+      aiGenLoading = false;
+      render();
+    }
+  });
+  const aiRevertBtn = document.getElementById("aiRevertBtn");
+  if (aiRevertBtn) aiRevertBtn.addEventListener("click", () => {
+    updateEntry(activeDate, { aiWorkout: null });
+    render();
+  });
   const markAllBtn = document.getElementById("markAllBtn");
   if (markAllBtn) markAllBtn.addEventListener("click", () => {
-    const dayInfo = DAY_TYPES[entry.dayType];
+    const dayInfo = effectiveDayInfo(entry, entry.dayType);
     const allIds = [...dayInfo.exercises.map(e => e.id), ...(entry.customExercises||[]).map(e => e.id)];
     const setTo = markAllBtn.dataset.set === "true";
     const doneExercises = { ...entry.doneExercises };
