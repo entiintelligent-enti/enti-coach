@@ -41,7 +41,6 @@
   .info-btn { background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #0F9E8C; font-size: 13px; font-weight: 700; }
   .ex-row-custom { border-style: dashed; border-color: #D0D5DD; }
   .ex-custom-tip { font-size: 11px; color: #6B7280; margin-top: 3px; line-height: 1.4; }
-  .suggest-btn { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: #F3F5F7; border: 1px dashed #BEE9E0; border-radius: 10px; padding: 11px 0; color: #0F9E8C; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 14px; }
   .ai-gen-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #4DD8C7; border: none; border-radius: 12px; padding: 13px 0; color: #12151A; font-size: 13.5px; font-weight: 700; cursor: pointer; }
   .ai-revert-btn { display: block; background: none; border: none; color: #94A0AE; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; text-decoration: underline; margin: -6px auto 0; }
   .ai-badge { color: #0F9E8C; }
@@ -214,7 +213,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "2.3.0";
+const APP_VERSION = "2.4.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -512,19 +511,6 @@ HAREKET KATALOĞU (id: isim): ${EXERCISE_CATALOG_TEXT}
   const parsed = JSON.parse(clean);
   const exercises = (parsed.exercises || []).map((ex, i) => ({ id: ex.id && MEDIA[ex.id] ? ex.id : `ai-${Date.now()}-${i}`, name: ex.name, scheme: ex.scheme, tip: ex.tip }));
   return { label: parsed.label, sub: parsed.sub, cardio: parsed.cardio || null, exercises };
-}
-
-async function suggestExtraExercises(dayInfo, profile, phase, existingNames) {
-  const statusInfo = TRAINING_STATUS[profile.trainingStatus] || TRAINING_STATUS.yeni;
-  const systemPrompt = `Sen Enti Coach'sun, deneyimli bir antrenman koçusun.
-Kullanıcının bugünkü antrenman günü: "${dayInfo.label}" (${dayInfo.sub}). Bu günde zaten şu hareketler var: ${existingNames.join(", ")}.
-Kullanıcı: antrenman geçmişi "${statusInfo.label}", program fazı: ${phase === "adaptation" ? "adaptasyon (hafif ağırlık, form odaklı)" : "split (normal yoğunluk)"}.
-Görevin: bu güne uygun, mevcut hareketleri TEKRARLAMAYAN 2 ek hareket öner. Fazına uygun zorlukta olsun.
-SADECE şu JSON formatında yanıt ver, başka hiçbir açıklama, markdown fence ekleme: [{"name": "Hareket adı", "scheme": "3 × 10-12", "tip": "1 cümlelik Türkçe form ipucu"}, {"name": "...", "scheme": "...", "tip": "..."}]`;
-  const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: "Bugün için ek hareket öner." }] }]);
-  const clean = raw.replace(/```json|```/g, "").trim();
-  const parsed = JSON.parse(clean);
-  return Array.isArray(parsed) ? parsed : [];
 }
 
 async function askCoach(userMessage, profile, targets, history, dayCtx) {
@@ -1198,9 +1184,6 @@ function attachNutritionHandlers(entry, targets) {
 // ---------------------------------------------------------------------------
 // Training tab
 // ---------------------------------------------------------------------------
-let suggestLoading = false;
-let suggestError = false;
-
 let aiGenLoading = false;
 let aiGenError = false;
 
@@ -1259,11 +1242,6 @@ function renderTraining(entry, phase, weeksRemaining) {
       ${totalEx > 0 ? `<div class="progress-track"><div class="progress-fill" style="width:${(doneEx/totalEx)*100}%"></div></div>` : ""}
       ${dayInfo.cardio ? `<div class="cardio-note">🏃 ${dayInfo.cardio}</div>` : ""}
       ${exListHtml}
-      ${totalEx > 0 ? `
-        <button class="suggest-btn" id="suggestBtn" ${suggestLoading ? "disabled" : ""}>
-          ✨ ${suggestLoading ? "öneriliyor…" : "AI'dan ek hareket öner"}
-        </button>` : ""}
-      ${suggestError ? `<div class="chat-error">Öneri alınamadı (Gemini API key gerekli olabilir), tekrar dener misin?</div>` : ""}
     </section>
     <div class="version-tag">Enti Coach v${APP_VERSION}</div>
   `;
@@ -1328,27 +1306,6 @@ function attachTrainingHandlers(entry) {
       render();
     });
   });
-  const suggestBtn = document.getElementById("suggestBtn");
-  if (suggestBtn) {
-    suggestBtn.addEventListener("click", async () => {
-      if (!getGeminiKey()) { suggestError = true; render(); return; }
-      const dayInfo = DAY_TYPES[entry.dayType];
-      const phase = computePhase(profile, activeDate);
-      suggestLoading = true; suggestError = false;
-      render();
-      try {
-        const existingNames = [...dayInfo.exercises.map(e => e.name), ...(entry.customExercises||[]).map(e => e.name)];
-        const suggestions = await suggestExtraExercises(dayInfo, profile, phase, existingNames);
-        const withIds = suggestions.map((s, i) => ({ id: `custom-${Date.now()}-${i}`, name: s.name, scheme: s.scheme, tip: s.tip }));
-        updateEntry(activeDate, { customExercises: [...(entry.customExercises||[]), ...withIds] });
-      } catch (e) {
-        suggestError = true;
-      } finally {
-        suggestLoading = false;
-        render();
-      }
-    });
-  }
 }
 
 function openModal(exId, name, scheme, tipArg) {
