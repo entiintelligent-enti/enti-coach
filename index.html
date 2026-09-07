@@ -96,6 +96,28 @@
   .modal-img { width: 50%; border-radius: 10px; background: #EEF1F4; object-fit: cover; aspect-ratio: 1/1; }
   .modal-tip { font-size: 13.5px; color: #3A4048; line-height: 1.55; margin-top: 14px; }
   .modal-scheme { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F9E8C; margin-top: 12px; }
+  .meal-row.clickable { cursor: pointer; }
+  .recipe-chip { display: inline-flex; align-items: center; gap: 4px; background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; padding: 4px 9px; font-size: 10.5px; font-weight: 700; color: #0F9E8C; margin-top: 8px; }
+  .recipe-progress { display: flex; gap: 4px; margin-bottom: 16px; }
+  .recipe-progress-seg { flex: 1; height: 3px; border-radius: 2px; background: #ECEFF2; }
+  .recipe-progress-seg.filled { background: #4DD8C7; }
+  .recipe-servings-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 8px 10px; margin-bottom: 12px; }
+  .recipe-servings-label { font-size: 12px; color: #6B7280; font-weight: 500; }
+  .recipe-servings-stepper { display: flex; align-items: center; gap: 8px; }
+  .recipe-servings-stepper .stepper-btn { width: 26px; height: 26px; font-size: 16px; }
+  .recipe-servings-stepper .stepper-value { font-size: 15px; width: 20px; flex: none; }
+  .recipe-ingredients-toggle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #0F9E8C; background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 10px; text-decoration: underline; }
+  .recipe-ingredients-list { font-size: 12.5px; color: #3A4048; line-height: 1.7; margin-bottom: 14px; background: #F3F5F7; border-radius: 10px; padding: 10px 12px; }
+  .recipe-step-counter { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #94A0AE; text-align: center; }
+  .recipe-step-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 21px; color: #12151A; margin-top: 8px; text-align: center; }
+  .recipe-step-content { font-size: 14px; color: #3A4048; line-height: 1.55; margin-top: 12px; text-align: center; }
+  .recipe-timer { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; color: #12151A; text-align: center; margin-top: 18px; }
+  .recipe-timer-btn { width: 54px; height: 54px; border-radius: 50%; background: #12151A; color: #FFFFFF; border: none; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 12px auto 0; cursor: pointer; }
+  .recipe-nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; }
+  .recipe-nav-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: #12151A; flex-shrink: 0; }
+  .recipe-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .recipe-note-box { font-size: 11.5px; color: #B8720A; line-height: 1.5; margin-top: 18px; background: #FBF3E6; border: 1px solid #F0DDB8; border-radius: 10px; padding: 10px 12px; }
+  .recipe-macro-box { font-size: 11.5px; color: #94A0AE; line-height: 1.6; margin-top: 10px; }
   input:focus, textarea:focus { outline: 2px solid #4DD8C7; outline-offset: 1px; }
   button:focus-visible { outline: 2px solid #4DD8C7; outline-offset: 2px; }
 
@@ -169,6 +191,20 @@
   .coach-panel.open { display: flex; }
   .coach-panel-head { display: flex; justify-content: space-between; align-items: flex-start; }
   .coach-panel-sub { font-size: 12px; color: #6B7280; margin-top: 4px; max-width: 280px; }
+  .rest-fab { position: fixed; bottom: 78px; left: 16px; width: 52px; height: 52px; border-radius: 26px; background: #12151A; border: none; box-shadow: 0 6px 18px rgba(18,21,26,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 45; font-size: 20px; color: #FFFFFF; flex-direction: column; }
+  .rest-fab-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; line-height: 1; margin-top: 1px; }
+  .rest-panel { position: fixed; bottom: 78px; left: 12px; right: 12px; max-width: 456px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 14px; padding: 18px; display: none; flex-direction: column; align-items: center; z-index: 45; box-shadow: 0 -8px 28px rgba(16,24,40,0.15); }
+  .rest-panel.open { display: flex; }
+  .rest-panel-head { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+  .rest-panel-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; color: #12151A; }
+  .rest-display { font-family: 'JetBrains Mono', monospace; font-size: 46px; font-weight: 700; color: #12151A; margin: 14px 0 6px; }
+  .rest-preset-row { display: flex; gap: 8px; width: 100%; }
+  .rest-preset-btn { flex: 1; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 8px; padding: 8px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #6B7280; cursor: pointer; }
+  .rest-preset-btn.active { background: #E1F5F1; border-color: #4DD8C7; color: #0F9E8C; }
+  .rest-adjust-row { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+  .rest-adjust-btn { width: 34px; height: 34px; border-radius: 8px; background: #ECEFF2; border: none; color: #12151A; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .rest-main-btn { width: 100%; background: #4DD8C7; border: none; border-radius: 10px; padding: 12px 0; color: #0C1512; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+  .rest-reset-link { background: none; border: none; color: #94A0AE; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; margin-top: 8px; text-decoration: underline; }
   .coach-close-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #6B7280; }
   .gemini-setup { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 12.5px; color: #6B7280; line-height: 1.5; }
   .gemini-setup a { color: #0F9E8C; }
@@ -208,12 +244,15 @@
   <div class="modal-backdrop" id="modalBackdrop">
     <div class="modal-card" id="modalCard"></div>
   </div>
+  <div class="modal-backdrop" id="recipeModalBackdrop">
+    <div class="modal-card" id="recipeModalCard"></div>
+  </div>
 
 <script>
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "2.5.1";
+const APP_VERSION = "2.7.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -345,11 +384,75 @@ const TRAINING_STATUS = {
   devam: { label: "Düzenli devam ediyorum", sub: "Zaten aktif antrenman yapıyorum" },
 };
 const MEAL_PLAN = [
-  { name: "Kahvaltı", ratio: 0.25, items: "3-4 yumurta, yulaf ezmesi, yoğunlaştırılmış yoğurt, mevsim meyvesi" },
-  { name: "Öğle", ratio: 0.30, items: "Tavuk göğsü veya kırmızı et, pirinç/bulgur, bol sebze, zeytinyağı" },
-  { name: "Akşam", ratio: 0.30, items: "Balık veya tavuk, tatlı patates/bulgur, yeşil salata" },
-  { name: "Ara Öğün", ratio: 0.15, items: "Whey protein veya kefir, kuruyemiş, meyve" },
+  { name: "Kahvaltı (06:45)", ratio: 0.22, items: "Yulaf + süt + yumurta + lor/yoğurt + muz-ceviz-bal — gece hazırla, sabah 5 dk", recipeId: "sporcu_kahvaltisi" },
+  { name: "Öğle (12:30)", ratio: 0.26, items: "İş yerinde çıkan — tabakta önce protein, sonra sebze, en son pilav/makarna", recipeId: null },
+  { name: "Ara Öğün (15:30)", ratio: 0.11, items: "Haşlanmış tavuk göğsü + elma — evden getir, sporadan ~2.5 saat önce", recipeId: "ara_ogun" },
+  { name: "Akşam / Antrenman Sonrası (~21:00)", ratio: 0.41, items: "Tavuk pilav — pişmiş toplam ~400g, 100g'da 12.8g protein", recipeId: "tavuk_pilav" },
 ];
+
+// Tıklanabilir tarif kartları: adım adım hazırlanış + gramaj + (varsa) pişmiş verim/100g makro.
+const RECIPES = {
+  sporcu_kahvaltisi: {
+    title: "Sporcu Kahvaltısı",
+    baseServings: 1,
+    macros: { kcal: 620, protein: 45, carbs: 55, fat: 22 },
+    ingredients: [
+      { id: "sk1", name: "yumurta", amount: 3, unit: "adet" },
+      { id: "sk2", name: "yulaf ezmesi", amount: 60, unit: "g" },
+      { id: "sk3", name: "süt", amount: 200, unit: "ml" },
+      { id: "sk4", name: "lor peyniri veya süzme yoğurt", amount: 100, unit: "g" },
+      { id: "sk5", name: "muz", amount: 1, unit: "adet" },
+      { id: "sk6", name: "ceviz içi", amount: 15, unit: "g" },
+      { id: "sk7", name: "bal", amount: 5, unit: "ml" },
+      { id: "sk8", name: "tarçın", amount: 1, unit: "g" },
+      { id: "sk9", name: "zeytinyağı", amount: 5, unit: "ml" },
+      { id: "sk10", name: "tuz", amount: 1, unit: "g" },
+    ],
+    steps: [
+      { title: "Yulafı hazırla", content: "Yulafı süt ile küçük bir tencereye al, tarçın ve bir tutam tuz ekle, orta ateşte karıştırarak pişir.", timer: 300 },
+      { title: "Yumurtaları pişir", content: "Ayrı bir tavada zeytinyağıyla yumurtaları çırpıp omlet ya da sahanda pişir.", timer: 240 },
+      { title: "Topla", content: "Lor peyniri/süzme yoğurdu, dilimlenmiş muz, ceviz ve balı yulafın üzerine ekle.", timer: null },
+      { title: "Servis et", content: "Yumurtayla birlikte servis et.", timer: null },
+    ],
+    note: "Gece hazırlık: yulaf+sütü kavanoza koy buzdolabına at, sabah sadece ısıt ve üstünü topla — 5 dk yeter.",
+  },
+  ara_ogun: {
+    title: "Ara Öğün: Tavuk + Elma",
+    baseServings: 1,
+    macros: { kcal: 275, protein: 37, carbs: 21, fat: 4 },
+    ingredients: [
+      { id: "ao1", name: "haşlanmış tavuk göğsü", amount: 120, unit: "g" },
+      { id: "ao2", name: "elma", amount: 1, unit: "adet" },
+    ],
+    steps: [
+      { title: "Hazırla", content: "Önceden haşladığın tavuğu küçük bir kaba koy, elmayı yıka ve yanına ekle.", timer: null },
+    ],
+    note: "Sabah kahvaltı hazırlarken bunu da hazırla (+3 dk), küçük kutuda işe taşınabilir.",
+  },
+  tavuk_pilav: {
+    title: "Tavuk Pilav (Sade, Sporcu Porsiyonu)",
+    baseServings: 1,
+    cookedYieldG: 400,
+    per100g: { kcal: 173, protein: 12.8, carbs: 18, fat: 4.8 },
+    ingredients: [
+      { id: "tp1", name: "tavuk göğsü (çiğ)", amount: 200, unit: "g" },
+      { id: "tp2", name: "pirinç (çiğ)", amount: 90, unit: "g" },
+      { id: "tp3", name: "tereyağı", amount: 10, unit: "g" },
+      { id: "tp4", name: "tavuk suyu (haşlama suyundan süzülmüş)", amount: 180, unit: "ml" },
+      { id: "tp5", name: "tuz", amount: 2, unit: "g" },
+      { id: "tp6", name: "defne yaprağı", amount: 1, unit: "adet" },
+    ],
+    steps: [
+      { title: "Tavuğu haşla", content: "Tavuğu bir tencerede üzerini geçecek su ve defne yaprağıyla kaynat. Kaynayınca orta ateşte, içi pembe kalmayana kadar haşla. Suyunu süzüp ayır.", timer: 1080 },
+      { title: "Pirinci bekletme", content: "Pirinci ılık suyla yıka, üzerini geçecek sıcak su ve tuzun yarısıyla 10 dk bekletip süz.", timer: 600 },
+      { title: "Pirinci kavur", content: "Tereyağını kısık ateşte erit, süzülmüş pirinci ekleyip 2 dk karıştırarak kavur.", timer: 120 },
+      { title: "Kısık ateşte pişir", content: "Sıcak tavuk suyunu ekle, kalan tuzu serp, kaynayınca ateşi kısıp kapağı kapat, suyunu çekene kadar pişir.", timer: 900 },
+      { title: "Dinlendir", content: "Ocaktan alıp kapağın altına kağıt havlu koyup 10 dk dinlendir.", timer: 600 },
+      { title: "Tavuğu ekle, servis et", content: "Haşlanmış tavuğu küp küp doğrayıp pilavın üzerine ekle, karıştır veya üstüne serilmiş halde servis et.", timer: null },
+    ],
+    note: "Günlere bölerken: kaba koyduğun miktarı gramla tart, 100g başına değerle çarp. Örn. 200g ayırırsan ≈ 346 kcal, 25.6g protein.",
+  },
+};
 
 const LOGS_KEY = "glowria-coach-logs-v2";
 const PROFILE_KEY = "glowria-coach-profile-v2";
@@ -479,6 +582,36 @@ SADECE şu JSON formatında yanıt ver, başka hiçbir şey ekleme, markdown fen
   const clean = extractJson(raw);
   const parsed = JSON.parse(clean);
   return { breakdown: String(parsed.breakdown||""), kcal: Number(parsed.kcal)||0, protein: Number(parsed.protein)||0, carbs: Number(parsed.carbs)||0, fat: Number(parsed.fat)||0, advice: String(parsed.advice||"") };
+}
+async function generateCustomRecipe(dishName, profile, targets, priorTotals) {
+  const remainingKcal = Math.max(0, targets.calorieTarget - priorTotals.kcal);
+  const remainingProtein = Math.max(0, targets.proteinG - priorTotals.protein);
+  const systemPrompt = `Sen Enti Coach'sun, Türk mutfağına aşina bir beslenme koçu ve aşçısın. Kullanıcı hazırlamak istediği bir yemeğin adını veriyor. Görevin:
+1) Bu yemek için kullanıcının GÜNLÜK KALAN bütçesine uygun, gerçekçi bir TEK KİŞİLİK porsiyon gramajı belirle (ihtiyacı kadar — kalan kalori/proteini karşılayacak ama aşırıya kaçmayacak şekilde, Türk ev mutfağı ölçülerinde).
+2) Malzemeleri ÇİĞ gramaj olarak listele.
+3) Adım adım, kısa ve net hazırlanış talimatları yaz (her adımda varsa süre; haşlama/kızartma/pişirme gibi yöntemi ve YAKLAŞIK süreyi mutlaka belirt).
+4) Tarifin toplam makrosunu ve mümkünse pişmiş toplam gramajı ile 100g'daki makroyu hesapla (meal-prep için gerekiyor).
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.weightKg}kg, hedefi: ${GOALS[profile.goal]?.label}.
+GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein. BUGÜN ŞU ANA KADAR ALINAN: ${Math.round(priorTotals.kcal)} kcal, ${Math.round(priorTotals.protein)}g protein. KALAN BÜTÇE: ${Math.round(remainingKcal)} kcal, ${Math.round(remainingProtein)}g protein.
+SADECE şu JSON formatında yanıt ver, başka hiçbir şey ekleme, markdown fence kullanma:
+{"title": "yemek adı", "ingredients": [{"name": "malzeme", "amount": sayı, "unit": "g|ml|adet"}], "steps": [{"title": "kısa başlık", "content": "talimat cümlesi", "timer_seconds": sayı_veya_null}], "macros": {"kcal": sayı, "protein": sayı, "carbs": sayı, "fat": sayı}, "cooked_yield_g": sayı_veya_null, "per_100g": {"kcal": sayı, "protein": sayı, "carbs": sayı, "fat": sayı}_veya_null}`;
+  const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: dishName }] }], 2000);
+  const clean = extractJson(raw);
+  const parsed = JSON.parse(clean);
+  const ingredients = (parsed.ingredients || []).map((ing, i) => ({ id: `cr${i}`, name: String(ing.name||""), amount: Number(ing.amount)||0, unit: ing.unit || "" }));
+  const steps = (parsed.steps || []).map(s => ({ title: String(s.title||"Adım"), content: String(s.content||""), timer: s.timer_seconds != null ? Number(s.timer_seconds) : null }));
+  const result = {
+    title: String(parsed.title || dishName),
+    baseServings: 1,
+    ingredients,
+    steps: steps.length ? steps : [{ title: "Hazırla", content: "Malzemeleri birleştirip pişir.", timer: null }],
+    macros: parsed.macros ? { kcal: Number(parsed.macros.kcal)||0, protein: Number(parsed.macros.protein)||0, carbs: Number(parsed.macros.carbs)||0, fat: Number(parsed.macros.fat)||0 } : null,
+  };
+  if (parsed.cooked_yield_g && parsed.per_100g) {
+    result.cookedYieldG = Number(parsed.cooked_yield_g);
+    result.per100g = { kcal: Number(parsed.per_100g.kcal)||0, protein: Number(parsed.per_100g.protein)||0, carbs: Number(parsed.per_100g.carbs)||0, fat: Number(parsed.per_100g.fat)||0 };
+  }
+  return result;
 }
 function buildTrainingHistoryLines(trainingDays, dateStr, days) {
   const lines = [];
@@ -690,6 +823,7 @@ function render() {
   if (activeTab === "training") attachTrainingHandlers(entry);
 
   renderCoachWidget();
+  renderRestTimerWidget();
 }
 
 // ---------------------------------------------------------------------------
@@ -994,6 +1128,28 @@ let mealLoading = false;
 let mealError = "";
 let lastMealResult = null;
 
+// Recipe modal (swipeable step-by-step preparation view)
+let recipeId = null;
+let recipeStepIdx = 0;
+let recipeServings = 1;
+let recipeShowIngredients = true;
+let recipeTimerLeft = null;
+let recipeTimerRunning = false;
+let recipeTimerHandle = null;
+let customRecipeData = null; // AI-generated recipe, used when recipeId === "__custom__"
+
+// AI custom recipe generator (nutrition tab)
+let customRecipeInputText = "";
+let customRecipeLoading = false;
+let customRecipeError = "";
+
+// Rest timer (training tab, floating widget)
+let restTimerOpen = false;
+let restTimerLeft = 90;
+let restTimerDuration = 90;
+let restTimerRunning = false;
+let restTimerHandle = null;
+
 function renderNutrition(entry, targets) {
   const totals = sumMeals(entry.meals);
   const remainingKcal = Math.max(0, targets.calorieTarget - totals.kcal);
@@ -1057,15 +1213,26 @@ function renderNutrition(entry, targets) {
     </section>
 
     <section class="card">
+      <div class="card-eyebrow">BİR YEMEK HAZIRLAYACAĞIM</div>
+      <div class="card-sub">Yemeğin adını yaz, koç kalan bütçene göre kaç gr malzeme kullanman gerektiğini ve hazırlanışını çıkarsın.</div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="customRecipeInput" placeholder="örn. tavuklu makarna, mercimek çorbası" value="${esc(customRecipeInputText)}" />
+        <button class="chat-send-btn" id="customRecipeSend">➤</button>
+      </div>
+      ${customRecipeLoading ? `<div class="meal-analyzing">tarif hazırlanıyor…</div>` : ""}
+      ${customRecipeError ? `<div class="chat-error">Tarif oluşturulamadı: ${esc(customRecipeError)}</div>` : ""}
+    </section>
+
+    <section class="card">
       <div class="card-eyebrow">ÖĞÜN PLANI ÖNERİSİ</div>
       <div class="meal-list">
         ${MEAL_PLAN.map(m => {
           const kcal = Math.round(targets.calorieTarget * m.ratio);
           const protein = Math.round(targets.proteinG * m.ratio);
-          return `<div class="meal-row"><div class="meal-head-row"><span class="meal-name">${m.name}</span><span class="meal-macro">${kcal} kcal · ${protein}g protein</span></div><div class="meal-items">${m.items}</div></div>`;
+          return `<div class="meal-row ${m.recipeId ? "clickable" : ""}" ${m.recipeId ? `data-open-recipe="${m.recipeId}"` : ""}><div class="meal-head-row"><span class="meal-name">${m.name}</span><span class="meal-macro">${kcal} kcal · ${protein}g protein</span></div><div class="meal-items">${m.items}</div>${m.recipeId ? `<div class="recipe-chip">📖 Tarifi gör</div>` : ""}</div>`;
         }).join("")}
       </div>
-      <div class="meal-footnote">Örnek dağılım — referans amaçlı, gerçek yediklerini yukarıdan kaydet.</div>
+      <div class="meal-footnote">Örnek dağılım — referans amaçlı, gerçek yediklerini yukarıdan kaydet. Tarifi olan öğünlere dokun.</div>
     </section>
   `;
 }
@@ -1116,6 +1283,34 @@ function attachNutritionHandlers(entry, targets) {
   };
   document.getElementById("mealSend").addEventListener("click", submitMeal);
   document.getElementById("mealInput").addEventListener("keydown", (e) => { if (e.key === "Enter") submitMeal(); });
+
+  document.querySelectorAll("[data-open-recipe]").forEach(row => {
+    row.addEventListener("click", () => openRecipeModal(row.dataset.openRecipe));
+  });
+
+  const customRecipeInput = document.getElementById("customRecipeInput");
+  customRecipeInput.addEventListener("input", () => { customRecipeInputText = customRecipeInput.value; });
+  const submitCustomRecipe = async () => {
+    const dishName = customRecipeInput.value.trim();
+    if (!dishName || customRecipeLoading) return;
+    if (!getGeminiKey()) { customRecipeError = "API key bulunamadı."; render(); return; }
+    customRecipeLoading = true; customRecipeError = "";
+    render();
+    try {
+      const priorTotals = sumMeals(entry.meals);
+      const data = await generateCustomRecipe(dishName, profile, targets, priorTotals);
+      customRecipeLoading = false;
+      customRecipeInputText = "";
+      render();
+      openCustomRecipeModal(data);
+    } catch (e) {
+      customRecipeLoading = false;
+      customRecipeError = e.message || "Bilinmeyen hata";
+      render();
+    }
+  };
+  document.getElementById("customRecipeSend").addEventListener("click", submitCustomRecipe);
+  customRecipeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") submitCustomRecipe(); });
 }
 
 // ---------------------------------------------------------------------------
@@ -1267,6 +1462,202 @@ function openModal(exId, name, scheme, tipArg) {
 }
 function closeModal() { document.getElementById("modalBackdrop").classList.remove("open"); }
 document.getElementById("modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
+
+// ---------------------------------------------------------------------------
+// Recipe modal — swipeable step-by-step preparation view (like the sporcu
+// kahvaltısı example), with a servings stepper that scales grams and a
+// per-step timer.
+// ---------------------------------------------------------------------------
+function fmtAmount(n) { return Number.isInteger(n) ? n : Math.round(n * 10) / 10; }
+function getActiveRecipe() { return recipeId === "__custom__" ? customRecipeData : RECIPES[recipeId]; }
+function stopRecipeTimer() {
+  if (recipeTimerHandle) { clearInterval(recipeTimerHandle); recipeTimerHandle = null; }
+  recipeTimerRunning = false;
+}
+function openRecipeModal(id) {
+  const r = RECIPES[id];
+  if (!r) return;
+  recipeId = id;
+  recipeStepIdx = 0;
+  recipeServings = r.baseServings || 1;
+  recipeShowIngredients = true;
+  stopRecipeTimer();
+  recipeTimerLeft = r.steps[0]?.timer ?? null;
+  renderRecipeModal();
+  document.getElementById("recipeModalBackdrop").classList.add("open");
+}
+function openCustomRecipeModal(data) {
+  customRecipeData = data;
+  recipeId = "__custom__";
+  recipeStepIdx = 0;
+  recipeServings = data.baseServings || 1;
+  recipeShowIngredients = true;
+  stopRecipeTimer();
+  recipeTimerLeft = data.steps[0]?.timer ?? null;
+  renderRecipeModal();
+  document.getElementById("recipeModalBackdrop").classList.add("open");
+}
+function closeRecipeModal() {
+  stopRecipeTimer();
+  document.getElementById("recipeModalBackdrop").classList.remove("open");
+  recipeId = null;
+}
+function goToRecipeStep(idx) {
+  const r = getActiveRecipe();
+  if (!r || idx < 0 || idx >= r.steps.length) return;
+  stopRecipeTimer();
+  recipeStepIdx = idx;
+  recipeTimerLeft = r.steps[idx]?.timer ?? null;
+  renderRecipeModal();
+}
+function toggleRecipeTimer() {
+  const r = getActiveRecipe();
+  const step = r.steps[recipeStepIdx];
+  if (!step || step.timer == null) return;
+  if (recipeTimerRunning) {
+    stopRecipeTimer();
+  } else {
+    if (recipeTimerLeft == null || recipeTimerLeft <= 0) recipeTimerLeft = step.timer;
+    recipeTimerRunning = true;
+    recipeTimerHandle = setInterval(() => {
+      recipeTimerLeft = Math.max(0, recipeTimerLeft - 1);
+      if (recipeTimerLeft === 0) stopRecipeTimer();
+      updateRecipeTimerUI();
+    }, 1000);
+  }
+  updateRecipeTimerUI();
+}
+function updateRecipeTimerUI() {
+  const el = document.getElementById("recipeTimerDisplay");
+  const btn = document.getElementById("recipeTimerBtn");
+  if (el) { const m = Math.floor(recipeTimerLeft/60), s = recipeTimerLeft%60; el.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+  if (btn) btn.textContent = recipeTimerRunning ? "⏸" : "▶";
+}
+function renderRecipeModal() {
+  const r = getActiveRecipe();
+  if (!r) return;
+  const scale = recipeServings / (r.baseServings || 1);
+  const step = r.steps[recipeStepIdx];
+  const total = r.steps.length;
+
+  const ingredientsHtml = r.ingredients.map(ing => `<div>${fmtAmount(ing.amount * scale)}${ing.unit ? ing.unit : ""} ${esc(ing.name)}</div>`).join("");
+
+  let macroBoxHtml = "";
+  if (r.macros) {
+    macroBoxHtml = `<div class="recipe-macro-box">Tüm tarif (${fmtAmount(recipeServings)} porsiyon): ~${Math.round(r.macros.kcal*scale)} kcal · ${Math.round(r.macros.protein*scale)}g protein · ${Math.round(r.macros.carbs*scale)}g karb · ${Math.round(r.macros.fat*scale)}g yağ</div>`;
+  }
+  if (r.cookedYieldG && r.per100g) {
+    const yieldG = fmtAmount(r.cookedYieldG * scale);
+    macroBoxHtml += `<div class="recipe-macro-box">Pişmiş toplam: ~${yieldG}g · 100g'da ${r.per100g.kcal} kcal, ${r.per100g.protein}g protein, ${r.per100g.carbs}g karb, ${r.per100g.fat}g yağ</div>`;
+  }
+
+  document.getElementById("recipeModalCard").innerHTML = `
+    <div class="modal-head">
+      <div><div class="card-eyebrow">TARİF</div><div class="modal-title">${esc(r.title)}</div></div>
+      <button class="modal-close" id="recipeModalCloseBtn">✕</button>
+    </div>
+
+    <div class="recipe-servings-row">
+      <span class="recipe-servings-label">Porsiyon (gün sayısı gibi düşün)</span>
+      <div class="recipe-servings-stepper">
+        <button class="stepper-btn" id="recipeServMinus">−</button>
+        <span class="stepper-value">${fmtAmount(recipeServings)}</span>
+        <button class="stepper-btn" id="recipeServPlus">+</button>
+      </div>
+    </div>
+
+    <button class="recipe-ingredients-toggle" id="recipeIngToggle">${recipeShowIngredients ? "malzemeleri gizle ▲" : "malzemeleri göster ▼"}</button>
+    ${recipeShowIngredients ? `<div class="recipe-ingredients-list">${ingredientsHtml}</div>` : ""}
+
+    <div class="recipe-progress">
+      ${r.steps.map((s,i) => `<div class="recipe-progress-seg ${i<=recipeStepIdx?"filled":""}"></div>`).join("")}
+    </div>
+    <div class="recipe-step-counter">${recipeStepIdx+1} / ${total}</div>
+    <div class="recipe-step-title">${esc(step.title)}</div>
+    <div class="recipe-step-content">${esc(step.content)}</div>
+
+    ${step.timer != null ? `
+      <div class="recipe-timer" id="recipeTimerDisplay">${String(Math.floor((recipeTimerLeft??step.timer)/60)).padStart(2,"0")}:${String((recipeTimerLeft??step.timer)%60).padStart(2,"0")}</div>
+      <button class="recipe-timer-btn" id="recipeTimerBtn">${recipeTimerRunning ? "⏸" : "▶"}</button>
+    ` : ""}
+
+    <div class="recipe-nav-row">
+      <button class="recipe-nav-btn" id="recipePrevBtn" ${recipeStepIdx===0?"disabled":""}>‹</button>
+      <button class="recipe-nav-btn" id="recipeNextBtn" ${recipeStepIdx===total-1?"disabled":""}>›</button>
+    </div>
+
+    ${macroBoxHtml}
+    ${r.note ? `<div class="recipe-note-box">${esc(r.note)}</div>` : ""}
+  `;
+
+  document.getElementById("recipeModalCloseBtn").addEventListener("click", closeRecipeModal);
+  document.getElementById("recipePrevBtn").addEventListener("click", () => goToRecipeStep(recipeStepIdx-1));
+  document.getElementById("recipeNextBtn").addEventListener("click", () => goToRecipeStep(recipeStepIdx+1));
+  document.getElementById("recipeIngToggle").addEventListener("click", () => { recipeShowIngredients = !recipeShowIngredients; renderRecipeModal(); });
+  document.getElementById("recipeServMinus").addEventListener("click", () => { recipeServings = Math.max(1, recipeServings-1); renderRecipeModal(); });
+  document.getElementById("recipeServPlus").addEventListener("click", () => { recipeServings = recipeServings+1; renderRecipeModal(); });
+  const timerBtn = document.getElementById("recipeTimerBtn");
+  if (timerBtn) timerBtn.addEventListener("click", toggleRecipeTimer);
+}
+document.getElementById("recipeModalBackdrop").addEventListener("click", (e) => { if (e.target.id === "recipeModalBackdrop") closeRecipeModal(); });
+
+// ---------------------------------------------------------------------------
+// Rest timer — floating widget for gym set-to-set breaks (training tab only)
+// ---------------------------------------------------------------------------
+const REST_PRESETS = [60, 90, 120];
+function fmtClock(sec) { const m = Math.floor(sec/60), s = sec%60; return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+function stopRestTimer() { if (restTimerHandle) { clearInterval(restTimerHandle); restTimerHandle = null; } restTimerRunning = false; }
+function startRestTimer() {
+  if (restTimerLeft <= 0) restTimerLeft = restTimerDuration;
+  restTimerRunning = true;
+  restTimerHandle = setInterval(() => {
+    restTimerLeft = Math.max(0, restTimerLeft - 1);
+    if (restTimerLeft === 0) stopRestTimer();
+    renderRestTimerWidget();
+  }, 1000);
+  renderRestTimerWidget();
+}
+function toggleRestTimer() { if (restTimerRunning) stopRestTimer(); else startRestTimer(); renderRestTimerWidget(); }
+function setRestPreset(sec) { stopRestTimer(); restTimerDuration = sec; restTimerLeft = sec; renderRestTimerWidget(); }
+function adjustRestTimer(delta) { restTimerLeft = Math.max(0, restTimerLeft + delta); if (!restTimerRunning) restTimerDuration = restTimerLeft; renderRestTimerWidget(); }
+function resetRestTimer() { stopRestTimer(); restTimerLeft = restTimerDuration; renderRestTimerWidget(); }
+
+function renderRestTimerWidget() {
+  let el = document.getElementById("restTimerWidget");
+  if (!el) { el = document.createElement("div"); el.id = "restTimerWidget"; document.body.appendChild(el); }
+  if (!profile || editingProfile || activeTab !== "training") { el.innerHTML = ""; return; }
+
+  el.innerHTML = `
+    <button class="rest-fab" id="restFabBtn" style="${restTimerOpen ? "display:none;" : ""}">
+      ⏱<span class="rest-fab-time">${fmtClock(restTimerLeft)}</span>
+    </button>
+    <div class="rest-panel ${restTimerOpen ? "open" : ""}">
+      <div class="rest-panel-head">
+        <span class="rest-panel-title">Mola Sayacı</span>
+        <button class="modal-close" id="restCloseBtn">✕</button>
+      </div>
+      <div class="rest-display">${fmtClock(restTimerLeft)}</div>
+      <div class="rest-preset-row">
+        ${REST_PRESETS.map(p => `<button class="rest-preset-btn ${restTimerDuration===p?"active":""}" data-preset="${p}">${p}s</button>`).join("")}
+      </div>
+      <div class="rest-adjust-row">
+        <button class="rest-adjust-btn" id="restMinus15">−15</button>
+        <button class="rest-adjust-btn" id="restPlus15">+15</button>
+      </div>
+      <button class="rest-main-btn" id="restToggleBtn">${restTimerRunning ? "Duraklat" : "Başlat"}</button>
+      <button class="rest-reset-link" id="restResetBtn">sıfırla</button>
+    </div>
+  `;
+
+  const fab = document.getElementById("restFabBtn");
+  if (fab) fab.addEventListener("click", () => { restTimerOpen = true; renderRestTimerWidget(); });
+  document.getElementById("restCloseBtn").addEventListener("click", () => { restTimerOpen = false; renderRestTimerWidget(); });
+  document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("click", () => setRestPreset(Number(b.dataset.preset))));
+  document.getElementById("restMinus15").addEventListener("click", () => adjustRestTimer(-15));
+  document.getElementById("restPlus15").addEventListener("click", () => adjustRestTimer(15));
+  document.getElementById("restToggleBtn").addEventListener("click", toggleRestTimer);
+  document.getElementById("restResetBtn").addEventListener("click", resetRestTimer);
+}
 
 // ---------------------------------------------------------------------------
 // Onboarding
