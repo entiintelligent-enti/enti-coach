@@ -286,7 +286,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "2.11.1";
+const APP_VERSION = "2.12.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -1180,7 +1180,15 @@ function renderHome(entry, targets, streak) {
       </div>
     </section>
 
-    ${ringsCardHtml(entry, targets)}
+    ${homeRingsHtml(entry)}
+
+    <section class="card">
+      <div class="card-eyebrow">SU & UYKU</div>
+      <div class="metrics-grid">
+        ${metricCellHtml("water", "💧 Su", "ml", WATER_TARGET_ML, entry.water, 250)}
+        ${metricCellHtml("sleep", "🌙 Uyku", "saat", SLEEP_TARGET_H, entry.sleep, 0.5)}
+      </div>
+    </section>
 
     <section class="card">
       <div class="card-head-row">
@@ -1213,8 +1221,24 @@ function renderHome(entry, targets, streak) {
   `;
 }
 
+function metricCellHtml(key, label, unit, target, value, step) {
+  return `
+    <div class="metric-cell">
+      <div class="metric-label-row">${label}</div>
+      <div class="stepper-row">
+        <button class="stepper-btn" data-step="${key}" data-dir="dec">−</button>
+        <button class="stepper-value" data-edit-metric="${key}">${value ?? "—"}</button>
+        <input class="stepper-input" type="number" inputmode="decimal" step="${step}" value="${value ?? ""}" data-metric="${key}" style="display:none;" />
+        <button class="stepper-btn" data-step="${key}" data-dir="inc">+</button>
+      </div>
+      <div class="metric-target-row"><span>${unit}</span><span class="unit-mono">hedef ${target}</span></div>
+    </div>`;
+}
+
 // --- Apple-Watch style progress rings ---------------------------------------
-const METRIC_COLORS = { calories: "#FF2D6F", protein: "#A8F000", workout: "#22D3F5" };
+const WATER_TARGET_ML = 3000;
+const SLEEP_TARGET_H = 8;
+const METRIC_COLORS = { calories: "#FF2D6F", protein: "#A8F000", workout: "#22D3F5", water: "#22D3F5", sleep: "#B79CF0" };
 
 function ringArc(pct, r) {
   const circ = 2 * Math.PI * r;
@@ -1231,27 +1255,16 @@ function miniRingSvg(pct, color) {
       <text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" class="metric-ring-pct" fill="${color}">${pct}%</text>
     </svg>`;
 }
-function ringsCardHtml(entry, targets) {
-  const totals = sumMeals(entry.meals);
-  const info = effectiveDayInfo(entry, entry.dayType);
-  const allEx = [...info.exercises, ...(entry.customExercises || [])];
-  const doneCount = allEx.filter(ex => entry.doneExercises[ex.id]).length;
-  const isRest = entry.dayType === "rest";
-
-  const rows = [
-    { key: "calories", label: "Kalori",  value: Math.round(totals.kcal),    target: targets.calorieTarget, unit: "kcal" },
-    { key: "protein",  label: "Protein", value: Math.round(totals.protein), target: targets.proteinG,      unit: "g" },
-    {
-      key: "workout", label: "Antrenman",
-      value: doneCount, target: allEx.length,
-      unit: "hareket",
-      note: isRest ? "dinlenme günü" : null,
-    },
-  ].map(r => ({ ...r, pct: r.target ? Math.min(999, Math.round((r.value / r.target) * 100)) : (isRest ? 100 : 0) }));
-
+// Generic concentric-ring card. `rows` need key/label/value/target/unit and may
+// carry a `note` that replaces the "x / y unit" line (e.g. on rest days).
+function ringsCardHtml(eyebrow, rows) {
+  const withPct = rows.map(r => ({
+    ...r,
+    pct: r.target ? Math.min(999, Math.round((r.value / r.target) * 100)) : (r.fullWhenNoTarget ? 100 : 0),
+  }));
   const size = 168, sw = 15;
   const radii = [68, 49, 30];
-  const circles = rows.map((r, i) => {
+  const circles = withPct.map((r, i) => {
     const { dash } = ringArc(r.pct, radii[i]);
     const c = METRIC_COLORS[r.key];
     return `
@@ -1261,11 +1274,11 @@ function ringsCardHtml(entry, targets) {
 
   return `
     <section class="card">
-      <div class="card-eyebrow">${activeDate === today ? "BUGÜN NELER YAPTIM" : "O GÜN NELER YAPTIM"}</div>
+      <div class="card-eyebrow">${eyebrow}</div>
       <div class="rings-card" style="margin-top:14px;">
         <svg class="rings-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${circles}</svg>
         <div class="rings-legend">
-          ${rows.map(r => `
+          ${withPct.map(r => `
             <div class="ring-legend-item">
               <span class="ring-legend-dot" style="background:${METRIC_COLORS[r.key]}"></span>
               <span class="ring-legend-text">
@@ -1279,7 +1292,58 @@ function ringsCardHtml(entry, targets) {
     </section>`;
 }
 
+// Home: water, sleep, workout completion.
+function homeRingsHtml(entry) {
+  const info = effectiveDayInfo(entry, entry.dayType);
+  const allEx = [...info.exercises, ...(entry.customExercises || [])];
+  const doneCount = allEx.filter(ex => entry.doneExercises[ex.id]).length;
+  const isRest = entry.dayType === "rest";
+  return ringsCardHtml(activeDate === today ? "BUGÜN NELER YAPTIM" : "O GÜN NELER YAPTIM", [
+    { key: "water", label: "Su",    value: entry.water ?? 0, target: WATER_TARGET_ML, unit: "ml" },
+    { key: "sleep", label: "Uyku",  value: entry.sleep ?? 0, target: SLEEP_TARGET_H,  unit: "saat" },
+    { key: "workout", label: "Antrenman", value: doneCount, target: allEx.length, unit: "hareket",
+      note: isRest ? "dinlenme günü" : null, fullWhenNoTarget: isRest },
+  ]);
+}
+
+// Nutrition: calories and protein against the day's targets.
+function nutritionRingsHtml(entry, targets) {
+  const totals = sumMeals(entry.meals);
+  return ringsCardHtml(activeDate === today ? "BUGÜN NE ALDIM" : "O GÜN NE ALDIM", [
+    { key: "calories", label: "Kalori",  value: Math.round(totals.kcal),    target: targets.calorieTarget, unit: "kcal" },
+    { key: "protein",  label: "Protein", value: Math.round(totals.protein), target: targets.proteinG,      unit: "g" },
+  ]);
+}
+
 function attachHomeHandlers(entry, targets) {
+  const stepValues = { water: 250, sleep: 0.5 };
+  document.querySelectorAll("[data-step]").forEach(el => {
+    el.addEventListener("click", () => {
+      const key = el.dataset.step;
+      const step = stepValues[key] || 1;
+      const current = entry[key] ?? 0;
+      const next = el.dataset.dir === "inc" ? +(current + step).toFixed(1) : Math.max(0, +(current - step).toFixed(1));
+      updateEntry(activeDate, { [key]: next });
+      render();
+    });
+  });
+  document.querySelectorAll("[data-edit-metric]").forEach(el => {
+    el.addEventListener("click", () => {
+      const key = el.dataset.editMetric;
+      el.style.display = "none";
+      const input = document.querySelector(`[data-metric="${key}"]`);
+      if (input) { input.style.display = "block"; input.focus(); }
+    });
+  });
+  document.querySelectorAll("[data-metric]").forEach(el => {
+    const commit = () => {
+      const v = el.value === "" ? null : Number(el.value);
+      updateEntry(activeDate, { [el.dataset.metric]: v });
+      render();
+    };
+    el.addEventListener("blur", commit);
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") commit(); });
+  });
   document.querySelectorAll("[data-day-choice]").forEach(el => {
     el.addEventListener("click", () => {
       setDayOverride(activeDate, el.dataset.dayChoice === "train");
@@ -1338,6 +1402,8 @@ function renderNutrition(entry, targets) {
         <div class="macro-block"><div class="macro-label-row">💧 Yağ</div><div class="macro-value" style="color:#1D74C9">${targets.fatG}g</div><div class="macro-kcal">${targets.fatG*9} kcal</div></div>
       </div>
     </section>
+
+    ${nutritionRingsHtml(entry, targets)}
 
     <section class="card">
       <div class="card-eyebrow">NE YEDİN?</div>
