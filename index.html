@@ -205,6 +205,40 @@
   .rest-adjust-btn { width: 34px; height: 34px; border-radius: 8px; background: #ECEFF2; border: none; color: #12151A; font-size: 16px; font-weight: 700; cursor: pointer; }
   .rest-main-btn { width: 100%; background: #4DD8C7; border: none; border-radius: 10px; padding: 12px 0; color: #0C1512; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 16px; }
   .rest-reset-link { background: none; border: none; color: #94A0AE; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; margin-top: 8px; text-decoration: underline; }
+  .ex-block { display: flex; flex-direction: column; }
+  .log-btn { background: #F3F0FB; border: 1px solid #DDD3F5; border-radius: 7px; height: 28px; padding: 0 7px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #7E5BC4; font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .log-btn.has-sets { background: #7E5BC4; border-color: #7E5BC4; color: #FFFFFF; }
+  .log-panel { background: #FAF8FE; border: 1px solid #DDD3F5; border-top: none; border-radius: 0 0 10px 10px; padding: 10px 12px 12px; margin-top: -4px; }
+  .log-last { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #7E5BC4; margin-bottom: 8px; }
+  .log-set-row { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #3A4048; padding: 4px 0; }
+  .log-set-idx { color: #94A0AE; font-size: 10.5px; width: 22px; flex-shrink: 0; }
+  .log-set-val { flex: 1; }
+  .log-set-del { background: none; border: none; color: #C0C6CE; cursor: pointer; font-size: 12px; padding: 2px 4px; flex-shrink: 0; }
+  .log-input-row { display: flex; gap: 6px; margin-top: 8px; }
+  .log-input { flex: 1; min-width: 0; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 8px; padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; text-align: center; outline: none; color: #12151A; }
+  .log-input:focus { border-color: #7E5BC4; }
+  .log-add-btn { background: #7E5BC4; border: none; border-radius: 8px; width: 40px; flex-shrink: 0; color: #FFFFFF; font-size: 17px; font-weight: 700; cursor: pointer; }
+  .log-empty { font-size: 11.5px; color: #94A0AE; }
+  .log-volume { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #6B7280; margin-top: 8px; }
+  .auto-plan-banner { background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 10px; padding: 10px 12px; font-size: 12.5px; color: #0F9E8C; font-weight: 600; }
+  .auto-plan-note { background: #FBF3E6; border: 1px solid #F0DDB8; border-radius: 10px; padding: 10px 30px 10px 12px; font-size: 12.5px; color: #B8720A; line-height: 1.45; position: relative; }
+  .auto-plan-dismiss { position: absolute; top: 6px; right: 6px; background: none; border: none; color: #C9A464; cursor: pointer; font-size: 12px; padding: 4px; }
+  .auto-plan-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6B7280; padding: 2px 2px 0; cursor: pointer; }
+  .auto-plan-toggle input { width: 16px; height: 16px; accent-color: #0F9E8C; flex-shrink: 0; }
+  .rings-card { display: flex; align-items: center; gap: 16px; }
+  .rings-svg { flex-shrink: 0; }
+  .ring-bg { fill: none; opacity: 0.18; }
+  .ring-fg { fill: none; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dasharray 0.5s ease; }
+  .rings-legend { display: flex; flex-direction: column; gap: 9px; flex: 1; min-width: 0; }
+  .ring-legend-item { display: flex; align-items: center; gap: 8px; }
+  .ring-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+  .ring-legend-text { flex: 1; min-width: 0; }
+  .ring-legend-label { font-size: 11.5px; color: #6B7280; }
+  .ring-legend-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #12151A; }
+  .ring-legend-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .metric-ring-row { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+  .metric-ring-pct { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; }
+  .setup-toggle-btn { width: 100%; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 11px 0; color: #6B7280; font-size: 12.5px; font-weight: 600; cursor: pointer; margin-top: 16px; }
   .coach-close-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #6B7280; }
   .gemini-setup { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 12.5px; color: #6B7280; line-height: 1.5; }
   .gemini-setup a { color: #0F9E8C; }
@@ -252,7 +286,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "2.7.0";
+const APP_VERSION = "2.11.1";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -503,10 +537,42 @@ function dayTypeForDate(dateStr, trainingDays, phase, overrides) {
   return order[Math.max(0, pos) % order.length];
 }
 function emptyEntry(dateStr, trainingDays, phase, overrides) {
-  return { dayType: dayTypeForDate(dateStr, trainingDays, phase, overrides), doneExercises: {}, calories: null, protein: null, water: null, sleep: null, meals: [], customExercises: [], manualComplete: false };
+  return { dayType: dayTypeForDate(dateStr, trainingDays, phase, overrides), doneExercises: {}, calories: null, protein: null, water: null, sleep: null, meals: [], customExercises: [], exerciseLogs: {}, manualComplete: false };
 }
 function sumMeals(meals) {
   return (meals || []).reduce((acc, m) => ({ kcal: acc.kcal + (m.kcal||0), protein: acc.protein + (m.protein||0), carbs: acc.carbs + (m.carbs||0), fat: acc.fat + (m.fat||0) }), { kcal:0, protein:0, carbs:0, fat:0 });
+}
+
+// --- Set logging (kg × reps) -----------------------------------------------
+// Logs are keyed by NORMALIZED EXERCISE NAME (not id) so that an exercise keeps
+// its history whether it came from the static program or from an AI plan,
+// whose ids are regenerated every time.
+function exKey(name) { return String(name || "").toLocaleLowerCase("tr").replace(/\s+/g, " ").trim(); }
+function getSets(entry, name) { return (entry.exerciseLogs || {})[exKey(name)] || []; }
+function setVolume(sets) { return sets.reduce((t, s) => t + (Number(s.kg)||0) * (Number(s.reps)||0), 0); }
+function formatSets(sets) { return sets.map(s => `${s.kg}kg×${s.reps}`).join(", "); }
+function addSet(dateStr, name, kg, reps) {
+  const e = getEntry(dateStr);
+  const key = exKey(name);
+  const logs_ = { ...(e.exerciseLogs || {}) };
+  logs_[key] = [...(logs_[key] || []), { kg, reps }];
+  updateEntry(dateStr, { exerciseLogs: logs_ });
+}
+function removeSet(dateStr, name, idx) {
+  const e = getEntry(dateStr);
+  const key = exKey(name);
+  const logs_ = { ...(e.exerciseLogs || {}) };
+  const next = (logs_[key] || []).filter((_, i) => i !== idx);
+  if (next.length) logs_[key] = next; else delete logs_[key];
+  updateEntry(dateStr, { exerciseLogs: logs_ });
+}
+// Most recent day BEFORE dateStr on which this exercise was logged.
+function findLastPerformance(name, beforeDate) {
+  const key = exKey(name);
+  const dates = Object.keys(logs).filter(d => d < beforeDate && logs[d] && logs[d].exerciseLogs && logs[d].exerciseLogs[key] && logs[d].exerciseLogs[key].length).sort();
+  if (!dates.length) return null;
+  const d = dates[dates.length - 1];
+  return { date: d, sets: logs[d].exerciseLogs[key] };
 }
 function calcBMR(p) { const base = 10*p.weightKg + 6.25*p.heightCm - 5*p.age; return p.gender === "kadin" ? base - 161 : base + 5; }
 function calcBMI(p) { const h = p.heightCm/100; return p.weightKg/(h*h); }
@@ -624,12 +690,27 @@ function buildTrainingHistoryLines(trainingDays, dateStr, days) {
     const doneEx = e ? info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length : 0;
     const trained = (totalEx > 0 && doneEx === totalEx) || !!(e && e.manualComplete);
     const nutrition = e && (e.calories != null || e.protein != null) ? ` (${e.calories ?? "?"} kcal, ${e.protein ?? "?"}g protein)` : "";
-    lines.push(`${d}: ${trained ? `antrenman yaptı — ${info.label}` : "antrenman yapmadı"}${nutrition}`);
+    let lifts = "";
+    if (e && e.exerciseLogs && Object.keys(e.exerciseLogs).length) {
+      lifts = " | kaldırdığı: " + Object.entries(e.exerciseLogs).map(([k, sets]) => `${k} ${formatSets(sets)}`).join("; ");
+    }
+    lines.push(`${d}: ${trained ? `antrenman yaptı — ${info.label}` : "antrenman yapmadı"}${nutrition}${lifts}`);
   }
   return lines.join("\n");
 }
+// Last recorded performance for each of today's planned exercises, so the AI can
+// prescribe an actual progression instead of guessing.
+function buildLastPerformanceLines(entry, dateStr) {
+  const info = effectiveDayInfo(entry, entry.dayType);
+  const names = [...info.exercises.map(e => e.name), ...(entry.customExercises || []).map(e => e.name)];
+  const lines = names.map(n => {
+    const last = findLastPerformance(n, dateStr);
+    return last ? `${n}: son ${last.date} → ${formatSets(last.sets)}` : `${n}: kayıt yok`;
+  });
+  return lines.join("\n");
+}
 
-async function generateTodayWorkout(dayCtx, historyLines) {
+async function generateTodayWorkout(dayCtx, historyLines, lastPerfLines) {
   const statusInfo = TRAINING_STATUS[profile.trainingStatus] || TRAINING_STATUS.yeni;
   const statusLine = profile.trainingStatus === "ara_verdi" && profile.breakMonths
     ? `${statusInfo.label} (yaklaşık ${profile.breakMonths} aydır ara vermişti)` : statusInfo.label;
@@ -645,8 +726,12 @@ BUGÜNE KADAR ALINAN BESLENME: ${dayCtx.calories != null ? `${dayCtx.calories} k
 SON GÜNLERİN GERÇEK KAYDI (en eski en üstte):
 ${historyLines || "Kayıt yok — ilk kullanım."}
 
+BUGÜNKÜ PLANDAKİ HAREKETLERİN SON PERFORMANSI:
+${lastPerfLines || "Kayıt yok."}
+
 TALİMATLAR:
 - Yukarıdaki geçmişi dikkatle oku: art arda kaç gündür antrenman YAPILMADIĞINI, hangi kas gruplarının son zamanlarda çalışıldığını/çalışılmadığını, bugünkü beslenmenin antrenmana yetip yetmeyeceğini değerlendir.
+- KALDIRILAN AĞIRLIKLARI kullan: bir hareketin son kaydı varsa, "scheme" alanında hedef ağırlığı da yaz (örn. "3 × 8-10 @ 62.5kg") ve kademeli ilerlet — form bozulmadıysa küçük artış (üst vücut ~2.5kg, alt vücut ~5kg), beslenme düşükse veya uzun ara verilmişse aynı kal ya da azalt. Kaydı olmayan harekette ağırlık yazma, sadece set × tekrar ver.
 - Uzun süre ara verilmişse (örn. 5+ gün) daha hafif/toparlanma odaklı bir gün öner, agresif yükleme önerme.
 - Son günlerde belirli bir bölge çalışılmadıysa bugün ona öncelik ver.
 - Bugün beslenme çok düşükse, bunu antrenman yoğunluğuna yansıt ve "sub" alanında kısaca belirt.
@@ -660,6 +745,53 @@ HAREKET KATALOĞU (id: isim): ${EXERCISE_CATALOG_TEXT}
   const clean = extractJson(raw);
   const parsed = JSON.parse(clean);
   const exercises = (parsed.exercises || []).map((ex, i) => ({ id: ex.id && MEDIA[ex.id] ? ex.id : `ai-${Date.now()}-${i}`, name: ex.name, scheme: ex.scheme, tip: ex.tip }));
+  return { label: parsed.label, sub: parsed.sub, cardio: parsed.cardio || null, exercises };
+}
+
+// Re-tunes an already-generated plan when the day's nutrition has moved on.
+// Exercises the user has ALREADY COMPLETED are never touched — only the
+// remaining ones are added to, dropped, or re-scaled.
+async function adjustWorkoutForNutrition(currentPlan, doneNames, dayCtx, targets, totals, lastPerfLines) {
+  const systemPrompt = `Sen Enti Coach'sun. Kullanıcının BUGÜN İÇİN zaten oluşturulmuş bir antrenman planı var, ama gün içinde beslenmesi değişti. Planı bu yeni duruma göre GÜNCELLE.
+
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.weightKg}kg, hedefi: ${GOALS[profile.goal]?.label}.
+GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein.
+ŞU ANA KADAR ALINAN: ${Math.round(totals.kcal)} kcal, ${Math.round(totals.protein)}g protein, ${Math.round(totals.carbs)}g karbonhidrat.
+KALAN BÜTÇE: ${Math.max(0, Math.round(targets.calorieTarget - totals.kcal))} kcal, ${Math.max(0, Math.round(targets.proteinG - totals.protein))}g protein.
+PLAN OLUŞTURULDUĞUNDAKİ DURUM: ${Math.round(currentPlan.nutritionSnapshot?.kcal || 0)} kcal, ${Math.round(currentPlan.nutritionSnapshot?.protein || 0)}g protein.
+
+MEVCUT PLAN: ${currentPlan.label}
+${currentPlan.exercises.map(ex => `- ${ex.name} | ${ex.scheme}${doneNames.includes(exKey(ex.name)) ? " [TAMAMLANDI]" : ""}`).join("\n")}
+
+BU HAREKETLERİN SON PERFORMANSI:
+${lastPerfLines || "Kayıt yok."}
+
+TALİMATLAR:
+- [TAMAMLANDI] işaretli hareketleri AYNEN KORU — adını ve şemasını değiştirme, listeden çıkarma.
+- Karbonhidrat/kalori beklenenden YÜKSEKSE: hacmi artırabilirsin (1-2 hareket ekle veya set sayısını yükselt).
+- Kalori/karbonhidrat DÜŞÜKSE: hacmi kıs (kalan hareketlerden 1-2'sini çıkar, ağır bileşik hareketleri hafiflet), yaralanma riskini artırma.
+- Protein düşükse hacmi zorlamadan koru, "sub" alanında protein uyarısı ver.
+- Değişiklik gerekmiyorsa planı aynen döndür.
+- "sub" alanına neyi neden değiştirdiğini 1 cümleyle Türkçe yaz.
+- Mümkün olduğunca şu katalogdan seç ve id döndür; katalogda yoksa id null olsun.
+HAREKET KATALOĞU (id: isim): ${EXERCISE_CATALOG_TEXT}
+- SADECE şu JSON ile yanıt ver, markdown fence ekleme:
+{"label": "kısa başlık", "sub": "1 cümlelik gerekçe", "cardio": "kardiyo notu veya null", "exercises": [{"id": "katalog id veya null", "name": "Hareket adı", "scheme": "3 × 10-12", "tip": "1 cümlelik form ipucu"}]}`;
+
+  const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: "Planı güncel beslenmeme göre güncelle." }] }], 4000);
+  const parsed = JSON.parse(extractJson(raw));
+  const byName = {};
+  currentPlan.exercises.forEach(ex => { byName[exKey(ex.name)] = ex; });
+  const exercises = (parsed.exercises || []).map((ex, i) => {
+    const existing = byName[exKey(ex.name)];
+    // Reuse the existing id so that completed checkmarks and set logs survive.
+    if (existing) return { ...existing, scheme: doneNames.includes(exKey(ex.name)) ? existing.scheme : (ex.scheme || existing.scheme), tip: ex.tip || existing.tip };
+    return { id: ex.id && MEDIA[ex.id] ? ex.id : `ai-${Date.now()}-${i}`, name: ex.name, scheme: ex.scheme, tip: ex.tip };
+  });
+  // Safety net: never lose a completed exercise even if the model dropped it.
+  currentPlan.exercises.forEach(ex => {
+    if (doneNames.includes(exKey(ex.name)) && !exercises.some(n => exKey(n.name) === exKey(ex.name))) exercises.unshift(ex);
+  });
   return { label: parsed.label, sub: parsed.sub, cardio: parsed.cardio || null, exercises };
 }
 
@@ -679,6 +811,9 @@ ANTRENMAN GEÇMİŞİ: ${statusLine}. Hedef: ${GOALS[profile.goal]?.label}.
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein, ${targets.carbG}g karbonhidrat, ${targets.fatG}g yağ.
 ANTRENMAN PROGRAMI: ${dayCtx.phase === "adaptation" ? "adaptasyon fazında — full body + kardiyo, hafif ağırlık (sonra split'e geçecek)" : "haftada 4 gün Upper/Lower split"}.
 BUGÜN (${dayCtx.dateLabel}): antrenman günü ${dayCtx.dayLabel}${dayCtx.totalEx > 0 ? ` (${dayCtx.doneEx}/${dayCtx.totalEx} tamamlandı)` : ""}. Bugüne kadar: ${loggedLine}. Seri: ${dayCtx.streak} gün.
+SON ANTRENMAN KAYITLARI (beslenme + kaldırılan ağırlıklar):
+${buildTrainingHistoryLines(profile.trainingDays || DEFAULT_TRAINING_DAYS, today, 7) || "Kayıt yok."}
+Ağırlık sorulursa bu kayıtlara dayanarak somut sayı ver, tahmin etme.
 Antrenman geçmişini dikkate al: yeni başlayana form/temel öğret, ara verene kademeli yüklenmeyi hatırlat, deneyimliye temel açıklamalarla vakit kaybettirme.
 Cevaplarını profiline, hedefine ve bugünkü duruma göre şekillendir, genel tavsiye verme. Kısa ve uygulanabilir yaz. Tıbbi teşhis koyma.`;
   return callGemini(systemPrompt, toGeminiContents(history, userMessage));
@@ -731,21 +866,45 @@ function toggleDayTrained(dateStr) {
   persistLogs();
 }
 
+// Streak = how many days the current run has lasted. Rest days never break it;
+// the run only ends after a full week (7 consecutive days) with no completed
+// workout, so a normal Mon/Tue/Thu/Fri schedule keeps counting through
+// Wednesdays and weekends.
+const STREAK_BREAK_DAYS = 7;
 function computeStreak() {
   const td = profile?.trainingDays || DEFAULT_TRAINING_DAYS;
   const ov = profile?.trainingDayOverrides || {};
-  let count = 0, cursor = today;
-  for (let i = 0; i < 60; i++) {
-    const dt = dayTypeForDate(cursor, td, computePhase(profile, cursor), ov);
-    const e = logs[cursor];
-    if (e && e.manualComplete) { count++; cursor = addDays(cursor, -1); continue; }
-    if (dt === "rest") { cursor = addDays(cursor, -1); continue; }
+
+  const didTrain = (dateStr) => {
+    const e = logs[dateStr];
+    if (!e) return false;
+    if (e.manualComplete) return true;
+    const dt = dayTypeForDate(dateStr, td, computePhase(profile, dateStr), ov);
     const info = effectiveDayInfo(e, dt);
     const total = info.exercises.length;
-    const done = e ? info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length : 0;
-    if (total > 0 && done === total) { count++; cursor = addDays(cursor, -1); } else break;
+    if (total === 0) return false;
+    const done = info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length;
+    return done === total;
+  };
+
+  // Find the most recent completed workout — the run can't start after it.
+  let lastTrained = null;
+  for (let i = 0; i < 400; i++) {
+    const d = addDays(today, -i);
+    if (didTrain(d)) { lastTrained = d; break; }
+    if (i >= STREAK_BREAK_DAYS) break; // already a week dry → no active run
   }
-  return count;
+  if (!lastTrained) return 0;
+
+  // Walk back from there, allowing gaps shorter than a week.
+  let runStart = lastTrained;
+  let miss = 0;
+  for (let i = 1; i < 400; i++) {
+    const d = addDays(lastTrained, -i);
+    if (didTrain(d)) { runStart = d; miss = 0; }
+    else { miss++; if (miss >= STREAK_BREAK_DAYS) break; }
+  }
+  return daysBetween(runStart, today) + 1;
 }
 function todayContext() {
   const td = profile?.trainingDays || DEFAULT_TRAINING_DAYS;
@@ -824,6 +983,7 @@ function render() {
 
   renderCoachWidget();
   renderRestTimerWidget();
+  maybeAutoGeneratePlan();
 }
 
 // ---------------------------------------------------------------------------
@@ -1005,11 +1165,9 @@ function renderHome(entry, targets, streak) {
 
   const td = profile.trainingDays || DEFAULT_TRAINING_DAYS;
   const isTrainingDay = isEffectiveTrainingDay(activeDate, td, profile.trainingDayOverrides || {});
-  const dayWord = activeDate === today ? "Bugün" : turkishDate(activeDate);
 
   return `
     <section class="day-choice-card">
-      <div class="day-choice-q">${dayWord} spor günü mü?</div>
       <div class="day-choice-btn-row">
         <button class="day-choice-big-btn ${isTrainingDay ? 'active-train' : ''}" data-day-choice="train">
           <span class="day-choice-icon">🏋️</span>
@@ -1022,13 +1180,7 @@ function renderHome(entry, targets, streak) {
       </div>
     </section>
 
-    <section class="card">
-      <div class="card-eyebrow">SU & UYKU</div>
-      <div class="metrics-grid">
-        ${metricCellHtml("water", "💧 Su", "ml", 3000, entry.water, 50)}
-        ${metricCellHtml("sleep", "🌙 Uyku", "saat", 8, entry.sleep, 0.5)}
-      </div>
-    </section>
+    ${ringsCardHtml(entry, targets)}
 
     <section class="card">
       <div class="card-head-row">
@@ -1061,51 +1213,73 @@ function renderHome(entry, targets, streak) {
   `;
 }
 
-function metricCellHtml(key, label, unit, target, value, step) {
-  const pct = value ? Math.min(100, Math.round((value/target)*100)) : 0;
+// --- Apple-Watch style progress rings ---------------------------------------
+const METRIC_COLORS = { calories: "#FF2D6F", protein: "#A8F000", workout: "#22D3F5" };
+
+function ringArc(pct, r) {
+  const circ = 2 * Math.PI * r;
+  const filled = (Math.min(100, Math.max(0, pct)) / 100) * circ;
+  return { circ, dash: `${filled} ${circ - filled}` };
+}
+function miniRingSvg(pct, color) {
+  const r = 17, sw = 5, size = 44;
+  const { dash } = ringArc(pct, r);
   return `
-    <div class="metric-cell">
-      <div class="metric-label-row">${label}</div>
-      <div class="stepper-row">
-        <button class="stepper-btn" data-step="${key}" data-dir="dec">−</button>
-        <button class="stepper-value" data-edit-metric="${key}">${value ?? "—"}</button>
-        <input class="stepper-input" type="number" inputmode="decimal" step="${step}" value="${value ?? ""}" data-metric="${key}" style="display:none;" />
-        <button class="stepper-btn" data-step="${key}" data-dir="inc">+</button>
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle class="ring-bg" cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${sw}"></circle>
+      <circle class="ring-fg" cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${sw}" stroke-dasharray="${dash}"></circle>
+      <text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" class="metric-ring-pct" fill="${color}">${pct}%</text>
+    </svg>`;
+}
+function ringsCardHtml(entry, targets) {
+  const totals = sumMeals(entry.meals);
+  const info = effectiveDayInfo(entry, entry.dayType);
+  const allEx = [...info.exercises, ...(entry.customExercises || [])];
+  const doneCount = allEx.filter(ex => entry.doneExercises[ex.id]).length;
+  const isRest = entry.dayType === "rest";
+
+  const rows = [
+    { key: "calories", label: "Kalori",  value: Math.round(totals.kcal),    target: targets.calorieTarget, unit: "kcal" },
+    { key: "protein",  label: "Protein", value: Math.round(totals.protein), target: targets.proteinG,      unit: "g" },
+    {
+      key: "workout", label: "Antrenman",
+      value: doneCount, target: allEx.length,
+      unit: "hareket",
+      note: isRest ? "dinlenme günü" : null,
+    },
+  ].map(r => ({ ...r, pct: r.target ? Math.min(999, Math.round((r.value / r.target) * 100)) : (isRest ? 100 : 0) }));
+
+  const size = 168, sw = 15;
+  const radii = [68, 49, 30];
+  const circles = rows.map((r, i) => {
+    const { dash } = ringArc(r.pct, radii[i]);
+    const c = METRIC_COLORS[r.key];
+    return `
+      <circle class="ring-bg" cx="${size/2}" cy="${size/2}" r="${radii[i]}" stroke="${c}" stroke-width="${sw}"></circle>
+      <circle class="ring-fg" cx="${size/2}" cy="${size/2}" r="${radii[i]}" stroke="${c}" stroke-width="${sw}" stroke-dasharray="${dash}"></circle>`;
+  }).join("");
+
+  return `
+    <section class="card">
+      <div class="card-eyebrow">${activeDate === today ? "BUGÜN NELER YAPTIM" : "O GÜN NELER YAPTIM"}</div>
+      <div class="rings-card" style="margin-top:14px;">
+        <svg class="rings-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${circles}</svg>
+        <div class="rings-legend">
+          ${rows.map(r => `
+            <div class="ring-legend-item">
+              <span class="ring-legend-dot" style="background:${METRIC_COLORS[r.key]}"></span>
+              <span class="ring-legend-text">
+                <span class="ring-legend-label">${r.label}</span><br/>
+                <span class="ring-legend-value">${r.note ? r.note : `${r.value} / ${r.target} ${r.unit}`}</span>
+              </span>
+              <span class="ring-legend-pct" style="color:${METRIC_COLORS[r.key]}">${r.pct}%</span>
+            </div>`).join("")}
+        </div>
       </div>
-      <div class="metric-target-row"><span>${unit}</span><span class="unit-mono">hedef ${target}</span></div>
-      <div class="metric-track"><div class="metric-fill" style="width:${pct}%"></div></div>
-    </div>`;
+    </section>`;
 }
 
 function attachHomeHandlers(entry, targets) {
-  const stepValues = { water: 50, sleep: 0.5 };
-  document.querySelectorAll("[data-step]").forEach(el => {
-    el.addEventListener("click", () => {
-      const key = el.dataset.step;
-      const step = stepValues[key] || 1;
-      const current = entry[key] ?? 0;
-      const next = el.dataset.dir === "inc" ? +(current + step).toFixed(1) : Math.max(0, +(current - step).toFixed(1));
-      updateEntry(activeDate, { [key]: next });
-      render();
-    });
-  });
-  document.querySelectorAll("[data-edit-metric]").forEach(el => {
-    el.addEventListener("click", () => {
-      const key = el.dataset.editMetric;
-      el.style.display = "none";
-      const input = document.querySelector(`[data-metric="${key}"]`);
-      if (input) { input.style.display = "block"; input.focus(); }
-    });
-  });
-  document.querySelectorAll("[data-metric]").forEach(el => {
-    const commit = () => {
-      const v = el.value === "" ? null : Number(el.value);
-      updateEntry(activeDate, { [el.dataset.metric]: v });
-      render();
-    };
-    el.addEventListener("blur", commit);
-    el.addEventListener("keydown", (e) => { if (e.key === "Enter") commit(); });
-  });
   document.querySelectorAll("[data-day-choice]").forEach(el => {
     el.addEventListener("click", () => {
       setDayOverride(activeDate, el.dataset.dayChoice === "train");
@@ -1152,8 +1326,6 @@ let restTimerHandle = null;
 
 function renderNutrition(entry, targets) {
   const totals = sumMeals(entry.meals);
-  const remainingKcal = Math.max(0, targets.calorieTarget - totals.kcal);
-  const remainingProtein = Math.max(0, targets.proteinG - totals.protein);
 
   return `
     <section class="card">
@@ -1165,16 +1337,6 @@ function renderNutrition(entry, targets) {
         <div class="macro-block"><div class="macro-label-row">🌾 Karbonhidrat</div><div class="macro-value" style="color:#B8720A">${targets.carbG}g</div><div class="macro-kcal">${targets.carbG*4} kcal</div></div>
         <div class="macro-block"><div class="macro-label-row">💧 Yağ</div><div class="macro-value" style="color:#1D74C9">${targets.fatG}g</div><div class="macro-kcal">${targets.fatG*9} kcal</div></div>
       </div>
-    </section>
-
-    <section class="card">
-      <div class="card-eyebrow">BUGÜN NE KALDI</div>
-      <div class="remaining-row">
-        <div class="remaining-block"><div class="remaining-value">${Math.round(remainingKcal)}</div><div class="remaining-label">kcal kaldı</div></div>
-        <div class="remaining-block"><div class="remaining-value">${Math.round(remainingProtein)}g</div><div class="remaining-label">protein kaldı</div></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill" style="width:${Math.min(100,(totals.kcal/targets.calorieTarget)*100)}%"></div></div>
-      <div class="meal-footnote">${Math.round(totals.kcal)} / ${targets.calorieTarget} kcal alındı</div>
     </section>
 
     <section class="card">
@@ -1241,6 +1403,7 @@ function addMeal(entry, newMeal) {
   const nextMeals = [...(entry.meals || []), newMeal];
   const t = sumMeals(nextMeals);
   updateEntry(activeDate, { meals: nextMeals, calories: t.kcal, protein: t.protein, carbs: t.carbs, fat: t.fat });
+  maybeAdjustPlanForNutrition();
 }
 
 function attachNutritionHandlers(entry, targets) {
@@ -1250,6 +1413,7 @@ function attachNutritionHandlers(entry, targets) {
       const t = sumMeals(nextMeals);
       updateEntry(activeDate, { meals: nextMeals, calories: t.kcal, protein: t.protein, carbs: t.carbs, fat: t.fat });
       render();
+      maybeAdjustPlanForNutrition();
     });
   });
 
@@ -1318,6 +1482,131 @@ function attachNutritionHandlers(entry, targets) {
 // ---------------------------------------------------------------------------
 let aiGenLoading = false;
 let aiGenError = "";
+let openLogKey = null; // which exercise's set-log panel is expanded
+
+// Auto plan state
+let autoGenAttemptedDate = null;   // guards against repeat calls on re-render
+let autoGenLoading = false;
+let autoGenError = "";
+let planAdjustLoading = false;
+let planAdjustNote = "";           // short "what changed" message shown once
+const NUTRITION_DRIFT_KCAL = 250;  // re-tune only after a meaningful change
+const NUTRITION_DRIFT_PROTEIN = 20;
+
+// ---------------------------------------------------------------------------
+// Automatic AI planning
+// Fires once when a new training day opens, then re-tunes the plan as meals
+// are logged. Falls back silently to the static program if it can't run.
+// ---------------------------------------------------------------------------
+function autoPlanEnabled() { return profile && profile.autoAiPlan !== false; }
+
+function buildPlanDayCtx(entry, dateStr) {
+  return {
+    dateLabel: turkishDate(dateStr),
+    phase: computePhase(profile, dateStr),
+    calories: entry.calories,
+    protein: entry.protein,
+  };
+}
+
+async function maybeAutoGeneratePlan() {
+  if (!autoPlanEnabled() || autoGenLoading) return;
+  if (activeDate !== today) return;                 // only auto-plan the live day
+  if (autoGenAttemptedDate === today) return;       // one attempt per day
+  const entry = getEntry(today);
+  if (entry.aiWorkout && entry.aiWorkout.exercises && entry.aiWorkout.exercises.length) return;
+  if (entry.dayType === "rest") return;             // nothing to plan on rest days
+  if (!getGeminiKey()) return;                      // no key → keep static program
+
+  autoGenAttemptedDate = today;
+  autoGenLoading = true;
+  autoGenError = "";
+  render();
+  try {
+    const trainingDays = profile.trainingDays || DEFAULT_TRAINING_DAYS;
+    const targets = computeNutritionTargets(profile);
+    const totals = sumMeals(entry.meals);
+    const aiWorkout = await generateTodayWorkout(
+      buildPlanDayCtx(entry, today),
+      buildTrainingHistoryLines(trainingDays, today, 7),
+      buildLastPerformanceLines(entry, today)
+    );
+    aiWorkout.nutritionSnapshot = { kcal: totals.kcal, protein: totals.protein };
+    aiWorkout.autoGenerated = true;
+    updateEntry(today, { aiWorkout, doneExercises: {}, customExercises: [] });
+  } catch (e) {
+    autoGenError = e.message || "Bilinmeyen hata";
+  } finally {
+    autoGenLoading = false;
+    render();
+  }
+}
+
+// Called after a meal is logged. Only re-tunes once intake has actually moved.
+async function maybeAdjustPlanForNutrition() {
+  if (!autoPlanEnabled() || planAdjustLoading || autoGenLoading) return;
+  if (activeDate !== today) return;
+  const entry = getEntry(today);
+  const plan = entry.aiWorkout;
+  if (!plan || !plan.exercises || !plan.exercises.length) return;
+  if (!getGeminiKey()) return;
+
+  const targets = computeNutritionTargets(profile);
+  const totals = sumMeals(entry.meals);
+  const snap = plan.nutritionSnapshot || { kcal: 0, protein: 0 };
+  const driftKcal = Math.abs(totals.kcal - snap.kcal);
+  const driftProtein = Math.abs(totals.protein - snap.protein);
+  if (driftKcal < NUTRITION_DRIFT_KCAL && driftProtein < NUTRITION_DRIFT_PROTEIN) return;
+
+  planAdjustLoading = true;
+  planAdjustNote = "";
+  render();
+  try {
+    const doneNames = plan.exercises.filter(ex => entry.doneExercises[ex.id]).map(ex => exKey(ex.name));
+    const updated = await adjustWorkoutForNutrition(
+      plan, doneNames,
+      buildPlanDayCtx(entry, today), targets, totals,
+      buildLastPerformanceLines(entry, today)
+    );
+    updated.nutritionSnapshot = { kcal: totals.kcal, protein: totals.protein };
+    updated.autoGenerated = true;
+    // Keep the checkmarks of anything that survived the update.
+    const keptIds = new Set(updated.exercises.map(ex => ex.id));
+    const doneExercises = {};
+    Object.keys(entry.doneExercises || {}).forEach(id => { if (keptIds.has(id)) doneExercises[id] = entry.doneExercises[id]; });
+    updateEntry(today, { aiWorkout: updated, doneExercises });
+    planAdjustNote = updated.sub || "Plan beslenmene göre güncellendi.";
+  } catch (e) {
+    planAdjustNote = "";
+  } finally {
+    planAdjustLoading = false;
+    render();
+  }
+}
+
+function logBtnHtml(entry, name) {
+  const sets = getSets(entry, name);
+  return `<button class="log-btn ${sets.length ? "has-sets" : ""}" data-log="${esc(name)}">${sets.length ? `${sets.length}✓` : "kg"}</button>`;
+}
+function logPanelHtml(entry, name) {
+  if (openLogKey !== exKey(name)) return "";
+  const sets = getSets(entry, name);
+  const last = findLastPerformance(name, activeDate);
+  const vol = setVolume(sets);
+  return `
+    <div class="log-panel">
+      ${last ? `<div class="log-last">geçen sefer (${last.date}): ${esc(formatSets(last.sets))}</div>` : ""}
+      ${sets.length
+        ? sets.map((s, i) => `<div class="log-set-row"><span class="log-set-idx">${i+1}.</span><span class="log-set-val">${s.kg} kg × ${s.reps} tekrar</span><button class="log-set-del" data-del-set="${esc(name)}" data-idx="${i}">✕</button></div>`).join("")
+        : `<div class="log-empty">Henüz set girilmedi.</div>`}
+      ${sets.length ? `<div class="log-volume">toplam hacim: ${Math.round(vol)} kg</div>` : ""}
+      <div class="log-input-row">
+        <input class="log-input" type="number" inputmode="decimal" step="0.5" placeholder="kg" data-kg="${esc(name)}" />
+        <input class="log-input" type="number" inputmode="numeric" placeholder="tekrar" data-reps="${esc(name)}" />
+        <button class="log-add-btn" data-add-set="${esc(name)}">+</button>
+      </div>
+    </div>`;
+}
 
 function renderTraining(entry, phase, weeksRemaining) {
   const dayInfo = effectiveDayInfo(entry, entry.dayType);
@@ -1333,15 +1622,20 @@ function renderTraining(entry, phase, weeksRemaining) {
     exListHtml = markAllBtn + `<div class="ex-list">` + dayInfo.exercises.map(ex => {
       const done = !!entry.doneExercises[ex.id];
       return `
+        <div class="ex-block">
         <div class="ex-row ${done?'done':''}">
           <button class="checkbox-btn" data-toggle="${ex.id}"><span class="checkbox ${done?'done':''}">${done?'✓':''}</span></button>
           <button class="ex-name-btn" data-toggle="${ex.id}"><span class="ex-name ${done?'done':''}">${esc(ex.name)}</span></button>
           <span class="ex-scheme">${ex.scheme}</span>
+          ${logBtnHtml(entry, ex.name)}
           <button class="info-btn" data-info="${ex.id}" data-name="${esc(ex.name)}" data-scheme="${ex.scheme}" data-tip="${esc(ex.tip || "")}">i</button>
+        </div>
+        ${logPanelHtml(entry, ex.name)}
         </div>`;
     }).join("") + customExercises.map(ex => {
       const done = !!entry.doneExercises[ex.id];
       return `
+        <div class="ex-block">
         <div class="ex-row ex-row-custom ${done?'done':''}">
           <button class="checkbox-btn" data-toggle="${ex.id}"><span class="checkbox ${done?'done':''}">${done?'✓':''}</span></button>
           <button class="ex-name-btn" data-toggle="${ex.id}">
@@ -1349,7 +1643,10 @@ function renderTraining(entry, phase, weeksRemaining) {
             ${ex.tip ? `<div class="ex-custom-tip">${esc(ex.tip)}</div>` : ""}
           </button>
           <span class="ex-scheme">${ex.scheme}</span>
+          ${logBtnHtml(entry, ex.name)}
           <button class="info-btn" data-remove-custom="${ex.id}">✕</button>
+        </div>
+        ${logPanelHtml(entry, ex.name)}
         </div>`;
     }).join("") + `</div>`;
   }
@@ -1361,11 +1658,19 @@ function renderTraining(entry, phase, weeksRemaining) {
     </div>` : "";
 
   return `
-    <button class="ai-gen-btn" id="aiGenBtn" ${aiGenLoading ? "disabled" : ""}>
-      ✨ ${aiGenLoading ? "planlanıyor…" : dayInfo.isAI ? "Yeniden Oluştur" : "Bugünkü Antrenmanımı AI ile Oluştur"}
+    ${autoGenLoading ? `<div class="auto-plan-banner">✨ Bugünün planı hazırlanıyor…</div>` : ""}
+    ${planAdjustLoading ? `<div class="auto-plan-banner">🍽️ Plan beslenmene göre güncelleniyor…</div>` : ""}
+    ${planAdjustNote && !planAdjustLoading ? `<div class="auto-plan-note">🍽️ ${esc(planAdjustNote)}<button class="auto-plan-dismiss" id="planNoteDismiss">✕</button></div>` : ""}
+    ${autoGenError ? `<div class="chat-error">Otomatik plan kurulamadı: ${esc(autoGenError)} — standart program gösteriliyor.</div>` : ""}
+    <button class="ai-gen-btn" id="aiGenBtn" ${aiGenLoading || autoGenLoading ? "disabled" : ""}>
+      ✨ ${aiGenLoading ? "planlanıyor…" : dayInfo.isAI ? "Yeniden Planla" : "Yeni Antrenman Planla"}
     </button>
     ${aiGenError ? `<div class="chat-error">Plan oluşturulamadı: ${esc(aiGenError)}</div>` : ""}
     ${dayInfo.isAI ? `<button class="ai-revert-btn" id="aiRevertBtn">Standart programa dön</button>` : ""}
+    <label class="auto-plan-toggle">
+      <input type="checkbox" id="autoPlanToggle" ${autoPlanEnabled() ? "checked" : ""} />
+      <span>Her gün planı otomatik kur, öğünlerime göre güncelle</span>
+    </label>
     ${phaseBanner}
     <section class="card">
       <div class="card-head-row">
@@ -1394,7 +1699,10 @@ function attachTrainingHandlers(entry) {
         protein: entry.protein,
       };
       const historyLines = buildTrainingHistoryLines(trainingDays, activeDate, 7);
-      const aiWorkout = await generateTodayWorkout(dayCtx, historyLines);
+      const lastPerfLines = buildLastPerformanceLines(entry, activeDate);
+      const aiWorkout = await generateTodayWorkout(dayCtx, historyLines, lastPerfLines);
+      const totalsNow = sumMeals(entry.meals);
+      aiWorkout.nutritionSnapshot = { kcal: totalsNow.kcal, protein: totalsNow.protein };
       updateEntry(activeDate, { aiWorkout, doneExercises: {}, customExercises: [] });
     } catch (e) {
       aiGenError = e.message || "Bilinmeyen hata";
@@ -1406,8 +1714,18 @@ function attachTrainingHandlers(entry) {
   const aiRevertBtn = document.getElementById("aiRevertBtn");
   if (aiRevertBtn) aiRevertBtn.addEventListener("click", () => {
     updateEntry(activeDate, { aiWorkout: null });
+    if (activeDate === today) autoGenAttemptedDate = today; // don't instantly re-plan
     render();
   });
+  const autoPlanToggle = document.getElementById("autoPlanToggle");
+  if (autoPlanToggle) autoPlanToggle.addEventListener("change", () => {
+    profile = { ...profile, autoAiPlan: autoPlanToggle.checked };
+    persistProfile();
+    if (autoPlanToggle.checked) autoGenAttemptedDate = null; // allow an immediate attempt
+    render();
+  });
+  const planNoteDismiss = document.getElementById("planNoteDismiss");
+  if (planNoteDismiss) planNoteDismiss.addEventListener("click", () => { planAdjustNote = ""; render(); });
   const markAllBtn = document.getElementById("markAllBtn");
   if (markAllBtn) markAllBtn.addEventListener("click", () => {
     const dayInfo = effectiveDayInfo(entry, entry.dayType);
@@ -1435,6 +1753,37 @@ function attachTrainingHandlers(entry) {
       const doneExercises = { ...entry.doneExercises };
       delete doneExercises[id];
       updateEntry(activeDate, { customExercises: nextCustom, doneExercises });
+      render();
+    });
+  });
+
+  // --- set logging ---
+  document.querySelectorAll("[data-log]").forEach(el => {
+    el.addEventListener("click", () => {
+      const key = exKey(el.dataset.log);
+      openLogKey = openLogKey === key ? null : key;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-add-set]").forEach(el => {
+    const name = el.dataset.addSet;
+    const panel = el.closest(".log-panel");
+    const submit = () => {
+      const kgEl = panel.querySelector("[data-kg]");
+      const repsEl = panel.querySelector("[data-reps]");
+      const kg = Number(kgEl.value);
+      const reps = Number(repsEl.value);
+      if (!Number.isFinite(kg) || !Number.isFinite(reps) || reps <= 0) return;
+      addSet(activeDate, name, kg, reps);
+      render();
+    };
+    el.addEventListener("click", submit);
+    const repsEl = panel.querySelector("[data-reps]");
+    if (repsEl) repsEl.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+  });
+  document.querySelectorAll("[data-del-set]").forEach(el => {
+    el.addEventListener("click", () => {
+      removeSet(activeDate, el.dataset.delSet, Number(el.dataset.idx));
       render();
     });
   });
@@ -1540,7 +1889,11 @@ function renderRecipeModal() {
   const step = r.steps[recipeStepIdx];
   const total = r.steps.length;
 
-  const ingredientsHtml = r.ingredients.map(ing => `<div>${fmtAmount(ing.amount * scale)}${ing.unit ? ing.unit : ""} ${esc(ing.name)}</div>`).join("");
+  const ingredientsHtml = r.ingredients.map(ing => {
+    const u = ing.unit || "";
+    const sep = (u === "" || u === "g" || u === "ml") ? "" : " ";
+    return `<div>${fmtAmount(ing.amount * scale)}${sep}${u} ${esc(ing.name)}</div>`;
+  }).join("");
 
   let macroBoxHtml = "";
   if (r.macros) {
@@ -1663,6 +2016,7 @@ function renderRestTimerWidget() {
 // Onboarding
 // ---------------------------------------------------------------------------
 let obState = null;
+let showSetupSection = false; // in edit mode, the setup questions start collapsed
 function renderOnboarding() {
   const initial = profile;
   if (!obState) {
@@ -1690,23 +2044,10 @@ function renderOnboarding() {
     return `${w.short}: ${split.label}`;
   });
 
-  return `
-    <div class="onboarding-wrap"><div class="onboarding-card">
-      <div class="eyebrow">${initial ? "PROFİLİ DÜZENLE" : "TANIŞALIM"}</div>
-      <h1 style="margin-bottom:4px;">${initial ? "Bilgilerini güncelle" : "Sana özel program için birkaç bilgi"}</h1>
-      <p class="onboarding-sub">Bu veriler sadece bu cihazda/tarayıcıda saklanır.</p>
-
-      <div class="gender-row">
-        <button class="gender-btn ${obState.gender==='erkek'?'active':''}" data-gender="erkek">Erkek</button>
-        <button class="gender-btn ${obState.gender==='kadin'?'active':''}" data-gender="kadin">Kadın</button>
-      </div>
-
-      ${formFieldHtml("age","Yaş","yaş","23")}
-      ${formFieldHtml("heightCm","Boy","cm","182")}
-      ${formFieldHtml("weightKg","Kilo","kg","91.8")}
-      ${formFieldHtml("bodyFatPct","Yağ oranı","%","27")}
-      ${formFieldHtml("musclePct","Kas oranı (opsiyonel)","%","37.6")}
-
+  // On first run everything is asked. Afterwards the edit screen shows only the
+  // body metrics that actually change week to week; the setup questions
+  // (training history, activity, goal, days) sit behind a toggle.
+  const setupHtml = `
       <div class="form-label">Antrenman geçmişin nasıl?</div>
       <div class="option-col">
         ${Object.entries(TRAINING_STATUS).map(([k,v]) => `<button class="option-row ${obState.trainingStatus===k?'active':''}" data-status="${k}"><span class="option-row-label">${v.label}</span><span class="option-row-sub">${v.sub}</span></button>`).join("")}
@@ -1734,6 +2075,29 @@ function renderOnboarding() {
       </div>
       <div class="day-preview">${splitPreview.length ? splitPreview.join(" · ") : "En az 1 gün seç — seçmezsen varsayılan Pzt/Sal/Prş/Cum kullanılır."}</div>
       ${adaptWeeks > 0 ? `<div class="day-preview">İlk ${adaptWeeks} hafta full body + kardiyo ile başlayacaksın, sonra otomatik split'e geçeceksin.</div>` : ""}
+  `;
+
+  return `
+    <div class="onboarding-wrap"><div class="onboarding-card">
+      <div class="eyebrow">${initial ? "PROFİLİ DÜZENLE" : "TANIŞALIM"}</div>
+      <h1 style="margin-bottom:4px;">${initial ? "Bilgilerini güncelle" : "Sana özel program için birkaç bilgi"}</h1>
+      <p class="onboarding-sub">${initial ? "Kilo, yağ ve kas oranını güncelle — hedeflerin otomatik yeniden hesaplanır." : "Bu veriler sadece bu cihazda/tarayıcıda saklanır."}</p>
+
+      <div class="gender-row">
+        <button class="gender-btn ${obState.gender==='erkek'?'active':''}" data-gender="erkek">Erkek</button>
+        <button class="gender-btn ${obState.gender==='kadin'?'active':''}" data-gender="kadin">Kadın</button>
+      </div>
+
+      ${formFieldHtml("age","Yaş","yaş","23")}
+      ${formFieldHtml("heightCm","Boy","cm","182")}
+      ${formFieldHtml("weightKg","Kilo","kg","91.8")}
+      ${formFieldHtml("bodyFatPct","Yağ oranı","%","27")}
+      ${formFieldHtml("musclePct","Kas oranı (opsiyonel)","%","37.6")}
+
+      ${!initial ? setupHtml : `
+        <button class="setup-toggle-btn" id="obSetupToggle">${showSetupSection ? "Program ayarlarını gizle ▲" : "Program ayarlarını değiştir ▼"}</button>
+        ${showSetupSection ? setupHtml : ""}
+      `}
 
       <div class="onboarding-actions">
         ${initial ? `<button class="onboarding-cancel-btn" id="obCancel">vazgeç</button>` : ""}
@@ -1766,7 +2130,9 @@ function attachOnboardingHandlers() {
     render();
   }));
   const cancelBtn = document.getElementById("obCancel");
-  if (cancelBtn) cancelBtn.addEventListener("click", () => { editingProfile = false; obState = null; render(); });
+  if (cancelBtn) cancelBtn.addEventListener("click", () => { editingProfile = false; obState = null; showSetupSection = false; render(); });
+  const setupToggle = document.getElementById("obSetupToggle");
+  if (setupToggle) setupToggle.addEventListener("click", () => { showSetupSection = !showSetupSection; render(); });
   const saveBtn = document.getElementById("obSave");
   if (saveBtn) saveBtn.addEventListener("click", () => {
     if (!canSaveOb()) return;
@@ -1783,6 +2149,7 @@ function attachOnboardingHandlers() {
     persistProfile();
     editingProfile = false;
     obState = null;
+    showSetupSection = false;
     render();
   });
 }
