@@ -15,6 +15,7 @@
   h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; color: #12151A; }
   .streak-badge { display: flex; align-items: center; gap: 5px; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 10px; padding: 8px 12px; height: fit-content; }
   .streak-num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px; color: #B8720A; }
+  .streak-denom { font-size: 12px; color: #C9A464; }
   .streak-label { font-size: 11px; color: #6B7280; }
   .date-nav { display: flex; align-items: center; justify-content: space-between; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 12px; padding: 10px 6px; }
   .nav-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #12151A; font-size: 16px; }
@@ -286,7 +287,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "2.12.0";
+const APP_VERSION = "2.13.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -810,7 +811,7 @@ PROFİL: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş
 ANTRENMAN GEÇMİŞİ: ${statusLine}. Hedef: ${GOALS[profile.goal]?.label}.
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein, ${targets.carbG}g karbonhidrat, ${targets.fatG}g yağ.
 ANTRENMAN PROGRAMI: ${dayCtx.phase === "adaptation" ? "adaptasyon fazında — full body + kardiyo, hafif ağırlık (sonra split'e geçecek)" : "haftada 4 gün Upper/Lower split"}.
-BUGÜN (${dayCtx.dateLabel}): antrenman günü ${dayCtx.dayLabel}${dayCtx.totalEx > 0 ? ` (${dayCtx.doneEx}/${dayCtx.totalEx} tamamlandı)` : ""}. Bugüne kadar: ${loggedLine}. Seri: ${dayCtx.streak} gün.
+BUGÜN (${dayCtx.dateLabel}): antrenman günü ${dayCtx.dayLabel}${dayCtx.totalEx > 0 ? ` (${dayCtx.doneEx}/${dayCtx.totalEx} tamamlandı)` : ""}. Bugüne kadar: ${loggedLine}. Bu hafta tamamlanan antrenman: ${dayCtx.weekDone}/${dayCtx.weekPlanned}.
 SON ANTRENMAN KAYITLARI (beslenme + kaldırılan ağırlıklar):
 ${buildTrainingHistoryLines(profile.trainingDays || DEFAULT_TRAINING_DAYS, today, 7) || "Kayıt yok."}
 Ağırlık sorulursa bu kayıtlara dayanarak somut sayı ver, tahmin etme.
@@ -866,46 +867,36 @@ function toggleDayTrained(dateStr) {
   persistLogs();
 }
 
-// Streak = how many days the current run has lasted. Rest days never break it;
-// the run only ends after a full week (7 consecutive days) with no completed
-// workout, so a normal Mon/Tue/Thu/Fri schedule keeps counting through
-// Wednesdays and weekends.
-const STREAK_BREAK_DAYS = 7;
-function computeStreak() {
+// Weekly streak: how many planned sessions have actually been completed in the
+// CURRENT week (Mon-Sun). Rest days never count and never break it, and the
+// counter resets on its own every Monday.
+function didTrainOn(dateStr) {
+  const e = logs[dateStr];
+  if (!e) return false;
+  if (e.manualComplete) return true;
   const td = profile?.trainingDays || DEFAULT_TRAINING_DAYS;
   const ov = profile?.trainingDayOverrides || {};
-
-  const didTrain = (dateStr) => {
-    const e = logs[dateStr];
-    if (!e) return false;
-    if (e.manualComplete) return true;
-    const dt = dayTypeForDate(dateStr, td, computePhase(profile, dateStr), ov);
-    const info = effectiveDayInfo(e, dt);
-    const total = info.exercises.length;
-    if (total === 0) return false;
-    const done = info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length;
-    return done === total;
-  };
-
-  // Find the most recent completed workout — the run can't start after it.
-  let lastTrained = null;
-  for (let i = 0; i < 400; i++) {
-    const d = addDays(today, -i);
-    if (didTrain(d)) { lastTrained = d; break; }
-    if (i >= STREAK_BREAK_DAYS) break; // already a week dry → no active run
-  }
-  if (!lastTrained) return 0;
-
-  // Walk back from there, allowing gaps shorter than a week.
-  let runStart = lastTrained;
-  let miss = 0;
-  for (let i = 1; i < 400; i++) {
-    const d = addDays(lastTrained, -i);
-    if (didTrain(d)) { runStart = d; miss = 0; }
-    else { miss++; if (miss >= STREAK_BREAK_DAYS) break; }
-  }
-  return daysBetween(runStart, today) + 1;
+  const dt = dayTypeForDate(dateStr, td, computePhase(profile, dateStr), ov);
+  const info = effectiveDayInfo(e, dt);
+  const total = info.exercises.length;
+  if (total === 0) return false;
+  return info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length === total;
 }
+function weekStats(dateStr) {
+  const td = profile?.trainingDays || DEFAULT_TRAINING_DAYS;
+  const ov = profile?.trainingDayOverrides || {};
+  const d = new Date(dateStr + "T00:00:00");
+  const weekday = d.getDay() === 0 ? 6 : d.getDay() - 1; // Mon = 0
+  const monday = addDays(dateStr, -weekday);
+  let done = 0, planned = 0;
+  for (let i = 0; i < 7; i++) {
+    const ds = addDays(monday, i);
+    if (isEffectiveTrainingDay(ds, td, ov)) planned++;
+    if (didTrainOn(ds)) done++;
+  }
+  return { done, planned, monday };
+}
+function computeStreak() { return weekStats(today).done; }
 function todayContext() {
   const td = profile?.trainingDays || DEFAULT_TRAINING_DAYS;
   const ov = profile?.trainingDayOverrides || {};
@@ -914,7 +905,7 @@ function todayContext() {
   const e = getEntry(today);
   const info = effectiveDayInfo(e, dt);
   const doneEx = info.exercises.filter(ex => e.doneExercises[ex.id]).length;
-  return { dateLabel: turkishDate(today), dayLabel: info.label, phase, totalEx: info.exercises.length, doneEx, calories: e.calories, protein: e.protein, water: e.water, sleep: e.sleep, streak: computeStreak() };
+  return { dateLabel: turkishDate(today), dayLabel: info.label, phase, totalEx: info.exercises.length, doneEx, calories: e.calories, protein: e.protein, water: e.water, sleep: e.sleep, weekDone: weekStats(today).done, weekPlanned: weekStats(today).planned };
 }
 
 // ---------------------------------------------------------------------------
@@ -932,6 +923,7 @@ function render() {
   const entry = getEntry(activeDate);
   const targets = computeNutritionTargets(profile);
   const streak = computeStreak();
+  const streakStats = weekStats(today);
   const phase = computePhase(profile, activeDate);
   const weeksRemaining = phaseWeeksRemaining(profile, activeDate);
 
@@ -948,7 +940,7 @@ function render() {
             <div class="eyebrow">ENTİ COACH · v${APP_VERSION}</div>
             <h1>${activeTab === "home" ? "Ana Sayfa" : activeTab === "nutrition" ? "Beslenme" : "Antrenman"}</h1>
           </div>
-          <div class="streak-badge"><span class="streak-num">${streak}</span><span class="streak-label">gün seri</span></div>
+          <div class="streak-badge"><span class="streak-num">${streakStats.done}<span class="streak-denom">/${streakStats.planned}</span></span><span class="streak-label">bu hafta</span></div>
         </div>
         <div class="date-nav">
           <button class="nav-btn" id="navPrev">‹</button>
@@ -1238,7 +1230,13 @@ function metricCellHtml(key, label, unit, target, value, step) {
 // --- Apple-Watch style progress rings ---------------------------------------
 const WATER_TARGET_ML = 3000;
 const SLEEP_TARGET_H = 8;
-const METRIC_COLORS = { calories: "#FF2D6F", protein: "#A8F000", workout: "#22D3F5", water: "#22D3F5", sleep: "#B79CF0" };
+const METRIC_COLORS = {
+  calories: "#FF2D6F",  // pink
+  protein:  "#A8F000",  // lime
+  water:    "#00B8D9",  // cyan-blue
+  sleep:    "#7C5CE0",  // violet
+  workout:  "#FF8A1E",  // orange — kept well away from water/sleep
+};
 
 function ringArc(pct, r) {
   const circ = 2 * Math.PI * r;
