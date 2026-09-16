@@ -287,7 +287,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "2.13.0";
+const APP_VERSION = "2.14.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -600,10 +600,16 @@ function esc(s) { const d = document.createElement("div"); d.textContent = s == 
 function getGeminiKey() { try { return localStorage.getItem(GEMINI_KEY_STORAGE) || ""; } catch (e) { return ""; } }
 function setGeminiKey(key) { try { localStorage.setItem(GEMINI_KEY_STORAGE, key); } catch (e) {} }
 
-async function callGemini(systemPrompt, contents, maxTokens) {
-  const key = getGeminiKey();
-  if (!key) throw new Error("NO_KEY");
-  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent", {
+// Model chain: if the primary is overloaded we fall back down the list.
+// Flash-Lite is a much less contended endpoint, so it usually answers when the
+// main Flash model is saturated.
+const GEMINI_MODELS = ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.6-flash"];
+const RETRYABLE_STATUS = [429, 500, 502, 503, 504];
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+let geminiStatusNote = ""; // shown in the UI while retrying so it doesn't look frozen
+
+async function callGeminiOnce(model, key, systemPrompt, contents, maxTokens) {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": key },
     body: JSON.stringify({
@@ -612,19 +618,65 @@ async function callGemini(systemPrompt, contents, maxTokens) {
       generationConfig: { maxOutputTokens: maxTokens || 3000 },
     }),
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data?.error?.message || `Gemini isteği başarısız (${response.status})`);
-  const cands = data.candidates;
-  if (!cands || !cands[0]) throw new Error("Gemini boş yanıt döndürdü");
-  const cand = cands[0];
-  // Only use the final-answer parts, skip internal "thinking" parts (some Gemini models return both).
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const err = new Error(data?.error?.message || `Gemini isteği başarısız (${response.status})`);
+    err.status = response.status;
+    err.retryable = RETRYABLE_STATUS.includes(response.status);
+    throw err;
+  }
+  const cand = (data.candidates || [])[0];
+  if (!cand) {
+    const err = new Error("Gemini boş yanıt döndürdü");
+    err.retryable = true;
+    throw err;
+  }
+  // Only use final-answer parts, skip internal "thinking" parts.
   const text = (cand.content?.parts || []).filter(p => !p.thought).map(p => p.text || "").join("").trim();
   if (!text) {
     if (cand.finishReason === "MAX_TOKENS") throw new Error("Gemini yanıtı token limitine takıldı, tekrar dener misin?");
     if (cand.finishReason === "SAFETY") throw new Error("Gemini güvenlik filtresine takıldı");
-    throw new Error("Gemini boş yanıt döndürdü");
+    const err = new Error("Gemini boş yanıt döndürdü");
+    err.retryable = true;
+    throw err;
   }
   return text;
+}
+
+async function callGemini(systemPrompt, contents, maxTokens) {
+  const key = getGeminiKey();
+  if (!key) throw new Error("NO_KEY");
+  let lastErr = null;
+  geminiStatusNote = "";
+
+  for (let m = 0; m < GEMINI_MODELS.length; m++) {
+    const model = GEMINI_MODELS[m];
+    // 3 attempts per model with exponential backoff (1s, 2s, 4s) + jitter.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const out = await callGeminiOnce(model, key, systemPrompt, contents, maxTokens);
+        geminiStatusNote = "";
+        return out;
+      } catch (e) {
+        lastErr = e;
+        // A bad key, a blocked prompt or a token-limit hit won't fix itself.
+        if (e.retryable === false || e.status === 400 || e.status === 401 || e.status === 403) throw e;
+        if (!e.retryable) throw e;
+        if (attempt < 2) {
+          geminiStatusNote = `Sunucu yoğun, tekrar deneniyor (${attempt + 2}/3)…`;
+          render();
+          await sleep(1000 * Math.pow(2, attempt) + Math.random() * 400);
+        }
+      }
+    }
+    if (m < GEMINI_MODELS.length - 1) {
+      geminiStatusNote = `Yedek modele geçiliyor: ${GEMINI_MODELS[m + 1]}…`;
+      render();
+    }
+  }
+  geminiStatusNote = "";
+  const msg = lastErr?.message || "Bilinmeyen hata";
+  throw new Error(`Gemini şu an yoğun, tüm modeller denendi. Birkaç dakika sonra tekrar dene. (${msg})`);
 }
 function extractJson(raw) {
   const clean = raw.replace(/```json|```/g, "").trim();
@@ -1410,7 +1462,7 @@ function renderNutrition(entry, targets) {
         <input type="text" class="chat-input" id="mealInput" placeholder="örn. patlıcanlı patates, makarna, çorba" />
         <button class="chat-send-btn" id="mealSend">➤</button>
       </div>
-      ${mealLoading ? `<div class="meal-analyzing">öğün analiz ediliyor…</div>` : ""}
+      ${mealLoading ? `<div class="meal-analyzing">${geminiStatusNote || "öğün analiz ediliyor…"}</div>` : ""}
       ${mealError ? `<div class="chat-error">Analiz başarısız: ${esc(mealError)}. Aşağıdan elle ekleyebilirsin.</div>` : ""}
       ${lastMealResult ? `
         <div class="meal-result-card">
@@ -1445,7 +1497,7 @@ function renderNutrition(entry, targets) {
         <input type="text" class="chat-input" id="customRecipeInput" placeholder="örn. tavuklu makarna, mercimek çorbası" value="${esc(customRecipeInputText)}" />
         <button class="chat-send-btn" id="customRecipeSend">➤</button>
       </div>
-      ${customRecipeLoading ? `<div class="meal-analyzing">tarif hazırlanıyor…</div>` : ""}
+      ${customRecipeLoading ? `<div class="meal-analyzing">${geminiStatusNote || "tarif hazırlanıyor…"}</div>` : ""}
       ${customRecipeError ? `<div class="chat-error">Tarif oluşturulamadı: ${esc(customRecipeError)}</div>` : ""}
     </section>
 
@@ -1722,12 +1774,12 @@ function renderTraining(entry, phase, weeksRemaining) {
     </div>` : "";
 
   return `
-    ${autoGenLoading ? `<div class="auto-plan-banner">✨ Bugünün planı hazırlanıyor…</div>` : ""}
+    ${autoGenLoading ? `<div class="auto-plan-banner">✨ ${geminiStatusNote || "Bugünün planı hazırlanıyor…"}</div>` : ""}
     ${planAdjustLoading ? `<div class="auto-plan-banner">🍽️ Plan beslenmene göre güncelleniyor…</div>` : ""}
     ${planAdjustNote && !planAdjustLoading ? `<div class="auto-plan-note">🍽️ ${esc(planAdjustNote)}<button class="auto-plan-dismiss" id="planNoteDismiss">✕</button></div>` : ""}
     ${autoGenError ? `<div class="chat-error">Otomatik plan kurulamadı: ${esc(autoGenError)} — standart program gösteriliyor.</div>` : ""}
     <button class="ai-gen-btn" id="aiGenBtn" ${aiGenLoading || autoGenLoading ? "disabled" : ""}>
-      ✨ ${aiGenLoading ? "planlanıyor…" : dayInfo.isAI ? "Yeniden Planla" : "Yeni Antrenman Planla"}
+      ✨ ${aiGenLoading ? (geminiStatusNote || "planlanıyor…") : dayInfo.isAI ? "Yeniden Planla" : "Yeni Antrenman Planla"}
     </button>
     ${aiGenError ? `<div class="chat-error">Plan oluşturulamadı: ${esc(aiGenError)}</div>` : ""}
     ${dayInfo.isAI ? `<button class="ai-revert-btn" id="aiRevertBtn">Standart programa dön</button>` : ""}
