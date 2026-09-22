@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Enti Coach</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap');
@@ -16,7 +16,7 @@
   .streak-badge { display: flex; align-items: center; gap: 5px; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 10px; padding: 8px 12px; height: fit-content; }
   .streak-num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px; color: #B8720A; }
   .streak-denom { font-size: 12px; color: #C9A464; }
-  .streak-label { font-size: 11px; color: #6B7280; }
+  .streak-label { font-size: 10.5px; color: #6B7280; line-height: 1.2; }
   .date-nav { display: flex; align-items: center; justify-content: space-between; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 12px; padding: 10px 6px; }
   .nav-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #12151A; font-size: 16px; }
   .date-label { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: #12151A; text-transform: capitalize; }
@@ -40,6 +40,9 @@
   .ex-name.done { color: #9AA3AE; text-decoration: line-through; }
   .ex-scheme { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #6B7280; flex-shrink: 0; }
   .info-btn { background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #0F9E8C; font-size: 13px; font-weight: 700; }
+  .ex-region { display: block; font-size: 11px; color: #0F9E8C; margin-top: 2px; }
+  .ex-scheme-sub { display: block; margin-top: 2px; font-size: 11.5px; }
+  .swap-btn { background: #FFF3E0; border: 1px solid #FBD9A8; border-radius: 7px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #B8720A; font-size: 14px; font-weight: 700; }
   .ex-row-custom { border-style: dashed; border-color: #D0D5DD; }
   .ex-custom-tip { font-size: 11px; color: #6B7280; margin-top: 3px; line-height: 1.4; }
   .ai-gen-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #4DD8C7; border: none; border-radius: 12px; padding: 13px 0; color: #12151A; font-size: 13.5px; font-weight: 700; cursor: pointer; }
@@ -98,6 +101,7 @@
   .modal-tip { font-size: 13.5px; color: #3A4048; line-height: 1.55; margin-top: 14px; }
   .modal-scheme { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F9E8C; margin-top: 12px; }
   .meal-row.clickable { cursor: pointer; }
+  .meal-swap-btn { background: #ECEFF2; border: none; border-radius: 7px; width: 30px; height: 28px; cursor: pointer; font-size: 13px; flex-shrink: 0; }
   .recipe-chip { display: inline-flex; align-items: center; gap: 4px; background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; padding: 4px 9px; font-size: 10.5px; font-weight: 700; color: #0F9E8C; margin-top: 8px; }
   .recipe-progress { display: flex; gap: 4px; margin-bottom: 16px; }
   .recipe-progress-seg { flex: 1; height: 3px; border-radius: 2px; background: #ECEFF2; }
@@ -119,13 +123,33 @@
   .recipe-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .recipe-note-box { font-size: 11.5px; color: #B8720A; line-height: 1.5; margin-top: 18px; background: #FBF3E6; border: 1px solid #F0DDB8; border-radius: 10px; padding: 10px 12px; }
   .recipe-macro-box { font-size: 11.5px; color: #94A0AE; line-height: 1.6; margin-top: 10px; }
+  /* iOS Safari auto-zooms on focus when font-size < 16px */
+  input, textarea, select { font-size: 16px !important; }
+  html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
   input:focus, textarea:focus { outline: 2px solid #4DD8C7; outline-offset: 1px; }
   button:focus-visible { outline: 2px solid #4DD8C7; outline-offset: 2px; }
 
   .phase-banner { background: #EAF7E2; border: 1px solid #C7E6B8; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px; }
   .phase-banner-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #3F7A1F; font-weight: 700; }
   .phase-banner-sub { font-size: 12.5px; color: #5B6B4A; line-height: 1.45; }
+  .rotation-note { font-size: 11.5px; color: #6B7280; background: #F3F5F7; border-radius: 8px; padding: 8px 10px; margin-top: 12px; line-height: 1.45; }
   .cardio-note { font-size: 12.5px; color: #B8720A; background: #FFF3E0; border: 1px solid #FBD9A8; border-radius: 8px; padding: 8px 10px; margin-top: 12px; }
+  .sg-neglect { font-size: 12px; color: #B8720A; background: #FFF8EB; border: 1px solid #FBD9A8; border-radius: 8px; padding: 8px 10px; margin-top: 10px; }
+  .sg-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .sg-chip { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; color: #3A4048; cursor: pointer; }
+  .sg-chip.active { background: #4DD8C7; border-color: #4DD8C7; color: #12151A; }
+  .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .sg-card { display: flex; flex-direction: column; align-items: stretch; gap: 3px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 6px; cursor: pointer; text-align: left; min-width: 0; }
+  .sg-card .sg-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
+  .sg-thumb { width: 58px; height: 58px; object-fit: cover; border-radius: 8px; background: #E4E8ED; flex-shrink: 0; }
+  .sg-name { display: block; font-size: 12.5px; font-weight: 600; color: #12151A; line-height: 1.3; }
+  .sg-region { display: block; font-size: 10.5px; color: #0F9E8C; margin-top: 1px; }
+  .sg-why { display: block; font-size: 11.5px; color: #6B7280; margin-top: 3px; line-height: 1.4; }
+  .sg-result { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .sg-result-head { font-size: 12px; color: #94A0AE; font-family: 'JetBrains Mono', monospace; }
+  .sg-intro { font-size: 13px; color: #3A4048; line-height: 1.5; }
+  .sg-row { display: flex; align-items: center; gap: 8px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 6px 8px 6px 6px; }
+  .sg-row-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; cursor: pointer; }
   .version-tag { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #B7BEC7; margin-top: 4px; }
 
   .profile-edit-btn { display: flex; align-items: center; gap: 5px; background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; padding: 6px 10px; color: #0F9E8C; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; flex-shrink: 0; }
@@ -235,6 +259,9 @@
   .ring-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
   .ring-legend-text { flex: 1; min-width: 0; }
   .ring-legend-label { font-size: 11.5px; color: #6B7280; }
+  .ring-legend-value { white-space: nowrap; }
+  .ring-legend-sub { font-size: 10.5px; color: #94A0AE; font-family: 'JetBrains Mono', monospace; }
+  .fat-warn { font-size: 12.5px; color: #B42318; background: #FEF3F2; border: 1px solid #FECDCA; border-radius: 10px; padding: 9px 12px; margin-top: 12px; line-height: 1.45; }
   .ring-legend-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #12151A; }
   .ring-legend-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; flex-shrink: 0; }
   .metric-ring-row { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
@@ -287,7 +314,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "2.14.0";
+const APP_VERSION = "3.0.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -317,9 +344,9 @@ const MEDIA = {
   plank: { dbId: "Plank", tip: "Dirsekler omuz altında, kalça ne yukarı ne aşağı — düz bir çizgi koru." },
   glute_bridge: { dbId: "Butt_Lift_Bridge", tip: "Sırtüstü yat, dizler bükülü. Kalçayı yukarı it, tepede sık, kontrollü indir." },
 };
-function exImg(id, i) { return IMG_BASE + encodeURIComponent(MEDIA[id].dbId) + "/" + i + ".jpg"; }
+function exImg(id, i) { const m = mediaFor(id); return m ? IMG_BASE + encodeURIComponent(m.dbId) + "/" + i + ".jpg" : ""; }
 
-const DAY_TYPES = {
+const LEGACY_DAY_TYPES = { // pre-v3 fixed program — kept so past days keep their history
   upper_push: { label: "Upper — İtiş", sub: "Göğüs / Omuz / Triceps", exercises: [
     { id: "bench", name: "Bench Press", scheme: "4 × 6-8" },
     { id: "incline_db", name: "Incline Dumbbell Press", scheme: "3 × 8-10" },
@@ -374,8 +401,10 @@ const DAY_TYPES = {
 };
 const SPLIT_ORDER = ["upper_push", "lower_quad", "upper_pull", "lower_hip"];
 const FULL_BODY_ORDER = ["full_body_a", "full_body_b"];
-function effectiveDayInfo(entry, dayType) {
-  const base = DAY_TYPES[dayType];
+function effectiveDayInfo(entry, dayType, dateStr) {
+  const base = (!dateStr || (profile && profile.programV3Start && dateStr < profile.programV3Start))
+    ? LEGACY_DAY_TYPES[dayType]
+    : buildProgramDay(dayType, dateStr, entry);
   if (entry && entry.aiWorkout && entry.aiWorkout.exercises && entry.aiWorkout.exercises.length) {
     return {
       label: entry.aiWorkout.label || base.label,
@@ -388,16 +417,305 @@ function effectiveDayInfo(entry, dayType) {
   return base;
 }
 const DEFAULT_TRAINING_DAYS = [0, 1, 3, 4];
-const EXERCISE_CATALOG = (() => {
-  const map = {};
-  Object.values(DAY_TYPES).forEach((d) => {
-    (d.exercises || []).forEach((ex) => {
-      if (MEDIA[ex.id] && !map[ex.id]) map[ex.id] = ex.name;
-    });
+// ---------------------------------------------------------------------------
+// Exercise library — every entry has a real image in free-exercise-db.
+// [dbId, name, region, note]  note = which part it hits + key form cue.
+// ---------------------------------------------------------------------------
+const REGIONS = {
+  gogus_orta: "Göğüs (orta)", gogus_ust: "Üst göğüs", gogus_alt: "Alt göğüs", gogus_ic: "Göğüs (iç/sıkıştırma)",
+  omuz_on: "Ön omuz", omuz_yan: "Yan omuz", omuz_arka: "Arka omuz", trapez: "Trapez",
+  tri_dis: "Triceps dış baş", tri_uzun: "Triceps uzun baş", tri_ic: "Triceps iç baş", tri_genel: "Triceps (tüm)",
+  lat_genis: "Sırt genişliği (dış lat)", lat_alt: "Alt lat", sirt_orta: "Orta sırt / kalınlık", bel: "Bel / alt sırt",
+  bic_uzun: "Biceps uzun baş (tepe)", bic_kisa: "Biceps kısa baş (iç)", bic_genel: "Biceps (tüm)", brachialis: "Brachialis / ön kol",
+  quad: "Ön bacak (quad)", quad_dis: "Dış quad", quad_ic: "İç quad / diz üstü", hamstring: "Arka bacak", kalca: "Kalça", kalca_yan: "Yan kalça", ic_bacak: "İç bacak",
+  baldir_gastro: "Baldır (üst, gastrocnemius)", baldir_soleus: "Baldır (alt, soleus)",
+  karin_ust: "Üst karın", karin_alt: "Alt karın", oblik: "Yan karın (oblik)", core: "Core / stabilite",
+};
+const LIB_RAW = [
+  // --- Göğüs
+  ["Barbell_Bench_Press_-_Medium_Grip", "Bench Press (orta tutuş)", "gogus_orta", "Temel göğüs kütlesi. Kürek kemiklerini sık, bar göğüs ucuna iner."],
+  ["Wide-Grip_Barbell_Bench_Press", "Bench Press (geniş tutuş)", "gogus_orta", "Geniş tutuş göğsün dış kısmını daha çok gerer, triceps payı azalır."],
+  ["Barbell_Incline_Bench_Press_-_Medium_Grip", "Incline Bench Press (barbell)", "gogus_ust", "Bank 30°. Üst göğüs + ön omuz. Bar köprücük altına iner."],
+  ["Dumbbell_Bench_Press", "Dumbbell Bench Press", "gogus_orta", "Dumbbell daha derin esneme verir, sağ-sol dengesizliğini kapatır."],
+  ["Dumbbell_Bench_Press_with_Neutral_Grip", "Dumbbell Press (avuçlar içe)", "gogus_ic", "Nötr tutuş omuzu korur, iç göğüs ve triceps'e kayar."],
+  ["Incline_Dumbbell_Press", "Incline Dumbbell Press", "gogus_ust", "Bank 30-45°. Dumbbell'lar göğüs üstünden kontrollü iner."],
+  ["Hammer_Grip_Incline_DB_Bench_Press", "Incline DB Press (çekiç tutuş)", "gogus_ust", "Avuçlar içe bakar; üst göğüs + omuz dostu varyasyon."],
+  ["Decline_Dumbbell_Bench_Press", "Decline Dumbbell Press", "gogus_alt", "Baş aşağı eğimli bank; alt göğüs çizgisini çalıştırır."],
+  ["Decline_Barbell_Bench_Press", "Decline Bench Press", "gogus_alt", "Alt göğüs. Ayakları sabitle, bar göğsün alt kısmına iner."],
+  ["Machine_Bench_Press", "Machine Chest Press", "gogus_orta", "Makine sabit yol verir; yorgunken güvenli hacim için ideal."],
+  ["Smith_Machine_Incline_Bench_Press", "Smith Incline Press", "gogus_ust", "Sabit yol, üst göğse odaklanmak kolay."],
+  ["Incline_Cable_Chest_Press", "Incline Cable Press", "gogus_ust", "Kablo tüm hareket boyunca gerilim tutar."],
+  ["Cable_Crossover", "Cable Crossover (yukarıdan aşağı)", "gogus_alt", "Makaralar yüksekte; eller bel önünde birleşir → alt/orta göğüs."],
+  ["Low_Cable_Crossover", "Cable Crossover (aşağıdan yukarı)", "gogus_ust", "Makaralar aşağıda; eller çene hizasında birleşir → üst göğüs."],
+  ["Flat_Bench_Cable_Flyes", "Bankta Cable Fly", "gogus_ic", "Düz bank + kablo; en üstte sıkıştırma çok iyi."],
+  ["Dumbbell_Flyes", "Dumbbell Fly", "gogus_orta", "Dirsekler hafif bükülü, kollar yay çizer. Göğsü esnet."],
+  ["Incline_Dumbbell_Flyes", "Incline Dumbbell Fly", "gogus_ust", "Eğimli bankta fly; üst göğüs esnetme."],
+  ["Butterfly", "Pec Deck (Butterfly)", "gogus_ic", "Makinede kolları önde birleştir, 1 sn sık."],
+  ["Push-Up_Wide", "Geniş Şınav", "gogus_orta", "Eller omuzdan geniş; göğüs ağırlıklı şınav."],
+  ["Push-Ups_With_Feet_Elevated", "Ayak Yüksekte Şınav", "gogus_ust", "Ayaklar bankta → üst göğse kayar."],
+  ["Pushups", "Şınav", "gogus_orta", "Gövde düz bir çizgi, göğüs yere yakın iner."],
+  ["Straight-Arm_Dumbbell_Pullover", "Dumbbell Pullover", "gogus_orta", "Göğüs + lat birlikte; göğüs kafesini esnetir."],
+  // --- Omuz
+  ["Dumbbell_Shoulder_Press", "Dumbbell Shoulder Press", "omuz_on", "Otur, sırt destekli; omuz hizasından tepeye it."],
+  ["Arnold_Dumbbell_Press", "Arnold Press", "omuz_on", "Avuçlar sana dönükken başla, iterken dışa çevir — ön + yan omuz."],
+  ["Seated_Barbell_Military_Press", "Oturarak Barbell Press", "omuz_on", "Bar çene önünden tepeye; beli bankta sabitle."],
+  ["Standing_Military_Press", "Ayakta Military Press", "omuz_on", "Karın ve kalça sıkı; tüm vücut stabilitesi ister."],
+  ["Machine_Shoulder_Military_Press", "Makine Shoulder Press", "omuz_on", "Güvenli yol; ağır setler için rahat."],
+  ["Standing_Palms-In_Dumbbell_Press", "Avuçlar İçe DB Press", "omuz_on", "Nötr tutuş omuz eklemi dostudur."],
+  ["Side_Lateral_Raise", "Lateral Raise (dumbbell)", "omuz_yan", "Hafif ağırlık, dirsek hafif bükülü, omuz hizasına kadar."],
+  ["Cable_Seated_Lateral_Raise", "Cable Lateral Raise", "omuz_yan", "Kablo en altta da gerilim verir; tek kol tek kol yap."],
+  ["One-Arm_Incline_Lateral_Raise", "Eğimli Bankta Tek Kol Lateral", "omuz_yan", "Yana yatık bankta → hareketin alt kısmı zorlaşır."],
+  ["Lying_One-Arm_Lateral_Raise", "Yan Yatarak Lateral Raise", "omuz_yan", "Yan yat, kolu yukarı kaldır; sallanma imkansız."],
+  ["Seated_Side_Lateral_Raise", "Oturarak Lateral Raise", "omuz_yan", "Oturunca vücuttan destek alamazsın, daha temiz."],
+  ["Front_Dumbbell_Raise", "Front Raise", "omuz_on", "Ön omuz izolasyonu; bench günlerinde fazla yapma."],
+  ["Face_Pull", "Face Pull (halat)", "omuz_arka", "Halat yüze çekilir, dirsekler yukarıda; omuz sağlığı."],
+  ["Reverse_Machine_Flyes", "Reverse Pec Deck", "omuz_arka", "Makinede kollar geriye açılır; arka omuz izolasyonu."],
+  ["Cable_Rear_Delt_Fly", "Cable Rear Delt Fly", "omuz_arka", "Çapraz kablo, kollar geriye yay çizer."],
+  ["Seated_Bent-Over_Rear_Delt_Raise", "Eğilerek Rear Delt Raise", "omuz_arka", "Oturup öne eğil, dumbbell'ları yana kaldır."],
+  ["Reverse_Flyes", "Reverse Fly (dumbbell)", "omuz_arka", "Hafif ağırlık, kürek kemikleri sıkışır."],
+  ["Cable_Rope_Rear-Delt_Rows", "Halat Rear Delt Row", "omuz_arka", "Halatı yüz hizasına geniş dirsekle çek."],
+  ["Upright_Cable_Row", "Cable Upright Row", "trapez", "Yan omuz + trapez; dirsekler omuz hizasını geçmesin."],
+  ["Dumbbell_Shrug", "Dumbbell Shrug", "trapez", "Omuzları kulağa doğru kaldır, 1 sn tut."],
+  ["Barbell_Shrug", "Barbell Shrug", "trapez", "Ağır tutabilirsin; dönme yapma, düz yukarı."],
+  // --- Triceps
+  ["Triceps_Pushdown", "Triceps Pushdown (düz bar)", "tri_dis", "Düz bar → dış ve iç baş. Dirsekler gövdeye yapışık."],
+  ["Triceps_Pushdown_-_Rope_Attachment", "Triceps Pushdown (halat)", "tri_dis", "Halat → altta elleri dışa aç; dış başı en iyi sıkar."],
+  ["Triceps_Pushdown_-_V-Bar_Attachment", "Triceps Pushdown (V-bar)", "tri_genel", "V-bar en ağır yüklenebilen varyasyon; genel kütle."],
+  ["Reverse_Grip_Triceps_Pushdown", "Ters Tutuş Pushdown", "tri_ic", "Avuçlar yukarı → iç (medial) baş vurgusu, bileğe dikkat."],
+  ["Cable_Rope_Overhead_Triceps_Extension", "Halat Overhead Extension", "tri_uzun", "Kollar baş üstünde → uzun baş gerilir; kolun en kalın kısmı."],
+  ["Triceps_Overhead_Extension_with_Rope", "Overhead Rope Extension (ayakta)", "tri_uzun", "Makaraya sırtını dön, halatı baş üstünden ileri it."],
+  ["EZ-Bar_Skullcrusher", "EZ Bar Skull Crusher", "tri_uzun", "Bar alna doğru iner, dirsekler sabit."],
+  ["Standing_Dumbbell_Triceps_Extension", "Dumbbell Overhead Extension", "tri_uzun", "Tek dumbbell iki elle, baş arkasına indir."],
+  ["Dumbbell_One-Arm_Triceps_Extension", "Tek Kol DB Overhead Extension", "tri_uzun", "Tek kol baş üstü; her kolu ayrı çalıştırır."],
+  ["Close-Grip_Barbell_Bench_Press", "Dar Tutuş Bench Press", "tri_genel", "Eller omuz genişliğinde; ağır triceps bileşik hareketi."],
+  ["Dips_-_Triceps_Version", "Dips (triceps)", "tri_genel", "Gövde dik, dirsekler geriye; vücut ağırlığıyla kütle."],
+  ["Tricep_Dumbbell_Kickback", "Dumbbell Kickback", "tri_dis", "Öne eğil, üst kol sabit, ön kolu geriye aç, tepede sık."],
+  ["Bench_Dips", "Bank Dips", "tri_genel", "Eller bankta; aletsiz triceps."],
+  ["Cable_One_Arm_Tricep_Extension", "Tek Kol Cable Pushdown", "tri_dis", "Tek kol → sağ-sol farkını kapatır."],
+  // --- Sırt
+  ["Wide-Grip_Lat_Pulldown", "Lat Pulldown (geniş, düz tutuş)", "lat_genis", "Geniş tutuş → sırtın dış kanatları, V görünümü."],
+  ["Close-Grip_Front_Lat_Pulldown", "Lat Pulldown (dar, düz tutuş)", "lat_alt", "Dar tutuş → hareket açıklığı artar, alt lat + orta sırt."],
+  ["V-Bar_Pulldown", "Lat Pulldown (V-bar / üçgen)", "lat_alt", "Nötr tutuş → alt lat, göğse doğru çek, geriye yaslanma."],
+  ["Underhand_Cable_Pulldowns", "Lat Pulldown (ters tutuş)", "lat_alt", "Avuçlar sana dönük → alt lat + biceps'e yük biner."],
+  ["One_Arm_Lat_Pulldown", "Tek Kol Lat Pulldown", "lat_genis", "Tek kol, dirseği kalçaya doğru çek; tam esneme."],
+  ["Full_Range-Of-Motion_Lat_Pulldown", "Tam Açıklık Lat Pulldown", "lat_genis", "Tepede tam esne, altta tam sık."],
+  ["Pullups", "Barfiks (geniş)", "lat_genis", "Vücut ağırlığı; olmuyorsa makine/lastik destekli yap."],
+  ["Chin-Up", "Chin-Up (ters tutuş barfiks)", "lat_alt", "Avuçlar sana dönük; alt lat + biceps."],
+  ["Straight-Arm_Pulldown", "Straight-Arm Pulldown", "lat_genis", "Kollar düz, barı kalçaya indir; lat izolasyonu."],
+  ["Rope_Straight-Arm_Pulldown", "Halat Straight-Arm Pulldown", "lat_alt", "Halatla daha uzun hareket, altta lat'ı sık."],
+  ["Seated_Cable_Rows", "Seated Cable Row (V-bar)", "sirt_orta", "Göğüs dik, kürek kemiklerini sık, dirsekler gövdeye yakın."],
+  ["Seated_One-arm_Cable_Pulley_Rows", "Tek Kol Cable Row", "sirt_orta", "Tek kol, gövdeyi döndürmeden çek."],
+  ["Bent_Over_Barbell_Row", "Barbell Row", "sirt_orta", "Gövde ~45°, bar göbeğe çekilir; sırt kalınlığının temeli."],
+  ["Reverse_Grip_Bent-Over_Rows", "Ters Tutuş Barbell Row", "lat_alt", "Avuçlar yukarı → alt lat, dirsekler gövdeye yakın."],
+  ["One-Arm_Dumbbell_Row", "Tek Kol Dumbbell Row", "lat_alt", "Bankta destekli; dirseği kalçaya doğru çek."],
+  ["T-Bar_Row_with_Handle", "T-Bar Row", "sirt_orta", "Ağır yüklenebilir; orta sırt kalınlığı."],
+  ["Dumbbell_Incline_Row", "Göğüs Destekli DB Row", "sirt_orta", "Eğimli banka yüzüstü yat; bel yükü sıfır."],
+  ["Bent_Over_Two-Dumbbell_Row_With_Palms_In", "İki DB Row (avuçlar içe)", "sirt_orta", "Nötr tutuş, dirsekler gövdeye yakın."],
+  ["Leverage_High_Row", "Makine High Row", "lat_genis", "Yukarıdan aşağı-geriye çekiş; üst lat + orta sırt."],
+  ["Barbell_Deadlift", "Deadlift", "bel", "Sırt düz, bar bacağa yakın; tüm arka zincir."],
+  ["Rack_Pulls", "Rack Pull", "bel", "Diz hizasından deadlift; üst sırt + trapez, bele daha az yük."],
+  ["Trap_Bar_Deadlift", "Trap Bar Deadlift", "quad", "Altıgen bar; quad payı artar, bel için daha güvenli."],
+  ["Hyperextensions_Back_Extensions", "Hyperextension (bel)", "bel", "Bel kaslarını güçlendirir; tepede aşırı geriye bükülme."],
+  // --- Biceps / ön kol
+  ["Barbell_Curl", "Barbell Curl", "bic_genel", "Dirsekler sabit, sallanma yok; genel biceps kütlesi."],
+  ["EZ-Bar_Curl", "EZ Bar Curl", "bic_genel", "Kırık bar bileği rahatlatır."],
+  ["Close-Grip_EZ_Bar_Curl", "Dar Tutuş EZ Curl", "bic_uzun", "Dar tutuş → dış/uzun baş (biceps tepesi)."],
+  ["Wide-Grip_Standing_Barbell_Curl", "Geniş Tutuş Barbell Curl", "bic_kisa", "Geniş tutuş → iç/kısa baş (kolun iç kalınlığı)."],
+  ["Preacher_Curl", "Preacher Curl", "bic_kisa", "Kol sehpaya yaslı; hile imkansız, alt kısım çalışır."],
+  ["Incline_Dumbbell_Curl", "Incline Dumbbell Curl", "bic_uzun", "Eğimli bankta kollar geride → uzun baş gerilir."],
+  ["Dumbbell_Alternate_Bicep_Curl", "Alternate Dumbbell Curl", "bic_genel", "Kaldırırken avucu dışa çevir (supinasyon)."],
+  ["Concentration_Curls", "Concentration Curl", "bic_kisa", "Dirsek dizin içinde; tepede güçlü sıkma."],
+  ["Spider_Curl", "Spider Curl", "bic_kisa", "Eğimli banka yüzüstü; kısalmış pozisyonda zor."],
+  ["Standing_Biceps_Cable_Curl", "Cable Curl", "bic_genel", "Kablo sürekli gerilim verir."],
+  ["Overhead_Cable_Curl", "Overhead Cable Curl", "bic_kisa", "Kollar yanlarda yukarıda; tepede sıkma (poz gibi)."],
+  ["Machine_Preacher_Curls", "Makine Preacher Curl", "bic_kisa", "Sabit yol, izolasyon."],
+  ["Hammer_Curls", "Hammer Curl", "brachialis", "Avuçlar içe bakar; brachialis kolu dışa doğru kalınlaştırır."],
+  ["Cable_Hammer_Curls_-_Rope_Attachment", "Halat Hammer Curl", "brachialis", "Halatla çekiç tutuş, sürekli gerilim."],
+  ["Cross_Body_Hammer_Curl", "Çapraz Hammer Curl", "brachialis", "Dumbbell'ı karşı omza doğru kaldır."],
+  ["Reverse_Barbell_Curl", "Ters Tutuş Barbell Curl", "brachialis", "Avuçlar aşağı; ön kol + brachialis."],
+  ["Zottman_Curl", "Zottman Curl", "brachialis", "Normal kaldır, tepede avucu çevir, ters tutuşla indir."],
+  ["Palms-Up_Barbell_Wrist_Curl_Over_A_Bench", "Bilek Curl", "brachialis", "Ön kol iç kısmı; sadece bilek hareket eder."],
+  // --- Quad
+  ["Barbell_Squat", "Back Squat", "quad", "Bar üst sırtta; kalça geriye, göğüs dik."],
+  ["Front_Barbell_Squat", "Front Squat", "quad", "Bar önde → gövde dik kalır, quad'a daha çok yük."],
+  ["Hack_Squat", "Hack Squat (makine)", "quad", "Makine sırtı destekler; quad izolasyonu yüksek."],
+  ["Narrow_Stance_Hack_Squats", "Dar Duruş Hack Squat", "quad_dis", "Ayaklar dar → dış quad (vastus lateralis)."],
+  ["Smith_Machine_Squat", "Smith Squat", "quad", "Ayakları biraz öne al; quad odaklı, güvenli."],
+  ["Wide_Stance_Barbell_Squat", "Geniş Duruş Squat", "ic_bacak", "Geniş duruş → iç bacak + kalça."],
+  ["Leg_Press", "Leg Press", "quad", "Ayaklar orta; dizleri kilitlemeden it."],
+  ["Narrow_Stance_Leg_Press", "Leg Press (dar, alçak ayak)", "quad_dis", "Ayaklar dar ve platformun altında → quad vurgusu."],
+  ["Leg_Extensions", "Leg Extension", "quad_ic", "Tepede 1 sn sık; diz üstü (damla kas)."],
+  ["Single-Leg_Leg_Extension", "Tek Bacak Leg Extension", "quad_ic", "Her bacak ayrı; zayıf bacağı yakalar."],
+  ["Barbell_Walking_Lunge", "Walking Lunge (barbell)", "quad", "Uzun adım, arka diz yere yakın."],
+  ["Dumbbell_Lunges", "Dumbbell Lunge", "quad", "Yerinde öne adım; kısa adım quad, uzun adım kalça."],
+  ["Dumbbell_Rear_Lunge", "Geri Lunge", "kalca", "Geriye adım → diz dostu, kalça vurgusu."],
+  ["Dumbbell_Step_Ups", "Step-Up", "quad", "Bankta tek bacakla yüksel, arka ayakla itme."],
+  ["Split_Squat_with_Dumbbells", "Bulgarian Split Squat", "quad", "Arka ayak bankta; ön bacak dik iner."],
+  ["Goblet_Squat", "Goblet Squat", "quad", "Dumbbell göğüste; derin ve dik squat."],
+  // --- Hamstring / kalça
+  ["Romanian_Deadlift", "Romanian Deadlift", "hamstring", "Dizler hafif bükülü, kalçadan eğil; arka bacak gerilir."],
+  ["Stiff-Legged_Dumbbell_Deadlift", "Dumbbell Stiff-Leg Deadlift", "hamstring", "Dumbbell'la RDL; daha derin iner."],
+  ["Good_Morning", "Good Morning", "hamstring", "Bar sırtta, kalçadan öne eğil; hafif başla."],
+  ["Sumo_Deadlift", "Sumo Deadlift", "ic_bacak", "Geniş duruş → iç bacak + kalça."],
+  ["Seated_Leg_Curl", "Oturarak Leg Curl", "hamstring", "Oturunca hamstring uzamış pozisyonda → daha etkili."],
+  ["Lying_Leg_Curls", "Yüzüstü Leg Curl", "hamstring", "Kalçayı pedden kaldırma."],
+  ["Standing_Leg_Curl", "Ayakta Tek Bacak Leg Curl", "hamstring", "Tek bacak; sağ-sol dengesi."],
+  ["Glute_Ham_Raise", "Glute Ham Raise", "hamstring", "Zor; kontrollü in, gerekirse elle destek al."],
+  ["Barbell_Hip_Thrust", "Hip Thrust", "kalca", "Üst sırt bankta; tepede kalçayı sık."],
+  ["Barbell_Glute_Bridge", "Barbell Glute Bridge", "kalca", "Yerde yapılır; hip thrust'tan kısa hareket."],
+  ["Single_Leg_Glute_Bridge", "Tek Bacak Glute Bridge", "kalca", "Tek bacak; kalça dengesizliğini düzeltir."],
+  ["Pull_Through", "Cable Pull-Through", "kalca", "Bacak arasından halat; kalça menteşesi öğretir."],
+  ["One-Legged_Cable_Kickback", "Cable Kickback", "kalca", "Bacağı geriye it, kalçayı sık."],
+  ["Thigh_Abductor", "Abductor Makinesi", "kalca_yan", "Bacakları dışa aç; yan kalça."],
+  ["Thigh_Adductor", "Adductor Makinesi", "ic_bacak", "Bacakları içe kapat; iç bacak."],
+  // --- Baldır
+  ["Standing_Calf_Raises", "Ayakta Calf Raise (makine)", "baldir_gastro", "Diz düz → üst baldır. Tam esne, tepede sık."],
+  ["Rocking_Standing_Calf_Raise", "Ayakta Calf Raise (barbell)", "baldir_gastro", "Parmak ucunda yüksel, tam esnemeye in."],
+  ["Calf_Press_On_The_Leg_Press_Machine", "Leg Press'te Calf Press", "baldir_gastro", "Diz düz, sadece ayak bileği hareket eder."],
+  ["Smith_Machine_Calf_Raise", "Smith Calf Raise", "baldir_gastro", "Basamak üstünde, sabit yol."],
+  ["Standing_Dumbbell_Calf_Raise", "Dumbbell Calf Raise", "baldir_gastro", "Tek dumbbell, basamakta tek bacak da olur."],
+  ["Seated_Calf_Raise", "Oturarak Calf Raise", "baldir_soleus", "Diz bükülü → alt baldır (soleus)."],
+  ["Dumbbell_Seated_One-Leg_Calf_Raise", "Oturarak Tek Bacak DB Calf", "baldir_soleus", "Dumbbell dizde; aletsiz salonlarda soleus."],
+  ["Donkey_Calf_Raises", "Donkey Calf Raise", "baldir_gastro", "Öne eğilince baldır tam esner."],
+  // --- Karın
+  ["Hanging_Leg_Raise", "Hanging Leg Raise", "karin_alt", "Barda asılı, bacakları kaldır; sallanma yok, kalçayı yuvarla."],
+  ["Hanging_Pike", "Hanging Pike", "karin_alt", "İleri seviye: ayaklar bara doğru."],
+  ["Cable_Crunch", "Cable Crunch (diz çökerek)", "karin_ust", "Halat başın yanında; kalça sabit, göğsü dizlere kıvır."],
+  ["Standing_Rope_Crunch", "Ayakta Halat Crunch", "karin_ust", "Ayakta kablo crunch; karnı kıvırarak in."],
+  ["Ab_Crunch_Machine", "Crunch Makinesi", "karin_ust", "Ağırlık eklenebilir karın; kontrollü."],
+  ["Decline_Crunch", "Decline Crunch", "karin_ust", "Eğimli bankta crunch; zorluk artar."],
+  ["Crunches", "Crunch", "karin_ust", "Bel yerde, sadece omuzlar kalkar."],
+  ["Reverse_Crunch", "Reverse Crunch", "karin_alt", "Sırtüstü, kalçayı yerden kaldırarak dizleri göğse çek."],
+  ["Decline_Reverse_Crunch", "Decline Reverse Crunch", "karin_alt", "Eğimli bankta ters crunch; alt karın."],
+  ["Cable_Reverse_Crunch", "Cable Reverse Crunch", "karin_alt", "Ayaklara kablo; alt karına direnç."],
+  ["Flat_Bench_Lying_Leg_Raise", "Bankta Leg Raise", "karin_alt", "Bel banka yapışık kalsın."],
+  ["Bent-Knee_Hip_Raise", "Hip Raise", "karin_alt", "Dizler bükülü, kalçayı tavana kaldır."],
+  ["Seated_Flat_Bench_Leg_Pull-In", "Bankta Leg Pull-In", "karin_alt", "Bank kenarında oturarak dizleri göğse çek."],
+  ["Barbell_Ab_Rollout_-_On_Knees", "Ab Rollout (dizde)", "core", "Tekerlek/bar ile öne uzan; bel çukurlaşmasın."],
+  ["Plank", "Plank", "core", "Dirsekler omuz altında, kalça düz çizgide."],
+  ["Dead_Bug", "Dead Bug", "core", "Sırtüstü, çapraz kol-bacak uzat; bel yere yapışık."],
+  ["Pallof_Press", "Pallof Press", "oblik", "Kabloyu göğüsten ileri it, dönmeye direnç göster."],
+  ["Standing_Cable_Wood_Chop", "Cable Woodchop", "oblik", "Yukarıdan çapraz aşağı; gövdeyi döndür."],
+  ["Russian_Twist", "Russian Twist", "oblik", "Otur, geriye yaslan, gövdeyi sağa-sola çevir."],
+  ["Cable_Russian_Twists", "Cable Russian Twist", "oblik", "Kabloyla gövde rotasyonu."],
+  ["Side_Bridge", "Yan Plank", "oblik", "Dirsek üstünde yan dur, kalça düşmesin."],
+  ["Decline_Oblique_Crunch", "Decline Oblik Crunch", "oblik", "Eğimli bankta çapraz crunch."],
+  ["Oblique_Crunches_-_On_The_Floor", "Oblik Crunch", "oblik", "Yerde çapraz crunch; dirsek karşı dize."],
+  ["Dumbbell_Side_Bend", "Dumbbell Side Bend", "oblik", "Yana eğil-kalk; hafif ağırlık, yavaş."],
+  ["Air_Bike", "Bisiklet Crunch", "oblik", "Dirsek karşı dize, bacaklar pedal çevirir."],
+  ["Alternate_Heel_Touchers", "Topuk Dokunma", "oblik", "Yerde, yana eğilerek topuklara dokun."],
+  ["Jackknife_Sit-Up", "Jackknife (V-up)", "karin_ust", "Kol ve bacaklar aynı anda ortada buluşur."],
+  // --- Başlangıç
+  ["Bodyweight_Squat", "Bodyweight Squat", "quad", "Form öğren: kalça geriye, göğüs dik."],
+  ["Butt_Lift_Bridge", "Glute Bridge", "kalca", "Sırtüstü, kalçayı yukarı it, tepede sık."],
+];
+const LIB = {};
+LIB_RAW.forEach(([id, n, r, t]) => { LIB[id] = { id, n, r, t }; });
+
+// Groups shown as chips in the "Hareket Önerici".
+const LIB_GROUPS = [
+  { key: "karin", label: "Karın", regions: ["karin_ust", "karin_alt", "oblik", "core"] },
+  { key: "gogus", label: "Göğüs", regions: ["gogus_orta", "gogus_ust", "gogus_alt", "gogus_ic"] },
+  { key: "sirt", label: "Sırt", regions: ["lat_genis", "lat_alt", "sirt_orta", "bel"] },
+  { key: "omuz", label: "Omuz", regions: ["omuz_on", "omuz_yan", "omuz_arka", "trapez"] },
+  { key: "biceps", label: "Biceps / Ön kol", regions: ["bic_genel", "bic_uzun", "bic_kisa", "brachialis"] },
+  { key: "triceps", label: "Triceps", regions: ["tri_genel", "tri_dis", "tri_uzun", "tri_ic"] },
+  { key: "quad", label: "Ön bacak", regions: ["quad", "quad_dis", "quad_ic"] },
+  { key: "arka", label: "Arka bacak / Kalça", regions: ["hamstring", "kalca", "kalca_yan", "ic_bacak"] },
+  { key: "baldir", label: "Baldır", regions: ["baldir_gastro", "baldir_soleus"] },
+];
+function libByGroup(key) {
+  const g = LIB_GROUPS.find(x => x.key === key);
+  if (!g) return [];
+  return LIB_RAW.map(r => LIB[r[0]]).filter(e => g.regions.includes(e.r))
+    .sort((a, b) => g.regions.indexOf(a.r) - g.regions.indexOf(b.r));
+}
+const LIB_CATALOG_TEXT = LIB_RAW.map(([id, n, r]) => `${id} = ${n} [${REGIONS[r]}]`).join("\n");
+
+// ---------------------------------------------------------------------------
+// Rotating program (v3). Each slot is a movement pattern with several
+// variations that hit different regions (grip, cable attachment, angle...).
+// Heavy compound slots rotate every 3 weeks (so progression can build),
+// accessory slots rotate every week. A slot can also be swapped by hand (⇄).
+// ---------------------------------------------------------------------------
+const PROGRAM = {
+  upper_push: { label: "Upper — İtiş", sub: "Göğüs / Omuz / Triceps", slots: [
+    { slot: "push_main", scheme: "4 × 6-8", heavy: true, v: ["Barbell_Bench_Press_-_Medium_Grip", "Barbell_Incline_Bench_Press_-_Medium_Grip", "Dumbbell_Bench_Press", "Wide-Grip_Barbell_Bench_Press"] },
+    { slot: "push_incline", scheme: "3 × 8-10", v: ["Incline_Dumbbell_Press", "Hammer_Grip_Incline_DB_Bench_Press", "Decline_Dumbbell_Bench_Press", "Incline_Cable_Chest_Press", "Smith_Machine_Incline_Bench_Press", "Machine_Bench_Press"] },
+    { slot: "push_fly", scheme: "3 × 12-15", v: ["Cable_Crossover", "Low_Cable_Crossover", "Butterfly", "Incline_Dumbbell_Flyes", "Flat_Bench_Cable_Flyes", "Dumbbell_Flyes"] },
+    { slot: "push_press", scheme: "3 × 8-10", heavy: true, v: ["Dumbbell_Shoulder_Press", "Arnold_Dumbbell_Press", "Seated_Barbell_Military_Press", "Machine_Shoulder_Military_Press"] },
+    { slot: "push_lateral", scheme: "3 × 12-15", v: ["Side_Lateral_Raise", "Cable_Seated_Lateral_Raise", "One-Arm_Incline_Lateral_Raise", "Seated_Side_Lateral_Raise", "Lying_One-Arm_Lateral_Raise"] },
+    { slot: "push_tri_down", scheme: "3 × 10-12", v: ["Triceps_Pushdown_-_Rope_Attachment", "Triceps_Pushdown", "Triceps_Pushdown_-_V-Bar_Attachment", "Reverse_Grip_Triceps_Pushdown", "Cable_One_Arm_Tricep_Extension"] },
+    { slot: "push_tri_over", scheme: "2 × 10-12", v: ["Cable_Rope_Overhead_Triceps_Extension", "EZ-Bar_Skullcrusher", "Dips_-_Triceps_Version", "Standing_Dumbbell_Triceps_Extension", "Close-Grip_Barbell_Bench_Press", "Dumbbell_One-Arm_Triceps_Extension"] },
+  ]},
+  lower_quad: { label: "Lower — Quad", sub: "Squat ağırlıklı + karın", slots: [
+    { slot: "quad_main", scheme: "4 × 6-8", heavy: true, v: ["Barbell_Squat", "Hack_Squat", "Front_Barbell_Squat", "Smith_Machine_Squat"] },
+    { slot: "quad_press", scheme: "3 × 10-12", v: ["Leg_Press", "Narrow_Stance_Leg_Press", "Narrow_Stance_Hack_Squats", "Goblet_Squat"] },
+    { slot: "quad_uni", scheme: "3 × 10/bacak", v: ["Barbell_Walking_Lunge", "Dumbbell_Step_Ups", "Dumbbell_Lunges", "Dumbbell_Rear_Lunge"] },
+    { slot: "quad_ext", scheme: "3 × 12-15", v: ["Leg_Extensions", "Single-Leg_Leg_Extension"] },
+    { slot: "quad_calf", scheme: "4 × 12-15", v: ["Standing_Calf_Raises", "Calf_Press_On_The_Leg_Press_Machine", "Smith_Machine_Calf_Raise", "Rocking_Standing_Calf_Raise", "Donkey_Calf_Raises"] },
+    { slot: "quad_core", scheme: "3 × 12-15", v: ["Hanging_Leg_Raise", "Cable_Crunch", "Barbell_Ab_Rollout_-_On_Knees", "Decline_Reverse_Crunch", "Ab_Crunch_Machine", "Reverse_Crunch"] },
+  ]},
+  upper_pull: { label: "Upper — Çekiş", sub: "Sırt / Biceps / Arka omuz", slots: [
+    { slot: "pull_main", scheme: "4 × 6-8", heavy: true, v: ["Barbell_Deadlift", "Rack_Pulls", "Trap_Bar_Deadlift"] },
+    { slot: "pull_vert", scheme: "3 × 8-10", v: ["Wide-Grip_Lat_Pulldown", "Close-Grip_Front_Lat_Pulldown", "V-Bar_Pulldown", "Underhand_Cable_Pulldowns", "One_Arm_Lat_Pulldown", "Chin-Up"] },
+    { slot: "pull_row", scheme: "3 × 10-12", v: ["Seated_Cable_Rows", "Bent_Over_Barbell_Row", "One-Arm_Dumbbell_Row", "T-Bar_Row_with_Handle", "Reverse_Grip_Bent-Over_Rows", "Dumbbell_Incline_Row", "Seated_One-arm_Cable_Pulley_Rows"] },
+    { slot: "pull_rear", scheme: "3 × 15", v: ["Face_Pull", "Reverse_Machine_Flyes", "Cable_Rear_Delt_Fly", "Seated_Bent-Over_Rear_Delt_Raise", "Cable_Rope_Rear-Delt_Rows"] },
+    { slot: "pull_bic", scheme: "3 × 10-12", v: ["Barbell_Curl", "Incline_Dumbbell_Curl", "Preacher_Curl", "Close-Grip_EZ_Bar_Curl", "Standing_Biceps_Cable_Curl", "Spider_Curl", "Wide-Grip_Standing_Barbell_Curl"] },
+    { slot: "pull_ham", scheme: "2 × 10-12", v: ["Hammer_Curls", "Cable_Hammer_Curls_-_Rope_Attachment", "Reverse_Barbell_Curl", "Cross_Body_Hammer_Curl", "Zottman_Curl"] },
+  ]},
+  lower_hip: { label: "Lower — Hip/Hamstring", sub: "Arka zincir + yan karın", slots: [
+    { slot: "hip_main", scheme: "4 × 8-10", heavy: true, v: ["Romanian_Deadlift", "Stiff-Legged_Dumbbell_Deadlift", "Good_Morning"] },
+    { slot: "hip_thrust", scheme: "3 × 10-12", v: ["Barbell_Hip_Thrust", "Barbell_Glute_Bridge", "Pull_Through", "Single_Leg_Glute_Bridge"] },
+    { slot: "hip_curl", scheme: "3 × 12-15", v: ["Seated_Leg_Curl", "Lying_Leg_Curls", "Standing_Leg_Curl"] },
+    { slot: "hip_uni", scheme: "3 × 10/bacak", v: ["Split_Squat_with_Dumbbells", "Dumbbell_Rear_Lunge", "Dumbbell_Step_Ups"] },
+    { slot: "hip_calf", scheme: "3 × 15", v: ["Seated_Calf_Raise", "Dumbbell_Seated_One-Leg_Calf_Raise"] },
+    { slot: "hip_core", scheme: "3 × 12/taraf", v: ["Standing_Cable_Wood_Chop", "Pallof_Press", "Side_Bridge", "Russian_Twist", "Decline_Oblique_Crunch"] },
+  ]},
+  full_body_a: { label: "Full Body A + Kardiyo", sub: "Adaptasyon fazı — hafif ağırlık, form odaklı",
+    cardio: "15-20 dk hafif tempolu kardiyo (yürüyüş / bisiklet)", slots: [
+    { slot: "fba_leg", scheme: "3 × 12-15 (hafif)", v: ["Goblet_Squat", "Leg_Press", "Bodyweight_Squat"] },
+    { slot: "fba_push", scheme: "3 × 10-12 (hafif)", v: ["Pushups", "Machine_Bench_Press", "Dumbbell_Bench_Press"] },
+    { slot: "fba_pull", scheme: "3 × 12-15 (hafif)", v: ["Seated_Cable_Rows", "Dumbbell_Incline_Row", "One-Arm_Dumbbell_Row"] },
+    { slot: "fba_core", scheme: "3 × 30 sn", v: ["Plank", "Dead_Bug", "Side_Bridge"] },
+  ]},
+  full_body_b: { label: "Full Body B + Kardiyo", sub: "Adaptasyon fazı — hafif ağırlık, form odaklı",
+    cardio: "15-20 dk hafif tempolu kardiyo (yürüyüş / bisiklet)", slots: [
+    { slot: "fbb_hinge", scheme: "3 × 12 (hafif)", v: ["Romanian_Deadlift", "Stiff-Legged_Dumbbell_Deadlift", "Pull_Through"] },
+    { slot: "fbb_press", scheme: "3 × 12 (hafif)", v: ["Dumbbell_Shoulder_Press", "Machine_Shoulder_Military_Press"] },
+    { slot: "fbb_pull", scheme: "3 × 12-15 (hafif)", v: ["Wide-Grip_Lat_Pulldown", "V-Bar_Pulldown", "Close-Grip_Front_Lat_Pulldown"] },
+    { slot: "fbb_glute", scheme: "3 × 15", v: ["Butt_Lift_Bridge", "Barbell_Glute_Bridge", "Reverse_Crunch"] },
+  ]},
+  rest: { label: "Dinlenme", sub: "Serbest gün", slots: [] },
+};
+function programWeekIndex(dateStr) {
+  const start = profile && profile.programStartDate ? profile.programStartDate : "2026-01-05";
+  return Math.max(0, Math.floor(daysBetween(start, dateStr) / 7));
+}
+function slotVariantIndex(slotDef, slotIdx, dateStr, entry) {
+  const w = programWeekIndex(dateStr);
+  const base = slotDef.heavy ? Math.floor(w / 3) : (w + slotIdx);
+  const shift = (entry && entry.variantShift && entry.variantShift[slotDef.slot]) || 0;
+  return ((base + shift) % slotDef.v.length + slotDef.v.length) % slotDef.v.length;
+}
+function buildProgramDay(dayType, dateStr, entry) {
+  const def = PROGRAM[dayType];
+  if (!def) return LEGACY_DAY_TYPES.rest;
+  const exercises = def.slots.map((s, i) => {
+    const id = s.v[slotVariantIndex(s, i, dateStr, entry)];
+    const lib = LIB[id];
+    return { id, name: lib.n, scheme: s.scheme, tip: lib.t, region: REGIONS[lib.r], slot: s.slot, variants: s.v.length };
   });
-  return map;
-})();
-const EXERCISE_CATALOG_TEXT = Object.entries(EXERCISE_CATALOG).map(([id, name]) => `${id}: ${name}`).join(", ");
+  return { label: def.label, sub: def.sub, cardio: def.cardio, exercises, rotating: true };
+}
+
+function mediaFor(id) {
+  if (!id) return null;
+  if (MEDIA[id]) return { dbId: MEDIA[id].dbId, tip: MEDIA[id].tip };
+  if (LIB[id]) return { dbId: id, tip: LIB[id].t };
+  return null;
+}
+function isKnownExId(id) { return !!(id && (LIB[id] || MEDIA[id])); }
 const ADAPTATION_WEEKS = { yeni: 4, ara_verdi: 3, devam: 0 };
 const WEEKDAYS = [
   { idx: 0, short: "Pzt" }, { idx: 1, short: "Sal" }, { idx: 2, short: "Çrş" },
@@ -418,12 +736,221 @@ const TRAINING_STATUS = {
   ara_verdi: { label: "Ara verdim, tekrar başlıyorum", sub: "Daha önce spor yapıyordum" },
   devam: { label: "Düzenli devam ediyorum", sub: "Zaten aktif antrenman yapıyorum" },
 };
-const MEAL_PLAN = [
-  { name: "Kahvaltı (06:45)", ratio: 0.22, items: "Yulaf + süt + yumurta + lor/yoğurt + muz-ceviz-bal — gece hazırla, sabah 5 dk", recipeId: "sporcu_kahvaltisi" },
-  { name: "Öğle (12:30)", ratio: 0.26, items: "İş yerinde çıkan — tabakta önce protein, sonra sebze, en son pilav/makarna", recipeId: null },
-  { name: "Ara Öğün (15:30)", ratio: 0.11, items: "Haşlanmış tavuk göğsü + elma — evden getir, sporadan ~2.5 saat önce", recipeId: "ara_ogun" },
-  { name: "Akşam / Antrenman Sonrası (~21:00)", ratio: 0.41, items: "Tavuk pilav — pişmiş toplam ~400g, 100g'da 12.8g protein", recipeId: "tavuk_pilav" },
+// Daily-rotating meal plan. Each slot has a pool; the pick changes every day
+// (pool sizes differ, so the full combination rarely repeats) and can be
+// swapped by hand with 🔄. Items with a recipeId open the step-by-step recipe.
+const MEAL_SLOTS = [
+  { key: "kahvalti", name: "Kahvaltı (06:45)", ratio: 0.22, pool: [
+    { items: "Yulaf + süt + yumurta + lor/yoğurt + muz-ceviz-bal — gece hazırla, sabah 5 dk", recipeId: "sporcu_kahvaltisi" },
+    { items: "Menemen (3 yumurta) + 2 dilim tam buğday ekmek + 50g lor + salatalık", recipeId: "menemen_lor" },
+    { items: "Beyaz peynirli omlet + 2 dilim tam buğday + 5 zeytin + domates", recipeId: "peynirli_omlet" },
+    { items: "Gece yulafı: süzme yoğurt + yulaf + süt + chia/ceviz + meyve (kavanozda hazır)", recipeId: "gece_yulafi" },
+    { items: "3 haşlanmış yumurta + 60g lor + 2 dilim tam buğday + söğüş", recipeId: "haslama_kahvalti" },
+    { items: "Yulaf-muz pankek (yumurtalı) + süzme yoğurt + az bal", recipeId: "yulaf_pankek" },
+    { items: "Tavuklu tam buğday tost (az kaşar) + ayran", recipeId: "tavuklu_tost" },
+  ]},
+  { key: "ogle", name: "Öğle (12:30)", ratio: 0.26, pool: [
+    { items: "İş yeri: etli/tavuklu ana yemek + yarım porsiyon pilav/bulgur + salata. Önce protein, sonra sebze." },
+    { items: "İş yeri: kuru baklagil günü ise (nohut/fasulye/mercimek) + yoğurt/ayran — pilavı yarıya indir." },
+    { items: "İş yeri: ızgara/fırın varsa onu seç; kızartma varsa atla. Yanına çorba + salata." },
+    { items: "İş yeri: sebze yemeği günü ise protein eksik kalır → yanına 2 yumurta ya da ayran + yoğurt ekle." },
+    { items: "İş yeri: makarna/hamur işi günü → yarım porsiyon al, proteini ana yemekten tam al, tatlıyı pas geç." },
+    { items: "İş yeri: köfte/tavuk varsa çift porsiyon protein, karbonhidratı yarım tut; salata sosunda yağa dikkat." },
+    { items: "İş yeri: çorba + ana yemek + salata; ekmeği 1 dilimle sınırla, tatlı yerine meyve." },
+  ]},
+  { key: "ara", name: "Ara Öğün (15:30)", ratio: 0.11, pool: [
+    { items: "Haşlanmış tavuk göğsü + elma — evden getir, spordan ~2.5 saat önce", recipeId: "ara_ogun" },
+    { items: "200g süzme yoğurt + 1 tatlı kaşığı bal + 10g ceviz", recipeId: "yogurt_bal" },
+    { items: "2 haşlanmış yumurta + 1 muz", recipeId: "yumurta_muz" },
+    { items: "Ton balıklı (suyu süzülmüş) tam buğday sandviç", recipeId: "ton_sandvic" },
+    { items: "100g lor + 1 elma + tarçın", recipeId: "lor_elma" },
+    { items: "300ml kefir + 30g yulaf (karıştır, 5 dk beklet)", recipeId: "kefir_yulaf" },
+  ]},
+  { key: "aksam", name: "Akşam / Antrenman Sonrası (~21:00)", ratio: 0.41, pool: [
+    { items: "Tavuk pilav — pişmiş toplam ~400g, 100g'da 12.8g protein", recipeId: "tavuk_pilav" },
+    { items: "Izgara köfte (yağsız kıyma) + bulgur pilavı + cacık", recipeId: "kofte_bulgur" },
+    { items: "Fırın tavuk göğsü + fırın patates + yoğurt + salata", recipeId: "firin_tavuk" },
+    { items: "Tavuk sote (biberli) + tam buğday makarna", recipeId: "tavuk_sote_makarna" },
+    { items: "Ton balıklı makarna + yeşil salata", recipeId: "ton_makarna" },
+    { items: "Kıymalı (yağsız) nohut + bulgur + ayran", recipeId: "kiymali_nohut" },
+    { items: "Fırında somon/levrek + haşlanmış patates + roka", recipeId: "firin_balik" },
+  ]},
 ];
+function dayNumber(dateStr) { return daysBetween("2024-01-01", dateStr); }
+function mealPickFor(slotIdx, dateStr, entry) {
+  const slot = MEAL_SLOTS[slotIdx];
+  const shift = (entry && entry.mealShift && entry.mealShift[slot.key]) || 0;
+  const n = slot.pool.length;
+  return (((dayNumber(dateStr) + slotIdx * 3 + shift) % n) + n) % n;
+}
+function recipeTotalMacros(r) {
+  if (!r) return null;
+  if (r.macros) return r.macros;
+  if (r.per100g && r.cookedYieldG) {
+    const f = r.cookedYieldG / 100;
+    return { kcal: r.per100g.kcal * f, protein: r.per100g.protein * f, carbs: r.per100g.carbs * f, fat: r.per100g.fat * f };
+  }
+  return null;
+}
+
+const EXTRA_RECIPES = {
+  menemen_lor: { title: "Menemen + Lor", baseServings: 1, macros: { kcal: 560, protein: 34, carbs: 45, fat: 26 },
+    ingredients: [
+      { id: "m1", name: "yumurta", amount: 3, unit: "adet" }, { id: "m2", name: "domates", amount: 2, unit: "adet" },
+      { id: "m3", name: "sivri/çarliston biber", amount: 2, unit: "adet" }, { id: "m4", name: "zeytinyağı", amount: 5, unit: "ml" },
+      { id: "m5", name: "tam buğday ekmek", amount: 60, unit: "g" }, { id: "m6", name: "lor peyniri", amount: 50, unit: "g" },
+      { id: "m7", name: "salatalık", amount: 1, unit: "adet" },
+    ],
+    steps: [
+      { title: "Biberleri sotele", content: "Tavada zeytinyağını ısıt, doğranmış biberleri yumuşayana kadar sotele.", timer: 180 },
+      { title: "Domatesi ekle", content: "Rendelenmiş/küp domatesi ekle, suyunu çekene kadar pişir.", timer: 300 },
+      { title: "Yumurtaları kır", content: "Yumurtaları kır, hafifçe karıştırıp kıvam alınca ocaktan al.", timer: 120 },
+      { title: "Servis", content: "Ekmek, lor ve salatalıkla servis et.", timer: null },
+    ], note: "Yağ bütçesi için zeytinyağını 1 tatlı kaşığında tut." },
+  peynirli_omlet: { title: "Peynirli Omlet", baseServings: 1, macros: { kcal: 590, protein: 33, carbs: 40, fat: 32 },
+    ingredients: [
+      { id: "o1", name: "yumurta", amount: 3, unit: "adet" }, { id: "o2", name: "az yağlı beyaz peynir", amount: 40, unit: "g" },
+      { id: "o3", name: "tereyağı", amount: 5, unit: "g" }, { id: "o4", name: "tam buğday ekmek", amount: 60, unit: "g" },
+      { id: "o5", name: "zeytin", amount: 5, unit: "adet" }, { id: "o6", name: "domates", amount: 1, unit: "adet" },
+    ],
+    steps: [
+      { title: "Çırp", content: "Yumurtaları çırp, ufaladığın peyniri ekle.", timer: null },
+      { title: "Pişir", content: "Tereyağını tavada erit, karışımı dök, kısık ateşte kapağı kapalı pişir.", timer: 240 },
+      { title: "Servis", content: "Ekmek, zeytin ve domatesle servis et.", timer: null },
+    ], note: "Yağ limitini aşıyorsan 1 yumurtayı 2 yumurta akıyla değiştir." },
+  gece_yulafi: { title: "Gece Yulafı (Overnight Oats)", baseServings: 1, macros: { kcal: 560, protein: 35, carbs: 70, fat: 15 },
+    ingredients: [
+      { id: "g1", name: "yulaf ezmesi", amount: 70, unit: "g" }, { id: "g2", name: "süzme yoğurt", amount: 200, unit: "g" },
+      { id: "g3", name: "süt", amount: 100, unit: "ml" }, { id: "g4", name: "chia tohumu", amount: 10, unit: "g" },
+      { id: "g5", name: "ceviz", amount: 10, unit: "g" }, { id: "g6", name: "muz veya mevsim meyvesi", amount: 1, unit: "adet" },
+    ],
+    steps: [
+      { title: "Kavanoza koy", content: "Yulaf, yoğurt, süt ve chia'yı kavanozda karıştır, kapağını kapat.", timer: null },
+      { title: "Buzdolabı", content: "Gece boyunca buzdolabında beklet.", timer: null },
+      { title: "Sabah", content: "Üstüne meyve ve ceviz ekle, soğuk ye.", timer: null },
+    ], note: "Sabah 1 dakikalık iş. İşe de götürülebilir." },
+  haslama_kahvalti: { title: "Haşlanmış Yumurta Kahvaltısı", baseServings: 1, macros: { kcal: 520, protein: 34, carbs: 40, fat: 22 },
+    ingredients: [
+      { id: "h1", name: "yumurta", amount: 3, unit: "adet" }, { id: "h2", name: "lor peyniri", amount: 60, unit: "g" },
+      { id: "h3", name: "tam buğday ekmek", amount: 60, unit: "g" }, { id: "h4", name: "domates-salatalık-biber", amount: 200, unit: "g" },
+    ],
+    steps: [
+      { title: "Haşla", content: "Yumurtaları kaynar suya at, katı olması için haşla, soğuk suya al.", timer: 540 },
+      { title: "Servis", content: "Lor, ekmek ve söğüşle servis et.", timer: null },
+    ], note: "Akşamdan 6 yumurta haşlarsan 2 günlük hazır olur." },
+  yulaf_pankek: { title: "Yulaf-Muz Pankek", baseServings: 1, macros: { kcal: 580, protein: 36, carbs: 68, fat: 17 },
+    ingredients: [
+      { id: "p1", name: "yulaf ezmesi", amount: 60, unit: "g" }, { id: "p2", name: "yumurta", amount: 2, unit: "adet" },
+      { id: "p3", name: "yumurta akı", amount: 2, unit: "adet" }, { id: "p4", name: "muz", amount: 1, unit: "adet" },
+      { id: "p5", name: "süzme yoğurt", amount: 100, unit: "g" }, { id: "p6", name: "bal", amount: 5, unit: "ml" },
+    ],
+    steps: [
+      { title: "Blenderla", content: "Yulaf, yumurtalar, akları ve muzu blenderdan geçir.", timer: null },
+      { title: "Pişir", content: "Yapışmaz tavada (yağsız) küçük kepçelerle iki yüzünü pişir.", timer: 360 },
+      { title: "Servis", content: "Yoğurt ve az balla servis et.", timer: null },
+    ], note: "" },
+  tavuklu_tost: { title: "Tavuklu Tost + Ayran", baseServings: 1, macros: { kcal: 540, protein: 42, carbs: 50, fat: 17 },
+    ingredients: [
+      { id: "t1", name: "tam buğday ekmek", amount: 4, unit: "dilim" }, { id: "t2", name: "haşlanmış tavuk göğsü (didiklenmiş)", amount: 100, unit: "g" },
+      { id: "t3", name: "kaşar peyniri", amount: 25, unit: "g" }, { id: "t4", name: "domates", amount: 1, unit: "adet" },
+      { id: "t5", name: "ayran", amount: 250, unit: "ml" },
+    ],
+    steps: [
+      { title: "Hazırla", content: "Ekmeklerin arasına tavuk, domates ve ince kaşar koy.", timer: null },
+      { title: "Tost", content: "Tost makinesinde yağsız kızart.", timer: 240 },
+    ], note: "Tavuk pilav için haşladığın tavuktan ayırabilirsin." },
+  yogurt_bal: { title: "Yoğurt + Bal + Ceviz", baseServings: 1, macros: { kcal: 280, protein: 20, carbs: 18, fat: 14 },
+    ingredients: [
+      { id: "y1", name: "süzme yoğurt", amount: 200, unit: "g" }, { id: "y2", name: "bal", amount: 7, unit: "ml" }, { id: "y3", name: "ceviz", amount: 10, unit: "g" },
+    ],
+    steps: [{ title: "Karıştır", content: "Yoğurdu kaba al, bal ve cevizi üstüne ekle.", timer: null }], note: "" },
+  yumurta_muz: { title: "Yumurta + Muz", baseServings: 1, macros: { kcal: 245, protein: 13, carbs: 27, fat: 10 },
+    ingredients: [{ id: "ym1", name: "haşlanmış yumurta", amount: 2, unit: "adet" }, { id: "ym2", name: "muz", amount: 1, unit: "adet" }],
+    steps: [{ title: "Hazırla", content: "Sabahtan haşladığın yumurtaları muzla birlikte kutuya koy.", timer: null }], note: "" },
+  ton_sandvic: { title: "Ton Balıklı Sandviç", baseServings: 1, macros: { kcal: 310, protein: 28, carbs: 32, fat: 7 },
+    ingredients: [
+      { id: "ts1", name: "ton balığı (suda / yağı süzülmüş)", amount: 80, unit: "g" }, { id: "ts2", name: "tam buğday ekmek", amount: 2, unit: "dilim" },
+      { id: "ts3", name: "yoğurt (mayonez yerine)", amount: 20, unit: "g" }, { id: "ts4", name: "marul-domates", amount: 50, unit: "g" },
+    ],
+    steps: [{ title: "Hazırla", content: "Ton balığını yoğurtla ez, ekmeğe marul ve domatesle sür.", timer: null }], note: "Yağlı ton alıyorsan yağını mutlaka süz — 10g+ yağ fark eder." },
+  lor_elma: { title: "Lor + Elma + Tarçın", baseServings: 1, macros: { kcal: 210, protein: 15, carbs: 24, fat: 5 },
+    ingredients: [{ id: "le1", name: "lor peyniri", amount: 100, unit: "g" }, { id: "le2", name: "elma", amount: 1, unit: "adet" }, { id: "le3", name: "tarçın", amount: 1, unit: "g" }],
+    steps: [{ title: "Hazırla", content: "Elmayı dilimle, loru yanına koy, tarçın serp.", timer: null }], note: "" },
+  kefir_yulaf: { title: "Kefir + Yulaf", baseServings: 1, macros: { kcal: 300, protein: 15, carbs: 38, fat: 9 },
+    ingredients: [{ id: "k1", name: "kefir", amount: 300, unit: "ml" }, { id: "k2", name: "yulaf ezmesi", amount: 30, unit: "g" }],
+    steps: [{ title: "Karıştır", content: "Yulafı kefire kat, 5 dk beklet.", timer: 300 }], note: "" },
+  kofte_bulgur: { title: "Izgara Köfte + Bulgur + Cacık", baseServings: 1, macros: { kcal: 880, protein: 58, carbs: 88, fat: 30 },
+    ingredients: [
+      { id: "kb1", name: "yağsız dana kıyma", amount: 180, unit: "g" }, { id: "kb2", name: "soğan (rendelenmiş)", amount: 30, unit: "g" },
+      { id: "kb3", name: "galeta unu", amount: 10, unit: "g" }, { id: "kb4", name: "pilavlık bulgur (çiğ)", amount: 90, unit: "g" },
+      { id: "kb5", name: "domates salçası", amount: 10, unit: "g" }, { id: "kb6", name: "zeytinyağı", amount: 5, unit: "ml" },
+      { id: "kb7", name: "yoğurt", amount: 150, unit: "g" }, { id: "kb8", name: "salatalık", amount: 1, unit: "adet" },
+    ],
+    steps: [
+      { title: "Köfte harcı", content: "Kıyma, soğan suyu, galeta unu, tuz, kimyon ve karabiberi yoğur, 10 dk dinlendir.", timer: 600 },
+      { title: "Bulguru pişir", content: "Zeytinyağında salçayı kavur, bulguru ekle, 1.5 katı sıcak su ile kısık ateşte pişir.", timer: 900 },
+      { title: "Köfteleri pişir", content: "Köfteleri şekillendir, ızgara/döküm tavada yağsız her yüzünü pişir.", timer: 600 },
+      { title: "Cacık", content: "Yoğurda rendelenmiş salatalık, nane ve az su ekle.", timer: null },
+    ], note: "Kıymayı %10 yağlı seç; %20'lik kıyma bu tabağa ~15g ekstra yağ ekler." },
+  firin_tavuk: { title: "Fırın Tavuk + Patates", baseServings: 1, macros: { kcal: 820, protein: 62, carbs: 85, fat: 22 },
+    ingredients: [
+      { id: "ft1", name: "tavuk göğsü", amount: 220, unit: "g" }, { id: "ft2", name: "patates", amount: 350, unit: "g" },
+      { id: "ft3", name: "zeytinyağı", amount: 10, unit: "ml" }, { id: "ft4", name: "pul biber, kekik, sarımsak", amount: 5, unit: "g" },
+      { id: "ft5", name: "yoğurt", amount: 150, unit: "g" }, { id: "ft6", name: "yeşil salata", amount: 100, unit: "g" },
+    ],
+    steps: [
+      { title: "Marine", content: "Tavuğu 1 kaşık yoğurt, baharat ve yağın yarısıyla marine et.", timer: 900 },
+      { title: "Patatesler", content: "Patatesleri elma dilim kes, kalan yağ ve baharatla harmanla.", timer: null },
+      { title: "Fırın", content: "Hepsini 200°C fırında tepsiye diz, patatesler kızarana kadar pişir.", timer: 1800 },
+      { title: "Servis", content: "Yoğurt ve salatayla servis et.", timer: null },
+    ], note: "Tek tepside 2 günlük yap, meal-prep olur." },
+  tavuk_sote_makarna: { title: "Tavuk Sote + Makarna", baseServings: 1, macros: { kcal: 850, protein: 60, carbs: 100, fat: 18 },
+    ingredients: [
+      { id: "sm1", name: "tavuk göğsü (küp)", amount: 200, unit: "g" }, { id: "sm2", name: "tam buğday makarna (çiğ)", amount: 100, unit: "g" },
+      { id: "sm3", name: "biber (karışık)", amount: 150, unit: "g" }, { id: "sm4", name: "domates", amount: 1, unit: "adet" },
+      { id: "sm5", name: "soğan", amount: 50, unit: "g" }, { id: "sm6", name: "zeytinyağı", amount: 10, unit: "ml" },
+    ],
+    steps: [
+      { title: "Makarnayı haşla", content: "Tuzlu kaynar suda makarnayı haşla, süz.", timer: 540 },
+      { title: "Tavuğu mühürle", content: "Yağı ısıt, tavuğu yüksek ateşte suyunu çekene kadar sotele.", timer: 360 },
+      { title: "Sebzeler", content: "Soğan ve biberi ekle, 4 dk sotele, domatesi ekle 3 dk daha pişir.", timer: 420 },
+      { title: "Servis", content: "Makarnanın yanında veya üstünde servis et.", timer: null },
+    ], note: "" },
+  ton_makarna: { title: "Ton Balıklı Makarna", baseServings: 1, macros: { kcal: 780, protein: 48, carbs: 100, fat: 18 },
+    ingredients: [
+      { id: "tm1", name: "makarna (çiğ)", amount: 110, unit: "g" }, { id: "tm2", name: "ton balığı (süzülmüş)", amount: 150, unit: "g" },
+      { id: "tm3", name: "mısır", amount: 40, unit: "g" }, { id: "tm4", name: "yoğurt", amount: 60, unit: "g" },
+      { id: "tm5", name: "zeytinyağı", amount: 5, unit: "ml" }, { id: "tm6", name: "limon, dereotu", amount: 10, unit: "g" },
+    ],
+    steps: [
+      { title: "Haşla", content: "Makarnayı haşla, süz, soğumaya bırak.", timer: 540 },
+      { title: "Karıştır", content: "Ton, mısır, yoğurt, zeytinyağı, limon ve dereotunu makarnaya kat.", timer: null },
+    ], note: "Soğuk da yenir; işe götürmeye uygun." },
+  kiymali_nohut: { title: "Kıymalı Nohut + Bulgur", baseServings: 1, macros: { kcal: 860, protein: 52, carbs: 100, fat: 24 },
+    ingredients: [
+      { id: "kn1", name: "haşlanmış nohut", amount: 200, unit: "g" }, { id: "kn2", name: "yağsız kıyma", amount: 120, unit: "g" },
+      { id: "kn3", name: "soğan", amount: 60, unit: "g" }, { id: "kn4", name: "domates salçası", amount: 15, unit: "g" },
+      { id: "kn5", name: "bulgur (çiğ)", amount: 60, unit: "g" }, { id: "kn6", name: "zeytinyağı", amount: 5, unit: "ml" },
+      { id: "kn7", name: "ayran", amount: 250, unit: "ml" },
+    ],
+    steps: [
+      { title: "Kıymayı kavur", content: "Yağda soğanı kavur, kıymayı ekle, suyunu çekene kadar pişir.", timer: 420 },
+      { title: "Nohut", content: "Salçayı ekle, nohutu ve 1 su bardağı sıcak suyu koy, kısık ateşte pişir.", timer: 1200 },
+      { title: "Bulgur", content: "Bulguru ayrı tencerede 1.5 katı suyla pişir.", timer: 900 },
+    ], note: "Hazır haşlanmış nohut (kavanoz) kullanırsan 30 dk'da biter." },
+  firin_balik: { title: "Fırında Balık + Patates", baseServings: 1, macros: { kcal: 760, protein: 48, carbs: 65, fat: 32 },
+    ingredients: [
+      { id: "fb1", name: "somon veya levrek fileto", amount: 200, unit: "g" }, { id: "fb2", name: "patates", amount: 300, unit: "g" },
+      { id: "fb3", name: "zeytinyağı", amount: 5, unit: "ml" }, { id: "fb4", name: "limon", amount: 0.5, unit: "adet" },
+      { id: "fb5", name: "roka", amount: 60, unit: "g" },
+    ],
+    steps: [
+      { title: "Patatesi haşla", content: "Patatesleri küp kesip haşla.", timer: 900 },
+      { title: "Balığı fırınla", content: "Balığa tuz, limon, az yağ sür; 200°C fırında pişir.", timer: 1080 },
+      { title: "Servis", content: "Patates ve rokayla servis et.", timer: null },
+    ], note: "Somon sağlıklı yağ içerir ama yağ bütçesinin ~%40'ını tek tabakta harcar; o gün diğer öğünleri yağsız tut. Levrek seçersen yağ ~10g'a düşer." },
+};
+
 
 // Tıklanabilir tarif kartları: adım adım hazırlanış + gramaj + (varsa) pişmiş verim/100g makro.
 const RECIPES = {
@@ -488,6 +1015,8 @@ const RECIPES = {
     note: "Günlere bölerken: kaba koyduğun miktarı gramla tart, 100g başına değerle çarp. Örn. 200g ayırırsan ≈ 346 kcal, 25.6g protein.",
   },
 };
+
+Object.assign(RECIPES, EXTRA_RECIPES);
 
 const LOGS_KEY = "glowria-coach-logs-v2";
 const PROFILE_KEY = "glowria-coach-profile-v2";
@@ -691,10 +1220,12 @@ function toGeminiContents(historyMsgs, newUserText) {
 async function analyzeMealAndAdvise(description, profile, targets, dayCtx, priorTotals) {
   const remainingKcal = Math.max(0, targets.calorieTarget - priorTotals.kcal);
   const remainingProtein = Math.max(0, targets.proteinG - priorTotals.protein);
+  const remainingFat = Math.round(targets.fatG - (priorTotals.fat || 0));
   const systemPrompt = `Sen Enti Coach'sun, Türk mutfağına aşina bir beslenme koçusun.
 Kullanıcı az önce yediği bir öğünü anlatıyor. 1) Türk ev yemeği porsiyonlarına göre YAKLAŞIK kalori/makro tahmin et. 2) Günün geri kalanı için kısa somut tavsiye yaz (bugünün antrenmanını da hesaba kat).
 KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, yağ oranı %${profile.bodyFatPct}. Antrenman geçmişi: ${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}.
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein. BU ÖĞÜNDEN ÖNCE ALINAN: ${Math.round(priorTotals.kcal)} kcal, ${Math.round(priorTotals.protein)}g protein. KALAN BÜTÇE: ${Math.round(remainingKcal)} kcal, ${Math.round(remainingProtein)}g protein.
+YAĞ: günlük limit ${targets.fatG}g, bu öğünden önce ${Math.round(priorTotals.fat || 0)}g alındı, ${remainingFat >= 0 ? `${remainingFat}g kaldı` : `limit ${-remainingFat}g AŞILMIŞ`}. Yağ tahminini dikkatli yap (pişirme yağı, tereyağı, peynir, kıyma yağı dahil). Bu öğünle limit aşılıyorsa tavsiyede açıkça söyle.
 BUGÜNÜN ANTRENMANI: ${dayCtx.dayLabel}${dayCtx.totalEx > 0 ? ` (${dayCtx.doneEx}/${dayCtx.totalEx} tamamlandı)` : " (dinlenme günü)"}.
 SADECE şu JSON formatında yanıt ver, başka hiçbir şey ekleme, markdown fence kullanma: {"breakdown": "öğünün gramajlı dökümü, örn. '180g pilav, 150g tavuk göğsü, 100g salata'", "kcal": sayı, "protein": sayı, "carbs": sayı, "fat": sayı, "advice": "2-3 cümlelik Türkçe tavsiye"}`;
   const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: description }] }]);
@@ -738,7 +1269,7 @@ function buildTrainingHistoryLines(trainingDays, dateStr, days) {
     const d = addDays(dateStr, -i);
     const e = logs[d];
     const dt = dayTypeForDate(d, trainingDays, computePhase(profile, d), profile.trainingDayOverrides || {});
-    const info = effectiveDayInfo(e, dt);
+    const info = effectiveDayInfo(e, dt, d);
     const totalEx = info.exercises.length;
     const doneEx = e ? info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length : 0;
     const trained = (totalEx > 0 && doneEx === totalEx) || !!(e && e.manualComplete);
@@ -754,7 +1285,7 @@ function buildTrainingHistoryLines(trainingDays, dateStr, days) {
 // Last recorded performance for each of today's planned exercises, so the AI can
 // prescribe an actual progression instead of guessing.
 function buildLastPerformanceLines(entry, dateStr) {
-  const info = effectiveDayInfo(entry, entry.dayType);
+  const info = effectiveDayInfo(entry, entry.dayType, dateStr);
   const names = [...info.exercises.map(e => e.name), ...(entry.customExercises || []).map(e => e.name)];
   const lines = names.map(n => {
     const last = findLastPerformance(n, dateStr);
@@ -764,6 +1295,9 @@ function buildLastPerformanceLines(entry, dateStr) {
 }
 
 async function generateTodayWorkout(dayCtx, historyLines, lastPerfLines) {
+  const cov = buildRegionCoverage(today, 14);
+  const baseEntry = getEntry(activeDate);
+  const baseInfo = buildProgramDay(baseEntry.dayType === "rest" ? SPLIT_ORDER[0] : baseEntry.dayType, activeDate, null);
   const statusInfo = TRAINING_STATUS[profile.trainingStatus] || TRAINING_STATUS.yeni;
   const statusLine = profile.trainingStatus === "ara_verdi" && profile.breakMonths
     ? `${statusInfo.label} (yaklaşık ${profile.breakMonths} aydır ara vermişti)` : statusInfo.label;
@@ -787,17 +1321,23 @@ TALİMATLAR:
 - KALDIRILAN AĞIRLIKLARI kullan: bir hareketin son kaydı varsa, "scheme" alanında hedef ağırlığı da yaz (örn. "3 × 8-10 @ 62.5kg") ve kademeli ilerlet — form bozulmadıysa küçük artış (üst vücut ~2.5kg, alt vücut ~5kg), beslenme düşükse veya uzun ara verilmişse aynı kal ya da azalt. Kaydı olmayan harekette ağırlık yazma, sadece set × tekrar ver.
 - Uzun süre ara verilmişse (örn. 5+ gün) daha hafif/toparlanma odaklı bir gün öner, agresif yükleme önerme.
 - Son günlerde belirli bir bölge çalışılmadıysa bugün ona öncelik ver.
+- ÇEŞİTLİLİK ŞART: Kullanıcı aylardır aynı hareketleri yapmaktan şikayetçi. Aynı hareket kalıbının FARKLI varyasyonlarını kullan: tutuş (geniş/dar/ters/nötr), kablo aparatı (düz bar/halat/V-bar), açı (düz/incline/decline), alet (barbell/dumbbell/kablo/makine), tek taraflı. Son 14 günde yapılan varyasyonu tekrar etme; sadece ana ağır bileşik hareketi (ilerleme takibi için) koruyabilirsin.
+- Her gün en az 1 karın/core hareketi ekle; son 14 günde çalışılmayan bölgeleri (aşağıda) öncelikle kapat.
+- Bu haftanın rotasyon önerisi (baz al, istersen değiştir): ${baseInfo.label}: ${baseInfo.exercises.map(e => `${e.name} [${e.region}]`).join(", ")}.
+${cov.text}
 - Bugün beslenme çok düşükse, bunu antrenman yoğunluğuna yansıt ve "sub" alanında kısaca belirt.
-- 4-6 hareket seç, adaptasyon fazındaysa hafif ağırlık ve temel hareketler kullan.
-- GÖRSEL İÇİN ÖNEMLİ: Mümkün olduğunca aşağıdaki HAREKET KATALOĞUNDAN seç ve her hareket için o katalogdaki "id"yi döndür (böylece uygulamada görseli açılır). Katalogda olmayan bir hareket önermen gerekirse o hareketin "id" alanını null yap.
-HAREKET KATALOĞU (id: isim): ${EXERCISE_CATALOG_TEXT}
+- Adaptasyon fazındaysa hafif ağırlık ve temel hareketler kullan.
+- 5-7 hareket seç.
+- GÖRSEL İÇİN ÖNEMLİ: SADECE aşağıdaki HAREKET KÜTÜPHANESİ'nden seç ve id'yi AYNEN döndür (uygulama görseli bu id ile açıyor). "name" alanına kütüphanedeki ismi yaz.
+HAREKET KÜTÜPHANESİ (id = isim [çalıştırdığı bölge]):
+${LIB_CATALOG_TEXT}
 - SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir açıklama, markdown fence ekleme:
 {"label": "kısa başlık", "sub": "1 cümlelik gerekçe", "cardio": "opsiyonel kardiyo notu veya null", "exercises": [{"id": "katalogdaki id veya null", "name": "Hareket adı", "scheme": "3 × 10-12", "tip": "1 cümlelik Türkçe form ipucu"}]}`;
 
   const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: "Bugün için antrenmanımı planla." }] }], 4000);
   const clean = extractJson(raw);
   const parsed = JSON.parse(clean);
-  const exercises = (parsed.exercises || []).map((ex, i) => ({ id: ex.id && MEDIA[ex.id] ? ex.id : `ai-${Date.now()}-${i}`, name: ex.name, scheme: ex.scheme, tip: ex.tip }));
+  const exercises = (parsed.exercises || []).map((ex, i) => ({ id: isKnownExId(ex.id) ? ex.id : `ai-${Date.now()}-${i}`, name: LIB[ex.id] ? LIB[ex.id].n : ex.name, scheme: ex.scheme, tip: ex.tip, region: LIB[ex.id] ? REGIONS[LIB[ex.id].r] : undefined }));
   return { label: parsed.label, sub: parsed.sub, cardio: parsed.cardio || null, exercises };
 }
 
@@ -827,7 +1367,8 @@ TALİMATLAR:
 - Değişiklik gerekmiyorsa planı aynen döndür.
 - "sub" alanına neyi neden değiştirdiğini 1 cümleyle Türkçe yaz.
 - Mümkün olduğunca şu katalogdan seç ve id döndür; katalogda yoksa id null olsun.
-HAREKET KATALOĞU (id: isim): ${EXERCISE_CATALOG_TEXT}
+HAREKET KÜTÜPHANESİ (id = isim [çalıştırdığı bölge]):
+${LIB_CATALOG_TEXT}
 - SADECE şu JSON ile yanıt ver, markdown fence ekleme:
 {"label": "kısa başlık", "sub": "1 cümlelik gerekçe", "cardio": "kardiyo notu veya null", "exercises": [{"id": "katalog id veya null", "name": "Hareket adı", "scheme": "3 × 10-12", "tip": "1 cümlelik form ipucu"}]}`;
 
@@ -839,7 +1380,7 @@ HAREKET KATALOĞU (id: isim): ${EXERCISE_CATALOG_TEXT}
     const existing = byName[exKey(ex.name)];
     // Reuse the existing id so that completed checkmarks and set logs survive.
     if (existing) return { ...existing, scheme: doneNames.includes(exKey(ex.name)) ? existing.scheme : (ex.scheme || existing.scheme), tip: ex.tip || existing.tip };
-    return { id: ex.id && MEDIA[ex.id] ? ex.id : `ai-${Date.now()}-${i}`, name: ex.name, scheme: ex.scheme, tip: ex.tip };
+    return { id: isKnownExId(ex.id) ? ex.id : `ai-${Date.now()}-${i}`, name: ex.name, scheme: ex.scheme, tip: ex.tip };
   });
   // Safety net: never lose a completed exercise even if the model dropped it.
   currentPlan.exercises.forEach(ex => {
@@ -881,6 +1422,8 @@ try { const raw = localStorage.getItem(LOGS_KEY); logs = raw ? JSON.parse(raw) :
 try { const raw = localStorage.getItem(PROFILE_KEY); profile = raw ? JSON.parse(raw) : null; } catch (e) { profile = null; }
 
 const today = isoDate(new Date());
+// v3 rotating program applies from the first day this version runs; earlier days keep the old fixed program.
+if (profile && !profile.programV3Start) { profile.programV3Start = today; try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
 let activeDate = today;
 let activeTab = "home";
 let editingProfile = false;
@@ -929,7 +1472,7 @@ function didTrainOn(dateStr) {
   const td = profile?.trainingDays || DEFAULT_TRAINING_DAYS;
   const ov = profile?.trainingDayOverrides || {};
   const dt = dayTypeForDate(dateStr, td, computePhase(profile, dateStr), ov);
-  const info = effectiveDayInfo(e, dt);
+  const info = effectiveDayInfo(e, dt, dateStr);
   const total = info.exercises.length;
   if (total === 0) return false;
   return info.exercises.filter(ex => e.doneExercises && e.doneExercises[ex.id]).length === total;
@@ -955,7 +1498,7 @@ function todayContext() {
   const phase = computePhase(profile, today);
   const dt = dayTypeForDate(today, td, phase, ov);
   const e = getEntry(today);
-  const info = effectiveDayInfo(e, dt);
+  const info = effectiveDayInfo(e, dt, today);
   const doneEx = info.exercises.filter(ex => e.doneExercises[ex.id]).length;
   return { dateLabel: turkishDate(today), dayLabel: info.label, phase, totalEx: info.exercises.length, doneEx, calories: e.calories, protein: e.protein, water: e.water, sleep: e.sleep, weekDone: weekStats(today).done, weekPlanned: weekStats(today).planned };
 }
@@ -992,7 +1535,7 @@ function render() {
             <div class="eyebrow">ENTİ COACH · v${APP_VERSION}</div>
             <h1>${activeTab === "home" ? "Ana Sayfa" : activeTab === "nutrition" ? "Beslenme" : "Antrenman"}</h1>
           </div>
-          <div class="streak-badge"><span class="streak-num">${streakStats.done}<span class="streak-denom">/${streakStats.planned}</span></span><span class="streak-label">bu hafta</span></div>
+          <div class="streak-badge"><span style="font-size:15px;">🔥</span><span class="streak-num">${streakStats.done}</span><span class="streak-label">antrenman<br/>bu hafta</span></div>
         </div>
         <div class="date-nav">
           <button class="nav-btn" id="navPrev">‹</button>
@@ -1154,7 +1697,7 @@ function renderCalendarHtml() {
     const phase = computePhase(profile, dateStr);
     const dayType = dayTypeForDate(dateStr, trainingDays, phase, overrides);
     const dayEntry = logs[dateStr];
-    const dayInfo = effectiveDayInfo(dayEntry, dayType);
+    const dayInfo = effectiveDayInfo(dayEntry, dayType, dateStr);
     const totalEx = dayInfo.exercises.length;
     const doneEx = dayEntry ? dayInfo.exercises.filter(e => dayEntry.doneExercises && dayEntry.doneExercises[e.id]).length : 0;
     const completed = (totalEx > 0 && doneEx === totalEx) || !!(dayEntry && dayEntry.manualComplete);
@@ -1288,6 +1831,7 @@ const METRIC_COLORS = {
   water:    "#00B8D9",  // cyan-blue
   sleep:    "#7C5CE0",  // violet
   workout:  "#FF8A1E",  // orange — kept well away from water/sleep
+  fat:      "#FFB020",  // amber
 };
 
 function ringArc(pct, r) {
@@ -1312,8 +1856,9 @@ function ringsCardHtml(eyebrow, rows) {
     ...r,
     pct: r.target ? Math.min(999, Math.round((r.value / r.target) * 100)) : (r.fullWhenNoTarget ? 100 : 0),
   }));
-  const size = 168, sw = 15;
-  const radii = [68, 49, 30];
+  const compact = rows.some(r => r.sub);
+  const size = compact ? 132 : 168, sw = compact ? 12 : 15;
+  const radii = compact ? [54, 39, 24] : [68, 49, 30];
   const circles = withPct.map((r, i) => {
     const { dash } = ringArc(r.pct, radii[i]);
     const c = METRIC_COLORS[r.key];
@@ -1333,9 +1878,10 @@ function ringsCardHtml(eyebrow, rows) {
               <span class="ring-legend-dot" style="background:${METRIC_COLORS[r.key]}"></span>
               <span class="ring-legend-text">
                 <span class="ring-legend-label">${r.label}</span><br/>
-                <span class="ring-legend-value">${r.note ? r.note : `${r.value} / ${r.target} ${r.unit}`}</span>
+                <span class="ring-legend-value" ${r.noteColor ? `style="color:${r.noteColor}"` : ""}>${r.note ? r.note : `${r.value} / ${r.target} ${r.unit}`}</span>
+                ${r.sub ? `<br/><span class="ring-legend-sub">${r.sub}</span>` : ""}
               </span>
-              <span class="ring-legend-pct" style="color:${METRIC_COLORS[r.key]}">${r.pct}%</span>
+              ${compact ? "" : `<span class="ring-legend-pct" style="color:${METRIC_COLORS[r.key]}">${r.pct}%</span>`}
             </div>`).join("")}
         </div>
       </div>
@@ -1344,7 +1890,7 @@ function ringsCardHtml(eyebrow, rows) {
 
 // Home: water, sleep, workout completion.
 function homeRingsHtml(entry) {
-  const info = effectiveDayInfo(entry, entry.dayType);
+  const info = effectiveDayInfo(entry, entry.dayType, activeDate);
   const allEx = [...info.exercises, ...(entry.customExercises || [])];
   const doneCount = allEx.filter(ex => entry.doneExercises[ex.id]).length;
   const isRest = entry.dayType === "rest";
@@ -1356,13 +1902,32 @@ function homeRingsHtml(entry) {
   ]);
 }
 
-// Nutrition: calories and protein against the day's targets.
+// Nutrition: shows what is LEFT for the day (not what was eaten), so there is
+// nothing to subtract in your head. Calories and fat are limits; protein is a goal.
 function nutritionRingsHtml(entry, targets) {
   const totals = sumMeals(entry.meals);
-  return ringsCardHtml(activeDate === today ? "BUGÜN NE ALDIM" : "O GÜN NE ALDIM", [
-    { key: "calories", label: "Kalori",  value: Math.round(totals.kcal),    target: targets.calorieTarget, unit: "kcal" },
-    { key: "protein",  label: "Protein", value: Math.round(totals.protein), target: targets.proteinG,      unit: "g" },
+  const RED = "#D92D20", GREEN = "#0F9E8C";
+  const row = (key, label, value, target, unit, isGoal) => {
+    const left = target - value;
+    let note, noteColor = null;
+    if (left > 0) note = `${left} ${unit} kaldı`;
+    else if (left === 0) { note = isGoal ? "hedef tamam ✓" : "tam sınırda"; noteColor = GREEN; }
+    else if (isGoal) { note = `hedef tamam ✓ (+${-left}${unit})`; noteColor = GREEN; }
+    else { note = `${-left} ${unit} aştın`; noteColor = RED; }
+    return { key, label, value, target, unit, note, noteColor, sub: `alınan ${value} / ${target}` };
+  };
+  const fatVal = Math.round(totals.fat);
+  const fatOver = fatVal - targets.fatG;
+  const kcalOver = Math.round(totals.kcal) - targets.calorieTarget;
+  const warn = fatOver > 0
+    ? `<div class="fat-warn">⚠️ Günlük yağ limitini <b>${fatOver}g</b> aştın. Kalan öğünlerde kızartma, tereyağı, kaşar, kuruyemiş ve yağlı et yerine haşlama/ızgara + yağsız yoğurt/lor seç.</div>`
+    : (fatVal >= targets.fatG * 0.85 ? `<div class="fat-warn" style="color:#B8720A;background:#FFF8EB;border-color:#FBD9A8;">Yağ limitine yaklaştın — ${targets.fatG - fatVal}g kaldı. Kalan öğünleri yağsız seç.</div>` : "");
+  const card = ringsCardHtml(activeDate === today ? "BUGÜN NE KALDI" : "O GÜN NE KALDI", [
+    row("calories", "Kalori", Math.round(totals.kcal), targets.calorieTarget, "kcal", false),
+    row("protein", "Protein", Math.round(totals.protein), targets.proteinG, "g", true),
+    row("fat", "Yağ", fatVal, targets.fatG, "g", false),
   ]);
+  return warn ? card.replace(/<\/section>\s*$/, `${warn}</section>`) : card;
 }
 
 function attachHomeHandlers(entry, targets) {
@@ -1466,7 +2031,7 @@ function renderNutrition(entry, targets) {
       ${mealError ? `<div class="chat-error">Analiz başarısız: ${esc(mealError)}. Aşağıdan elle ekleyebilirsin.</div>` : ""}
       ${lastMealResult ? `
         <div class="meal-result-card">
-          <div class="meal-result-head"><span class="meal-result-title">Eklendi</span><span class="meal-macro">${Math.round(lastMealResult.kcal)} kcal · ${Math.round(lastMealResult.protein)}g protein</span></div>
+          <div class="meal-result-head"><span class="meal-result-title">Eklendi</span><span class="meal-macro">${Math.round(lastMealResult.kcal)} kcal · ${Math.round(lastMealResult.protein)}g P · ${Math.round(lastMealResult.fat)}g yağ</span></div>
           ${lastMealResult.breakdown ? `<div class="meal-breakdown">${esc(lastMealResult.breakdown)}</div>` : ""}
           <div class="meal-result-advice">${esc(lastMealResult.advice)}</div>
         </div>` : ""}
@@ -1474,8 +2039,9 @@ function renderNutrition(entry, targets) {
       <div class="form-field" style="margin-top:14px;">
         <label class="form-label">Elle ekle (opsiyonel)</label>
         <div style="display:flex; gap:8px;">
-          <div class="form-input-row" style="flex:1;"><input class="form-input" type="number" id="manualKcal" placeholder="kcal" /></div>
-          <div class="form-input-row" style="flex:1;"><input class="form-input" type="number" id="manualProtein" placeholder="protein g" /></div>
+          <div class="form-input-row" style="flex:1;min-width:0;padding:10px;"><input class="form-input" type="number" id="manualKcal" placeholder="kcal" style="font-size:16px;" /></div>
+          <div class="form-input-row" style="flex:1;min-width:0;padding:10px;"><input class="form-input" type="number" id="manualProtein" placeholder="prot g" style="font-size:16px;" /></div>
+          <div class="form-input-row" style="flex:1;min-width:0;padding:10px;"><input class="form-input" type="number" id="manualFat" placeholder="yağ g" style="font-size:16px;" /></div>
           <button class="chat-send-btn" id="manualAdd" style="width:44px;">+</button>
         </div>
       </div>
@@ -1484,7 +2050,7 @@ function renderNutrition(entry, targets) {
         <div class="logged-meal-list">
           ${entry.meals.map(m => `
             <div class="logged-meal-row">
-              <div style="flex:1;"><div class="logged-meal-text">${esc(m.text)}</div>${m.breakdown ? `<div class="logged-meal-breakdown">${esc(m.breakdown)}</div>` : ""}<div class="logged-meal-macro">${Math.round(m.kcal)} kcal · ${Math.round(m.protein)}g protein</div></div>
+              <div style="flex:1;"><div class="logged-meal-text">${esc(m.text)}</div>${m.breakdown ? `<div class="logged-meal-breakdown">${esc(m.breakdown)}</div>` : ""}<div class="logged-meal-macro">${Math.round(m.kcal)} kcal · ${Math.round(m.protein)}g protein · ${Math.round(m.fat || 0)}g yağ</div></div>
               <button class="logged-meal-remove" data-remove-meal="${m.id}">✕</button>
             </div>`).join("")}
         </div>` : ""}
@@ -1502,15 +2068,21 @@ function renderNutrition(entry, targets) {
     </section>
 
     <section class="card">
-      <div class="card-eyebrow">ÖĞÜN PLANI ÖNERİSİ</div>
+      <div class="card-eyebrow">ÖĞÜN PLANI ÖNERİSİ · ${activeDate === today ? "BUGÜN" : "O GÜN"}</div>
       <div class="meal-list">
-        ${MEAL_PLAN.map(m => {
-          const kcal = Math.round(targets.calorieTarget * m.ratio);
-          const protein = Math.round(targets.proteinG * m.ratio);
-          return `<div class="meal-row ${m.recipeId ? "clickable" : ""}" ${m.recipeId ? `data-open-recipe="${m.recipeId}"` : ""}><div class="meal-head-row"><span class="meal-name">${m.name}</span><span class="meal-macro">${kcal} kcal · ${protein}g protein</span></div><div class="meal-items">${m.items}</div>${m.recipeId ? `<div class="recipe-chip">📖 Tarifi gör</div>` : ""}</div>`;
+        ${MEAL_SLOTS.map((slot, si) => {
+          const m = slot.pool[mealPickFor(si, activeDate, entry)];
+          const rm = m.recipeId ? recipeTotalMacros(RECIPES[m.recipeId]) : null;
+          const kcal = Math.round(rm ? rm.kcal : targets.calorieTarget * slot.ratio);
+          const protein = Math.round(rm ? rm.protein : targets.proteinG * slot.ratio);
+          const fat = Math.round(rm ? rm.fat : targets.fatG * slot.ratio);
+          return `<div class="meal-row ${m.recipeId ? "clickable" : ""}" ${m.recipeId ? `data-open-recipe="${m.recipeId}"` : ""}>
+            <div class="meal-head-row"><span class="meal-name">${slot.name}</span><button class="meal-swap-btn" data-meal-swap="${slot.key}" title="Başka öneri">🔄</button></div>
+            <div class="meal-macro" style="margin-top:3px;">${rm ? "" : "~"}${kcal} kcal · ${protein}g P · ${fat}g yağ</div>
+            <div class="meal-items">${m.items}</div>${m.recipeId ? `<div class="recipe-chip">📖 Tarifi gör</div>` : ""}</div>`;
         }).join("")}
       </div>
-      <div class="meal-footnote">Örnek dağılım — referans amaçlı, gerçek yediklerini yukarıdan kaydet. Tarifi olan öğünlere dokun.</div>
+      <div class="meal-footnote">Her gün farklı öneri gelir; beğenmediğini 🔄 ile değiştir. Gerçek yediklerini yukarıdan kaydet. Tarifi olan öğünlere dokun.</div>
     </section>
   `;
 }
@@ -1536,8 +2108,9 @@ function attachNutritionHandlers(entry, targets) {
   document.getElementById("manualAdd").addEventListener("click", () => {
     const kcal = Number(document.getElementById("manualKcal").value) || 0;
     const protein = Number(document.getElementById("manualProtein").value) || 0;
-    if (!kcal && !protein) return;
-    addMeal(entry, { id: `${Date.now()}`, text: "Elle eklendi", kcal, protein, carbs: 0, fat: 0 });
+    const fat = Number(document.getElementById("manualFat").value) || 0;
+    if (!kcal && !protein && !fat) return;
+    addMeal(entry, { id: `${Date.now()}`, text: "Elle eklendi", kcal, protein, carbs: 0, fat });
     lastMealResult = null;
     render();
   });
@@ -1566,6 +2139,16 @@ function attachNutritionHandlers(entry, targets) {
 
   document.querySelectorAll("[data-open-recipe]").forEach(row => {
     row.addEventListener("click", () => openRecipeModal(row.dataset.openRecipe));
+  });
+  document.querySelectorAll("[data-meal-swap]").forEach(btn => {
+    btn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      const key = btn.dataset.mealSwap;
+      const shifts = { ...(entry.mealShift || {}) };
+      shifts[key] = (shifts[key] || 0) + 1;
+      updateEntry(activeDate, { mealShift: shifts });
+      render();
+    });
   });
 
   const customRecipeInput = document.getElementById("customRecipeInput");
@@ -1614,6 +2197,15 @@ const NUTRITION_DRIFT_PROTEIN = 20;
 // Fires once when a new training day opens, then re-tunes the plan as meals
 // are logged. Falls back silently to the static program if it can't run.
 // ---------------------------------------------------------------------------
+// True once any exercise is ticked, any set is logged, or the day is marked done.
+// From that point the plan is frozen: meals logged later never rewrite it.
+function workoutStartedOrDone(entry) {
+  if (!entry) return false;
+  if (entry.manualComplete) return true;
+  if (Object.values(entry.doneExercises || {}).some(Boolean)) return true;
+  if (Object.values(entry.exerciseLogs || {}).some(sets => sets && sets.length)) return true;
+  return false;
+}
 function autoPlanEnabled() { return profile && profile.autoAiPlan !== false; }
 
 function buildPlanDayCtx(entry, dateStr) {
@@ -1632,6 +2224,7 @@ async function maybeAutoGeneratePlan() {
   const entry = getEntry(today);
   if (entry.aiWorkout && entry.aiWorkout.exercises && entry.aiWorkout.exercises.length) return;
   if (entry.dayType === "rest") return;             // nothing to plan on rest days
+  if (workoutStartedOrDone(entry)) return;          // already trained today → leave it alone
   if (!getGeminiKey()) return;                      // no key → keep static program
 
   autoGenAttemptedDate = today;
@@ -1666,6 +2259,7 @@ async function maybeAdjustPlanForNutrition() {
   const plan = entry.aiWorkout;
   if (!plan || !plan.exercises || !plan.exercises.length) return;
   if (!getGeminiKey()) return;
+  if (workoutStartedOrDone(entry)) return;          // antrenman başladı/bitti → plana dokunma
 
   const targets = computeNutritionTargets(profile);
   const totals = sumMeals(entry.meals);
@@ -1700,6 +2294,10 @@ async function maybeAdjustPlanForNutrition() {
   }
 }
 
+function exRegionLine(ex) {
+  const r = ex.region || (LIB[ex.dbId || ex.id] ? REGIONS[LIB[ex.dbId || ex.id].r] : "");
+  return r ? `<span class="ex-region">${esc(r)}</span>` : "";
+}
 function logBtnHtml(entry, name) {
   const sets = getSets(entry, name);
   return `<button class="log-btn ${sets.length ? "has-sets" : ""}" data-log="${esc(name)}">${sets.length ? `${sets.length}✓` : "kg"}</button>`;
@@ -1725,14 +2323,33 @@ function logPanelHtml(entry, name) {
 }
 
 function renderTraining(entry, phase, weeksRemaining) {
-  const dayInfo = effectiveDayInfo(entry, entry.dayType);
+  const dayInfo = effectiveDayInfo(entry, entry.dayType, activeDate);
   const totalEx = dayInfo.exercises.length;
   const doneEx = dayInfo.exercises.filter(e => entry.doneExercises[e.id]).length;
   const customExercises = entry.customExercises || [];
 
+  const customHtml = customExercises.map(ex => {
+      const done = !!entry.doneExercises[ex.id];
+      return `
+        <div class="ex-block">
+        <div class="ex-row ex-row-custom ${done?'done':''}">
+          <button class="checkbox-btn" data-toggle="${ex.id}"><span class="checkbox ${done?'done':''}">${done?'✓':''}</span></button>
+          <button class="ex-name-btn" data-toggle="${ex.id}">
+            <span class="ex-name ${done?'done':''}">${esc(ex.name)}</span>
+            ${exRegionLine(ex)}
+            <span class="ex-scheme ex-scheme-sub">${esc(ex.scheme)}</span>
+          </button>
+          ${logBtnHtml(entry, ex.name)}
+          ${ex.dbId ? `<button class="info-btn" data-info="${ex.dbId}" data-name="${esc(ex.name)}" data-scheme="${esc(ex.scheme)}" data-tip="${esc(ex.tip || "")}">i</button>` : ""}
+          <button class="info-btn" style="background:#F3F5F7;border-color:#E4E8ED;color:#94A0AE;" data-remove-custom="${ex.id}">✕</button>
+        </div>
+        ${logPanelHtml(entry, ex.name)}
+        </div>`;
+    }).join("");
   let exListHtml = "";
   if (totalEx === 0) {
-    exListHtml = `<div class="rest-note">Bugün planda dinlenme var. Yine de antrenman yaptıysan Ana Sayfa'daki takvimden bu güne dokunarak işaretleyebilirsin.</div>`;
+    exListHtml = `<div class="rest-note">Bugün planda dinlenme var. Yine de antrenman yaptıysan Ana Sayfa'daki takvimden bu güne dokunarak işaretleyebilirsin. Aşağıdaki Hareket Önerici'den ekstra hareket de ekleyebilirsin.</div>`
+      + (customExercises.length ? `<div class="ex-list">${customHtml}</div>` : "");
   } else {
     const markAllBtn = `<button class="mark-all-btn" id="markAllBtn" data-set="${doneEx < totalEx}">${doneEx < totalEx ? "Tümünü tamamlandı işaretle" : "Tümünü kaldır"}</button>`;
     exListHtml = markAllBtn + `<div class="ex-list">` + dayInfo.exercises.map(ex => {
@@ -1741,30 +2358,14 @@ function renderTraining(entry, phase, weeksRemaining) {
         <div class="ex-block">
         <div class="ex-row ${done?'done':''}">
           <button class="checkbox-btn" data-toggle="${ex.id}"><span class="checkbox ${done?'done':''}">${done?'✓':''}</span></button>
-          <button class="ex-name-btn" data-toggle="${ex.id}"><span class="ex-name ${done?'done':''}">${esc(ex.name)}</span></button>
-          <span class="ex-scheme">${ex.scheme}</span>
+          <button class="ex-name-btn" data-toggle="${ex.id}"><span class="ex-name ${done?'done':''}">${esc(ex.name)}</span>${exRegionLine(ex)}<span class="ex-scheme ex-scheme-sub">${esc(ex.scheme)}</span></button>
+          ${ex.slot && ex.variants > 1 && !done ? `<button class="swap-btn" data-swap-slot="${ex.slot}" title="Başka varyasyon">⇄</button>` : ""}
           ${logBtnHtml(entry, ex.name)}
-          <button class="info-btn" data-info="${ex.id}" data-name="${esc(ex.name)}" data-scheme="${ex.scheme}" data-tip="${esc(ex.tip || "")}">i</button>
+          <button class="info-btn" data-info="${ex.id}" data-name="${esc(ex.name)}" data-scheme="${esc(ex.scheme)}" data-tip="${esc(ex.tip || "")}">i</button>
         </div>
         ${logPanelHtml(entry, ex.name)}
         </div>`;
-    }).join("") + customExercises.map(ex => {
-      const done = !!entry.doneExercises[ex.id];
-      return `
-        <div class="ex-block">
-        <div class="ex-row ex-row-custom ${done?'done':''}">
-          <button class="checkbox-btn" data-toggle="${ex.id}"><span class="checkbox ${done?'done':''}">${done?'✓':''}</span></button>
-          <button class="ex-name-btn" data-toggle="${ex.id}">
-            <span class="ex-name ${done?'done':''}">${esc(ex.name)}</span>
-            ${ex.tip ? `<div class="ex-custom-tip">${esc(ex.tip)}</div>` : ""}
-          </button>
-          <span class="ex-scheme">${ex.scheme}</span>
-          ${logBtnHtml(entry, ex.name)}
-          <button class="info-btn" data-remove-custom="${ex.id}">✕</button>
-        </div>
-        ${logPanelHtml(entry, ex.name)}
-        </div>`;
-    }).join("") + `</div>`;
+    }).join("") + customHtml + `</div>`;
   }
 
   const phaseBanner = phase === "adaptation" ? `
@@ -1794,13 +2395,16 @@ function renderTraining(entry, phase, weeksRemaining) {
       </div>
       ${totalEx > 0 ? `<div class="progress-track"><div class="progress-fill" style="width:${(doneEx/totalEx)*100}%"></div></div>` : ""}
       ${dayInfo.cardio ? `<div class="cardio-note">🏃 ${dayInfo.cardio}</div>` : ""}
+      ${dayInfo.rotating && totalEx > 0 ? `<div class="rotation-note">🔁 Program ${programWeekIndex(activeDate) + 1}. hafta varyasyonları — ana hareketler 3 haftada, yardımcı hareketler her hafta değişir. Beğenmediğine ⇄ bas.</div>` : ""}
       ${exListHtml}
     </section>
+    ${renderSuggestCard()}
     <div class="version-tag">Enti Coach v${APP_VERSION}</div>
   `;
 }
 
 function attachTrainingHandlers(entry) {
+  attachSuggestHandlers();
   const aiGenBtn = document.getElementById("aiGenBtn");
   if (aiGenBtn) aiGenBtn.addEventListener("click", async () => {
     if (!getGeminiKey()) { aiGenError = "API key bulunamadı."; render(); return; }
@@ -1844,7 +2448,7 @@ function attachTrainingHandlers(entry) {
   if (planNoteDismiss) planNoteDismiss.addEventListener("click", () => { planAdjustNote = ""; render(); });
   const markAllBtn = document.getElementById("markAllBtn");
   if (markAllBtn) markAllBtn.addEventListener("click", () => {
-    const dayInfo = effectiveDayInfo(entry, entry.dayType);
+    const dayInfo = effectiveDayInfo(entry, entry.dayType, activeDate);
     const allIds = [...dayInfo.exercises.map(e => e.id), ...(entry.customExercises||[]).map(e => e.id)];
     const setTo = markAllBtn.dataset.set === "true";
     const doneExercises = { ...entry.doneExercises };
@@ -1861,6 +2465,15 @@ function attachTrainingHandlers(entry) {
   });
   document.querySelectorAll("[data-info]").forEach(el => {
     el.addEventListener("click", () => openModal(el.dataset.info, el.dataset.name, el.dataset.scheme, el.dataset.tip));
+  });
+  document.querySelectorAll("[data-swap-slot]").forEach(el => {
+    el.addEventListener("click", () => {
+      const slot = el.dataset.swapSlot;
+      const vs = { ...(entry.variantShift || {}) };
+      vs[slot] = (vs[slot] || 0) + 1;
+      updateEntry(activeDate, { variantShift: vs });
+      render();
+    });
   });
   document.querySelectorAll("[data-remove-custom]").forEach(el => {
     el.addEventListener("click", () => {
@@ -1905,9 +2518,204 @@ function attachTrainingHandlers(entry) {
   });
 }
 
-function openModal(exId, name, scheme, tipArg) {
-  const media = MEDIA[exId];
-  const tip = (media && media.tip) || tipArg || "";
+
+// ---------------------------------------------------------------------------
+// Region coverage — which regions were actually trained in the last N days.
+// Used by the AI planner and the Hareket Önerici so they push neglected areas.
+// ---------------------------------------------------------------------------
+const LEGACY_NAME_MAP = (() => { const m = {}; Object.values(LEGACY_DAY_TYPES).forEach(d => (d.exercises || []).forEach(ex => { if (MEDIA[ex.id]) m[exKey(ex.name)] = MEDIA[ex.id].dbId; })); return m; })();
+const LIB_BY_NAME = (() => { const m = {}; LIB_RAW.forEach(([id, n]) => { m[exKey(n)] = id; }); return m; })();
+function libIdForExercise(ex) {
+  if (!ex) return null;
+  if (LIB[ex.dbId]) return ex.dbId;
+  if (LIB[ex.id]) return ex.id;
+  if (MEDIA[ex.id] && LIB[MEDIA[ex.id].dbId]) return MEDIA[ex.id].dbId;
+  const k = exKey(ex.name);
+  if (LIB_BY_NAME[k]) return LIB_BY_NAME[k];
+  if (LEGACY_NAME_MAP[k]) return LEGACY_NAME_MAP[k];
+  // keyword fallback for free-text names from older AI plans
+  const kw = [[/crunch|mekik|sit-?up/, "Crunches"], [/leg raise|bacak kald/, "Hanging_Leg_Raise"], [/plank/, "Plank"], [/twist|woodchop|oblik/, "Russian_Twist"],
+    [/incline.*(press|bench)/, "Incline_Dumbbell_Press"], [/bench|chest press|göğüs/, "Barbell_Bench_Press_-_Medium_Grip"], [/fly|crossover|pec/, "Cable_Crossover"],
+    [/lateral|yan omuz/, "Side_Lateral_Raise"], [/face pull|rear delt|reverse fly/, "Face_Pull"], [/shoulder press|military|omuz pres/, "Dumbbell_Shoulder_Press"],
+    [/pushdown|skull|triceps|dips/, "Triceps_Pushdown"], [/pulldown|pull-?up|barfiks|chin/, "Wide-Grip_Lat_Pulldown"], [/row|kürek/, "Seated_Cable_Rows"],
+    [/hammer/, "Hammer_Curls"], [/curl/, "Barbell_Curl"], [/romanian|rdl|stiff/, "Romanian_Deadlift"], [/deadlift/, "Barbell_Deadlift"],
+    [/leg curl/, "Seated_Leg_Curl"], [/hip thrust|glute|kalça/, "Barbell_Hip_Thrust"], [/calf|baldır/, "Standing_Calf_Raises"],
+    [/extension/, "Leg_Extensions"], [/squat|leg press|lunge|step/, "Barbell_Squat"]];
+  const hit = kw.find(([re]) => re.test(k));
+  return hit ? hit[1] : null;
+}
+function doneExercisesOn(dateStr) {
+  const e = logs[dateStr];
+  if (!e) return [];
+  const td = profile?.trainingDays || DEFAULT_TRAINING_DAYS;
+  const dt = dayTypeForDate(dateStr, td, computePhase(profile, dateStr), profile?.trainingDayOverrides || {});
+  const info = effectiveDayInfo(e, dt, dateStr);
+  const all = [...info.exercises, ...(e.customExercises || [])];
+  const logged = new Set(Object.keys(e.exerciseLogs || {}));
+  return all.filter(ex => e.manualComplete || (e.doneExercises && e.doneExercises[ex.id]) || logged.has(exKey(ex.name)));
+}
+function buildRegionCoverage(dateStr, days) {
+  const counts = {};
+  const names = [];
+  for (let i = days; i >= 0; i--) {
+    const d = addDays(dateStr, -i);
+    doneExercisesOn(d).forEach(ex => {
+      names.push(ex.name);
+      const id = libIdForExercise(ex);
+      if (id) { const r = LIB[id].r; counts[r] = (counts[r] || 0) + 1; }
+    });
+  }
+  const trained = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([r, c]) => `${REGIONS[r]} (${c})`);
+  const missing = Object.keys(REGIONS).filter(r => !counts[r]).map(r => REGIONS[r]);
+  const uniqNames = [...new Set(names)];
+  return {
+    text: `SON ${days} GÜNDE ÇALIŞILAN BÖLGELER: ${trained.join(", ") || "kayıt yok"}\nHİÇ ÇALIŞILMAYAN BÖLGELER: ${missing.join(", ")}\nSON ${days} GÜNDE YAPILAN HAREKETLER: ${uniqNames.join(", ") || "kayıt yok"}`,
+    missing,
+  };
+}
+
+function addLibExerciseToDay(dbId, scheme, tip) {
+  const lib = LIB[dbId];
+  if (!lib) return;
+  const entry = getEntry(activeDate);
+  const custom = [...(entry.customExercises || [])];
+  if (custom.some(c => c.dbId === dbId)) return;
+  custom.push({ id: `c-${Date.now()}-${custom.length}`, dbId, name: lib.n, scheme: scheme || "3 × 10-12", tip: tip || lib.t, region: REGIONS[lib.r] });
+  updateEntry(activeDate, { customExercises: custom });
+  render();
+}
+
+// ---------------------------------------------------------------------------
+// Hareket Önerici — browse the illustrated library by muscle, or ask the AI.
+// The AI must pick from the library, so every suggestion has pictures.
+// ---------------------------------------------------------------------------
+let suggestGroup = null;
+let suggestText = "";
+let suggestLoading = false;
+let suggestError = "";
+let suggestResult = null;
+
+async function suggestExercisesAI(request) {
+  const cov = buildRegionCoverage(today, 14);
+  const entry = getEntry(activeDate);
+  const info = effectiveDayInfo(entry, entry.dayType, activeDate);
+  const systemPrompt = `Sen Enti Coach'sun, deneyimli bir kuvvet antrenörüsün. Kullanıcı belirli bir bölge/amaç için hareket önerisi istiyor.
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.weightKg}kg, yağ %${profile.bodyFatPct}, hedef: ${GOALS[profile.goal]?.label}. ${TRAINING_STATUS[profile.trainingStatus]?.label || ""}.
+BUGÜNKÜ PLAN: ${info.label} — ${info.exercises.map(e => e.name).join(", ") || "dinlenme"}.
+${cov.text}
+
+KURALLAR:
+- SADECE aşağıdaki KÜTÜPHANE'deki id'leri kullan (uygulama görselleri bu id'lerle gösteriyor). Kütüphanede olmayan hareket UYDURMA.
+- 4-6 hareket seç. İstenen bölgenin FARKLI alt bölgelerini kapsa (örn. karın için: üst karın + alt karın + oblik + core stabilite; sırt için: genişlik + kalınlık; triceps için: uzun baş + dış baş).
+- Aynı hareketin iki varyasyonunu verme, çeşitlilik olsun. Son 14 günde yapılanları mümkünse tekrar etme.
+- Gerçekçi set × tekrar ver (karın için genelde 3 × 12-15 veya süre; ağır bileşikler için 6-10).
+- "why" alanında 1 kısa cümleyle o hareketin NEYİ çalıştırdığını ve neden seçtiğini Türkçe yaz.
+- "intro" alanında 1-2 cümleyle nasıl uygulanacağını söyle (sıra, dinlenme süresi, haftada kaç kez).
+KÜTÜPHANE (id = isim [bölge]):
+${LIB_CATALOG_TEXT}
+SADECE şu JSON ile yanıt ver, markdown fence yok:
+{"intro": "kısa açıklama", "exercises": [{"id": "kütüphane id", "scheme": "3 × 12-15", "why": "kısa gerekçe"}]}`;
+  const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: request }] }], 3000);
+  const parsed = JSON.parse(extractJson(raw));
+  const exercises = (parsed.exercises || []).filter(e => LIB[e.id]).map(e => ({ id: e.id, name: LIB[e.id].n, scheme: String(e.scheme || "3 × 10-12"), why: String(e.why || LIB[e.id].t) }));
+  if (!exercises.length) throw new Error("Kütüphaneden uygun hareket seçilemedi, isteği biraz daha açık yazar mısın?");
+  return { intro: String(parsed.intro || ""), exercises, request };
+}
+
+function suggestThumb(id) {
+  return `<img class="sg-thumb" loading="lazy" src="${exImg(id, 0)}" alt="" onerror="this.style.visibility='hidden'" />`;
+}
+function renderSuggestCard() {
+  const cov = buildRegionCoverage(today, 14);
+  const neglected = LIB_GROUPS.filter(g => g.regions.every(r => cov.missing.includes(REGIONS[r])));
+  const list = suggestGroup ? libByGroup(suggestGroup) : [];
+  return `
+    <section class="card">
+      <div class="card-eyebrow">HAREKET ÖNERİCİ</div>
+      <div class="card-sub">Bölge seç, resimli varyasyonları gör; dokun → nasıl yapılır + bugüne ekle. Ya da koça ne istediğini yaz.</div>
+      ${neglected.length && neglected.length < LIB_GROUPS.length ? `<div class="sg-neglect">Son 14 günde hiç çalışmadığın: <b>${neglected.map(g => g.label).join(", ")}</b></div>` : ""}
+      <div class="sg-chip-row">
+        ${LIB_GROUPS.map(g => `<button class="sg-chip ${suggestGroup === g.key ? "active" : ""}" data-sg-group="${g.key}">${g.label}</button>`).join("")}
+      </div>
+      ${suggestGroup ? `<div class="sg-grid">
+        ${list.map(e => `
+          <button class="sg-card" data-sg-open="${e.id}">
+            ${suggestThumb(e.id)}
+            <span class="sg-name">${esc(e.n)}</span>
+            <span class="sg-region">${esc(REGIONS[e.r])}</span>
+          </button>`).join("")}
+      </div>` : ""}
+
+      <div class="form-label" style="margin-top:16px;">Koça sor</div>
+      <div class="chat-input-row" style="margin-top:0;">
+        <input type="text" class="chat-input" id="suggestInput" placeholder="örn. karın, alt karın ağırlıklı / kol kalınlığı" value="${esc(suggestText)}" />
+        <button class="chat-send-btn" id="suggestSend" ${suggestLoading ? "disabled" : ""}>➤</button>
+      </div>
+      ${suggestLoading ? `<div class="meal-analyzing">${geminiStatusNote || "hareketler seçiliyor…"}</div>` : ""}
+      ${suggestError ? `<div class="chat-error">${esc(suggestError)}</div>` : ""}
+      ${suggestResult ? `
+        <div class="sg-result">
+          <div class="sg-result-head">“${esc(suggestResult.request)}”</div>
+          ${suggestResult.intro ? `<div class="sg-intro">${esc(suggestResult.intro)}</div>` : ""}
+          ${suggestResult.exercises.map(e => `
+            <div class="sg-row">
+              <button class="sg-row-main" data-sg-open="${e.id}" data-sg-scheme="${esc(e.scheme)}" data-sg-why="${esc(e.why)}">
+                ${suggestThumb(e.id)}
+                <span style="flex:1;min-width:0;text-align:left;">
+                  <span class="sg-name">${esc(e.name)}</span>
+                  <span class="sg-region">${esc(REGIONS[LIB[e.id].r])} · ${esc(e.scheme)}</span>
+                  <span class="sg-why">${esc(e.why)}</span>
+                </span>
+              </button>
+              <button class="log-add-btn" style="height:36px;" data-sg-add="${e.id}" data-sg-scheme="${esc(e.scheme)}" data-sg-why="${esc(e.why)}">+</button>
+            </div>`).join("")}
+          <button class="mark-all-btn" id="sgAddAll">Hepsini ${activeDate === today ? "bugünkü" : "o günkü"} antrenmana ekle</button>
+        </div>` : ""}
+    </section>`;
+}
+function attachSuggestHandlers() {
+  document.querySelectorAll("[data-sg-group]").forEach(b => b.addEventListener("click", () => {
+    suggestGroup = suggestGroup === b.dataset.sgGroup ? null : b.dataset.sgGroup;
+    render();
+  }));
+  document.querySelectorAll("[data-sg-open]").forEach(b => b.addEventListener("click", () => {
+    const id = b.dataset.sgOpen;
+    openModal(id, LIB[id].n, b.dataset.sgScheme || "3 × 10-12", b.dataset.sgWhy || LIB[id].t, { addable: true });
+  }));
+  document.querySelectorAll("[data-sg-add]").forEach(b => b.addEventListener("click", () => {
+    addLibExerciseToDay(b.dataset.sgAdd, b.dataset.sgScheme, b.dataset.sgWhy);
+  }));
+  const addAll = document.getElementById("sgAddAll");
+  if (addAll) addAll.addEventListener("click", () => {
+    suggestResult.exercises.forEach(e => addLibExerciseToDay(e.id, e.scheme, e.why));
+  });
+  const input = document.getElementById("suggestInput");
+  if (!input) return;
+  input.addEventListener("input", () => { suggestText = input.value; });
+  const submit = async () => {
+    const text = input.value.trim();
+    if (!text || suggestLoading) return;
+    if (!getGeminiKey()) { suggestError = "API key bulunamadı — Koçuna Sor kutusundan ekle. Yukarıdaki bölge butonlarıyla AI'sız da göz atabilirsin."; render(); return; }
+    suggestLoading = true; suggestError = ""; suggestResult = null;
+    render();
+    try {
+      suggestResult = await suggestExercisesAI(text);
+    } catch (e) {
+      suggestError = e.message === "NO_KEY" ? "API key bulunamadı." : (e.message || "Bilinmeyen hata");
+    } finally {
+      suggestLoading = false;
+      render();
+    }
+  };
+  document.getElementById("suggestSend").addEventListener("click", submit);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+}
+
+function openModal(exId, name, scheme, tipArg, opts) {
+  opts = opts || {};
+  const media = mediaFor(exId);
+  const tip = tipArg || (media && media.tip) || "";
+  const region = LIB[media?.dbId] ? REGIONS[LIB[media.dbId].r] : "";
   const imgHtml = media ? `
     <div class="modal-img-row">
       <img class="modal-img" src="${exImg(exId,0)}" alt="${esc(name)}" onerror="this.style.display='none'" />
@@ -1919,11 +2727,15 @@ function openModal(exId, name, scheme, tipArg) {
       <button class="modal-close" id="modalCloseBtn">✕</button>
     </div>
     ${imgHtml}
+    ${region ? `<div class="ex-region" style="font-size:12.5px;margin-top:12px;">🎯 ${esc(region)}</div>` : ""}
     ${tip ? `<div class="modal-tip">${esc(tip)}</div>` : ""}
-    <div class="modal-scheme">${scheme}</div>
+    ${scheme ? `<div class="modal-scheme">${esc(scheme)}</div>` : ""}
+    ${opts.addable ? `<button class="ai-gen-btn" id="modalAddBtn" style="margin-top:14px;">+ Bugünkü antrenmana ekle</button>` : ""}
   `;
   document.getElementById("modalBackdrop").classList.add("open");
   document.getElementById("modalCloseBtn").addEventListener("click", closeModal);
+  const addBtn = document.getElementById("modalAddBtn");
+  if (addBtn) addBtn.addEventListener("click", () => { addLibExerciseToDay(exId, scheme, tip); closeModal(); });
 }
 function closeModal() { document.getElementById("modalBackdrop").classList.remove("open"); }
 document.getElementById("modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
@@ -2156,7 +2968,7 @@ function renderOnboarding() {
   const previewOrder = adaptWeeks > 0 ? FULL_BODY_ORDER : SPLIT_ORDER;
   const splitPreview = sortedDays.map((idx,i) => {
     const w = WEEKDAYS.find(w => w.idx === idx);
-    const split = DAY_TYPES[previewOrder[i % previewOrder.length]];
+    const split = PROGRAM[previewOrder[i % previewOrder.length]];
     return `${w.short}: ${split.label}`;
   });
 
@@ -2261,6 +3073,9 @@ function attachOnboardingHandlers() {
       programStartDate,
       age: Number(obState.age), heightCm: Number(obState.heightCm), weightKg: Number(obState.weightKg),
       bodyFatPct: Number(obState.bodyFatPct), musclePct: obState.musclePct === "" ? null : Number(obState.musclePct),
+      programV3Start: profile?.programV3Start || today,
+      trainingDayOverrides: profile?.trainingDayOverrides || {},
+      autoAiPlan: profile?.autoAiPlan,
     };
     persistProfile();
     editingProfile = false;
