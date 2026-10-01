@@ -3,302 +3,521 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Enti Coach</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #FFFFFF; font-family: 'Inter', sans-serif; min-height: 100vh; }
-  .app { padding: 24px 16px 100px; }
-  .container { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-  .header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; color: #0F9E8C; margin-bottom: 4px; }
-  h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; color: #12151A; }
-  .streak-badge { display: flex; align-items: center; gap: 5px; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 10px; padding: 8px 12px; height: fit-content; }
-  .streak-num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px; color: #B8720A; }
-  .streak-denom { font-size: 12px; color: #C9A464; }
-  .streak-label { font-size: 10.5px; color: #6B7280; line-height: 1.2; }
-  .date-nav { display: flex; align-items: center; justify-content: space-between; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 12px; padding: 10px 6px; }
-  .nav-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #12151A; font-size: 16px; }
-  .date-label { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: #12151A; text-transform: capitalize; }
-  .today-link { background: none; border: none; color: #0F9E8C; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-top: 2px; cursor: pointer; display: block; margin-left: auto; margin-right: auto; }
-  .card { background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 14px; padding: 18px; }
-  .card-head-row { display: flex; justify-content: space-between; align-items: flex-start; }
-  .card-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: #6B7280; }
-  .card-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px; color: #12151A; margin-top: 4px; }
-  .card-sub { font-size: 13px; color: #6B7280; margin-top: 2px; }
-  .progress-track { height: 5px; background: #ECEFF2; border-radius: 3px; margin-top: 14px; overflow: hidden; }
-  .progress-fill { height: 100%; background: #4DD8C7; border-radius: 3px; }
-  .rest-note { font-size: 13px; color: #6B7280; margin-top: 14px; line-height: 1.5; }
-  .ex-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-  .ex-row { display: flex; align-items: center; gap: 8px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 8px 8px 8px 12px; }
-  .ex-row.done { background: #EAF7EC; border-color: #BEE9DC; }
+  /* Enti Coach v4 · Apple Fitness tarzı koyu tema: kutucuklar, canlı renkler, buzlu cam */
+  :root {
+    color-scheme: dark;
+    --bg: #000; --tile: #1C1C1E; --tile2: #2C2C2E; --tile3: #3A3A3C; --line: rgba(255,255,255,.08);
+    --fg: #fff; --fg2: rgba(235,235,245,.62); --fg3: rgba(235,235,245,.34);
+    --pink: #FA114F; --lime: #B4FF1A; --cyan: #19E3FF; --purple: #A78BFF; --blue: #2E9BFF;
+    --orange: #FF9F0A; --yellow: #FFD60A; --green: #32D74B; --red: #FF453A;
+    --glass: rgba(38,38,42,.6); --glass-edge: rgba(255,255,255,.14);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --round: "SF Pro Rounded", ui-rounded, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    --pillw: min(calc(100vw - 106px), 300px);
+    --dock-side: calc((100vw - var(--pillw) - 74px) / 2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { background: var(--bg); -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font); min-height: 100vh; letter-spacing: -.2px; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; color: inherit; }
+  .glass { background: var(--glass); backdrop-filter: saturate(200%) blur(26px); -webkit-backdrop-filter: saturate(200%) blur(26px); border: .5px solid var(--glass-edge); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 10px 30px rgba(0,0,0,.45); }
+
+  /* kutucuklar */
+  .tile-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  .tile-grid > * { grid-column: span 6; min-width: 0; }
+  .tile-grid > .half { grid-column: span 3; }
+  .tile-grid > .third { grid-column: span 2; }
+  .card, .day-choice-card { background: var(--tile); border: none; border-radius: 24px; padding: 18px; min-width: 0; }
+  .card-head-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .card-eyebrow { font-size: 20px; font-weight: 700; color: var(--fg); letter-spacing: .1px; text-transform: none; line-height: 1.2; }
+  .card-eyebrow::first-letter { text-transform: uppercase; }
+  .card-title { font-family: var(--round); font-weight: 600; font-size: 30px; color: var(--blue); margin-top: 6px; }
+  .card-sub { font-size: 14px; color: var(--fg2); margin-top: 4px; line-height: 1.4; }
+  .tile-title { font-size: 20px; font-weight: 700; color: var(--fg); }
+  .tile-cap { font-size: 15px; color: var(--fg); margin-top: 4px; }
+  .tile-num { font-family: var(--round); font-variant-numeric: tabular-nums; font-size: 30px; font-weight: 600; line-height: 1.1; margin-top: 4px; }
+  .tile-num small { font-size: 16px; font-weight: 700; text-transform: uppercase; }
+  .tile-sub { font-size: 13px; color: var(--fg2); margin-top: 4px; }
+
+  .progress-track { height: 6px; background: color-mix(in srgb, var(--orange) 20%, transparent); border-radius: 3px; margin-top: 14px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--orange); border-radius: 3px; transition: width .3s; }
+  .rest-note { font-size: 14px; color: var(--fg2); margin-top: 14px; line-height: 1.5; }
+
+  /* antrenman listesi */
+  .ex-list { display: flex; flex-direction: column; margin-top: 10px; }
+  .ex-block { display: flex; flex-direction: column; border-top: .5px solid var(--line); }
+  .ex-row { display: flex; align-items: center; gap: 8px; padding: 12px 0; background: none; border: none; }
+  .ex-row.done { background: none; }
   .checkbox-btn { background: none; border: none; padding: 0; cursor: pointer; flex-shrink: 0; }
-  .checkbox { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #D0D5DD; display: flex; align-items: center; justify-content: center; }
-  .checkbox.done { background: #4DD8C7; border-color: #4DD8C7; }
-  .ex-name-btn { background: none; border: none; padding: 0; cursor: pointer; flex: 1; text-align: left; }
-  .ex-name { font-size: 14px; color: #12151A; font-weight: 500; }
-  .ex-name.done { color: #9AA3AE; text-decoration: line-through; }
-  .ex-scheme { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #6B7280; flex-shrink: 0; }
-  .info-btn { background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #0F9E8C; font-size: 13px; font-weight: 700; }
-  .ex-region { display: block; font-size: 11px; color: #0F9E8C; margin-top: 2px; }
-  .ex-scheme-sub { display: block; margin-top: 2px; font-size: 11.5px; }
-  .swap-btn { background: #FFF3E0; border: 1px solid #FBD9A8; border-radius: 7px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #B8720A; font-size: 14px; font-weight: 700; }
-  .ex-row-custom { border-style: dashed; border-color: #D0D5DD; }
-  .ex-custom-tip { font-size: 11px; color: #6B7280; margin-top: 3px; line-height: 1.4; }
-  .ai-gen-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #4DD8C7; border: none; border-radius: 12px; padding: 13px 0; color: #12151A; font-size: 13.5px; font-weight: 700; cursor: pointer; }
-  .ai-revert-btn { display: block; background: none; border: none; color: #94A0AE; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; text-decoration: underline; margin: -6px auto 0; }
-  .ai-badge { color: #0F9E8C; }
-  .mark-all-btn { width: 100%; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 10px 0; color: #6B7280; font-size: 12.5px; font-weight: 600; cursor: pointer; margin-top: 14px; }
-  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-  .metric-cell { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px; }
-  .metric-label-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280; font-weight: 500; }
-  .metric-input { width: 100%; background: transparent; border: none; color: #12151A; font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; margin-top: 6px; padding: 0; outline: none; }
-  .stepper-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
-  .stepper-btn { width: 30px; height: 30px; flex-shrink: 0; background: #ECEFF2; border: none; border-radius: 8px; color: #0F9E8C; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
-  .stepper-value { flex: 1; background: none; border: none; color: #12151A; font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; cursor: pointer; text-align: center; padding: 2px 0; }
-  .stepper-input { flex: 1; width: 100%; min-width: 0; background: #FFFFFF; border: 1px solid #4DD8C7; border-radius: 8px; color: #12151A; font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; text-align: center; padding: 3px 0; outline: none; }
-  .day-choice-card { background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 14px; padding: 16px; }
-  .day-choice-q { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: #12151A; margin-bottom: 12px; text-align: center; }
-  .day-choice-btn-row { display: flex; gap: 10px; }
-  .day-choice-big-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 12px; padding: 16px 0; cursor: pointer; color: #12151A; }
-  .day-choice-big-btn.active-train { background: #4DD8C7; border-color: #4DD8C7; color: #12151A; }
-  .day-choice-big-btn.active-rest { background: #B79CF0; border-color: #B79CF0; color: #12151A; }
-  .day-choice-icon { font-size: 22px; }
-  .day-choice-big-label { font-size: 13px; font-weight: 700; }
-  .meal-breakdown { font-size: 12.5px; color: #B8720A; margin-top: 8px; line-height: 1.45; }
-  .logged-meal-breakdown { font-size: 11.5px; color: #B8720A; margin-top: 3px; line-height: 1.4; }
-  .metric-target-row { display: flex; justify-content: space-between; margin-top: 2px; font-size: 11px; color: #94A0AE; }
-  .metric-target-row .unit-mono { font-family: 'JetBrains Mono', monospace; }
-  .metric-track { height: 3px; background: #ECEFF2; border-radius: 2px; margin-top: 8px; overflow: hidden; }
-  .metric-fill { height: 100%; background: #4DD8C7; border-radius: 2px; }
-  .week-grid { display: flex; justify-content: space-between; align-items: flex-end; height: 90px; margin-top: 14px; gap: 6px; }
+  .checkbox { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--fg3); display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800; font-size: 14px; transition: all .2s; }
+  .checkbox.done { background: var(--orange); border-color: var(--orange); }
+  .ex-name-btn { background: none; border: none; padding: 0; cursor: pointer; flex: 1; text-align: left; min-width: 0; margin-left: 4px; }
+  .ex-name { font-size: 16px; color: var(--fg); font-weight: 600; }
+  .ex-name.done { color: var(--fg2); text-decoration: line-through; }
+  .ex-scheme { font-family: var(--round); font-size: 13px; color: var(--fg2); flex-shrink: 0; }
+  .ex-region { display: block; font-size: 12px; color: var(--cyan); margin-top: 2px; }
+  .ex-scheme-sub { display: block; margin-top: 2px; }
+  .info-btn, .swap-btn { background: var(--tile2); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: var(--orange); font-size: 14px; font-weight: 700; }
+  .info-btn.muted { color: var(--fg2); }
+  .ex-row-custom { border: none; }
+  .ex-row-custom .ex-name::after { content: " · ekstra"; font-size: 12px; font-weight: 500; color: var(--lime); }
+  .ex-custom-tip { font-size: 12px; color: var(--fg2); margin-top: 3px; line-height: 1.4; }
+  .ai-gen-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 52px; background: color-mix(in srgb, var(--lime) 22%, #1C1C1E); border: none; border-radius: 26px; color: var(--lime); font-size: 17px; font-weight: 600; cursor: pointer; }
+  .ai-gen-btn:disabled { opacity: .6; }
+  .ai-revert-btn { display: block; background: none; border: none; color: var(--fg2); font-size: 13px; cursor: pointer; text-decoration: underline; margin: -2px auto 0; }
+  .ai-badge { color: var(--lime); font-size: 13px; font-weight: 700; }
+  .mark-all-btn { width: 100%; height: 44px; background: color-mix(in srgb, var(--orange) 20%, #1C1C1E); border: none; border-radius: 22px; color: var(--orange); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 14px; }
+
+  /* su & uyku kutucukları */
+  .metric-cell { display: flex; flex-direction: column; }
+  .metric-label-row { font-size: 20px; font-weight: 700; color: var(--fg); }
+  .metric-cap { font-size: 15px; color: var(--fg); margin-top: 4px; }
+  .stepper-value { background: none; border: none; font-family: var(--round); font-variant-numeric: tabular-nums; font-size: 34px; font-weight: 600; cursor: pointer; text-align: left; padding: 2px 0; margin-top: 2px; }
+  .stepper-value small { font-size: 18px; font-weight: 700; text-transform: uppercase; }
+  .stepper-input { width: 100%; min-width: 0; background: var(--tile2); border: 1px solid var(--lime); border-radius: 12px; color: var(--fg); font-family: var(--round); font-size: 22px; font-weight: 700; padding: 6px 10px; margin-top: 4px; outline: none; }
+  .metric-bar { height: 6px; border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .metric-bar > div { height: 100%; border-radius: 3px; transition: width .3s; }
+  .metric-target-row { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--fg3); }
+  .metric-target-row .unit-mono { font-family: var(--round); }
+  .stepper-row { display: flex; gap: 8px; margin-top: 12px; }
+  .stepper-btn { flex: 1; height: 38px; background: var(--tile2); border: none; border-radius: 19px; color: var(--fg); font-size: 22px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .stepper-btn:active { transform: scale(.96); }
+
+  /* gün tipi seçici */
+  .day-choice-q { font-size: 20px; font-weight: 700; color: var(--fg); margin-bottom: 12px; }
+  .day-choice-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--tile2); border-radius: 26px; padding: 4px; }
+  .day-choice-big-btn { display: flex; align-items: center; justify-content: center; gap: 6px; height: 46px; background: none; border: none; border-radius: 23px; cursor: pointer; color: var(--fg2); transition: background .2s, color .2s; }
+  .day-choice-big-btn.active-train { background: color-mix(in srgb, var(--lime) 24%, #1C1C1E); color: var(--lime); }
+  .day-choice-big-btn.active-rest { background: color-mix(in srgb, var(--purple) 28%, #1C1C1E); color: var(--purple); }
+  .day-choice-icon { font-size: 17px; }
+  .day-choice-big-label { font-size: 15px; font-weight: 600; }
+
+  .meal-breakdown { font-size: 13px; color: var(--orange); margin-top: 8px; line-height: 1.45; }
+  .logged-meal-breakdown { font-size: 12px; color: var(--orange); margin-top: 3px; line-height: 1.4; }
+
+  /* haftalık grafik */
+  .week-grid { display: flex; justify-content: space-between; align-items: flex-end; height: 100px; margin-top: 14px; gap: 8px; }
   .week-col { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
-  .week-bar-track { width: 100%; height: 60px; background: #F3F5F7; border-radius: 5px; display: flex; align-items: flex-end; overflow: hidden; }
-  .week-bar-fill { width: 100%; background: #4DD8C7; border-radius: 5px 5px 0 0; min-height: 2px; }
-  .week-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #6B7280; text-transform: capitalize; }
-  .week-label.today { color: #0F9E8C; font-weight: 700; }
+  .week-bar-track { width: 100%; max-width: 26px; height: 74px; background: color-mix(in srgb, var(--pink) 14%, transparent); border-radius: 6px; display: flex; align-items: flex-end; overflow: hidden; }
+  .week-bar-fill { width: 100%; background: var(--pink); border-radius: 6px; min-height: 3px; opacity: .65; }
+  .week-col:last-child .week-bar-fill { opacity: 1; }
+  .week-label { font-size: 11px; color: var(--fg3); text-transform: capitalize; }
+  .week-label.today { color: var(--pink); font-weight: 700; }
+
+  /* takvim */
   .cal-head-row { display: flex; align-items: center; justify-content: space-between; }
-  .cal-month-label { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; color: #12151A; text-transform: capitalize; }
-  .cal-week-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 14px; margin-bottom: 4px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94A0AE; }
+  .cal-month-label { font-size: 20px; font-weight: 700; color: var(--fg); text-transform: capitalize; }
+  .cal-week-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 14px; margin-bottom: 4px; text-align: center; font-size: 11px; color: var(--fg3); }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 4px; }
   .cal-cell { background: none; border: none; padding: 3px 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .cal-cell.selected { outline: 1.5px solid #4DD8C7; outline-offset: -1px; border-radius: 8px; }
-  .cal-dot { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-  .cal-day-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
-  .cal-day-num.today { font-weight: 700; }
+  .cal-cell.selected .cal-dot { box-shadow: 0 0 0 2px var(--fg); }
+  .cal-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .cal-day-num { font-family: var(--round); font-size: 14px; }
+  .cal-day-num.today { font-weight: 800; }
   .cal-legend { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
-  .cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: #6B7280; }
-  .cal-legend-note { font-size: 10.5px; color: #94A0AE; margin-top: 4px; line-height: 1.4; width: 100%; }
-  .cal-legend-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,32,0.4); display: none; align-items: flex-end; justify-content: center; z-index: 50; }
+  .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--fg2); }
+  .cal-legend-note { font-size: 12px; color: var(--fg3); margin-top: 2px; line-height: 1.4; width: 100%; }
+  .cal-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  /* alttan açılan pencereler */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: flex-end; justify-content: center; z-index: 70; padding: 0 8px calc(8px + env(safe-area-inset-bottom)); }
   .modal-backdrop.open { display: flex; }
-  .modal-card { background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 18px 18px 0 0; padding: 18px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; }
-  .modal-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-  .modal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px; color: #12151A; margin-top: 4px; }
-  .modal-close { background: #ECEFF2; border: none; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #12151A; font-size: 16px; }
+  .modal-card { background: rgba(28,28,30,.92); backdrop-filter: saturate(200%) blur(26px); -webkit-backdrop-filter: saturate(200%) blur(26px); border: .5px solid var(--glass-edge); border-radius: 32px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; color: var(--fg); }
+  .modal-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; }
+  .modal-head .card-eyebrow { font-size: 13px; font-weight: 600; color: var(--fg2); }
+  .modal-title { font-weight: 700; font-size: 22px; color: var(--fg); margin-top: 2px; }
+  .modal-close { background: var(--tile2); border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--fg2); font-size: 14px; flex-shrink: 0; }
   .modal-img-row { display: flex; gap: 8px; }
-  .modal-img { width: 50%; border-radius: 10px; background: #EEF1F4; object-fit: cover; aspect-ratio: 1/1; }
-  .modal-tip { font-size: 13.5px; color: #3A4048; line-height: 1.55; margin-top: 14px; }
-  .modal-scheme { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F9E8C; margin-top: 12px; }
+  .modal-img { width: 50%; border-radius: 16px; background: var(--tile2); object-fit: cover; aspect-ratio: 1/1; }
+  .modal-tip { font-size: 15px; color: var(--fg); line-height: 1.55; margin-top: 14px; opacity: .9; }
+  .modal-scheme { font-family: var(--round); font-size: 14px; font-weight: 600; color: var(--orange); margin-top: 12px; }
+
+  /* öğün önerileri */
   .meal-row.clickable { cursor: pointer; }
-  .meal-swap-btn { background: #ECEFF2; border: none; border-radius: 7px; width: 30px; height: 28px; cursor: pointer; font-size: 13px; flex-shrink: 0; }
-  .recipe-chip { display: inline-flex; align-items: center; gap: 4px; background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; padding: 4px 9px; font-size: 10.5px; font-weight: 700; color: #0F9E8C; margin-top: 8px; }
+  .meal-swap-btn { background: var(--tile3); border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 13px; flex-shrink: 0; }
+  .recipe-chip { display: inline-flex; align-items: center; gap: 4px; background: color-mix(in srgb, var(--lime) 18%, transparent); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: var(--lime); margin-top: 8px; }
   .recipe-progress { display: flex; gap: 4px; margin-bottom: 16px; }
-  .recipe-progress-seg { flex: 1; height: 3px; border-radius: 2px; background: #ECEFF2; }
-  .recipe-progress-seg.filled { background: #4DD8C7; }
-  .recipe-servings-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 8px 10px; margin-bottom: 12px; }
-  .recipe-servings-label { font-size: 12px; color: #6B7280; font-weight: 500; }
+  .recipe-progress-seg { flex: 1; height: 4px; border-radius: 2px; background: var(--tile3); }
+  .recipe-progress-seg.filled { background: var(--lime); }
+  .recipe-servings-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--tile2); border-radius: 16px; padding: 8px 12px; margin-bottom: 12px; }
+  .recipe-servings-label { font-size: 14px; color: var(--fg2); font-weight: 500; }
   .recipe-servings-stepper { display: flex; align-items: center; gap: 8px; }
-  .recipe-servings-stepper .stepper-btn { width: 26px; height: 26px; font-size: 16px; }
-  .recipe-servings-stepper .stepper-value { font-size: 15px; width: 20px; flex: none; }
-  .recipe-ingredients-toggle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #0F9E8C; background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 10px; text-decoration: underline; }
-  .recipe-ingredients-list { font-size: 12.5px; color: #3A4048; line-height: 1.7; margin-bottom: 14px; background: #F3F5F7; border-radius: 10px; padding: 10px 12px; }
-  .recipe-step-counter { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #94A0AE; text-align: center; }
-  .recipe-step-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 21px; color: #12151A; margin-top: 8px; text-align: center; }
-  .recipe-step-content { font-size: 14px; color: #3A4048; line-height: 1.55; margin-top: 12px; text-align: center; }
-  .recipe-timer { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; color: #12151A; text-align: center; margin-top: 18px; }
-  .recipe-timer-btn { width: 54px; height: 54px; border-radius: 50%; background: #12151A; color: #FFFFFF; border: none; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 12px auto 0; cursor: pointer; }
+  .recipe-servings-stepper .stepper-btn { flex: none; width: 32px; height: 32px; font-size: 18px; background: var(--tile3); }
+  .recipe-servings-stepper .stepper-value { font-size: 17px; width: 24px; flex: none; text-align: center; margin: 0; }
+  .recipe-ingredients-toggle { font-size: 14px; font-weight: 600; color: var(--lime); background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 10px; }
+  .recipe-ingredients-list { font-size: 14px; color: var(--fg); line-height: 1.7; margin-bottom: 14px; background: var(--tile2); border-radius: 16px; padding: 12px 14px; }
+  .recipe-step-counter { font-size: 13px; color: var(--fg3); text-align: center; }
+  .recipe-step-title { font-weight: 700; font-size: 22px; color: var(--fg); margin-top: 8px; text-align: center; }
+  .recipe-step-content { font-size: 15px; color: var(--fg); opacity: .9; line-height: 1.55; margin-top: 12px; text-align: center; }
+  .recipe-timer { font-family: var(--round); font-variant-numeric: tabular-nums; font-size: 44px; font-weight: 600; color: var(--orange); text-align: center; margin-top: 18px; }
+  .recipe-timer-btn { width: 60px; height: 60px; border-radius: 50%; background: color-mix(in srgb, var(--orange) 24%, #1C1C1E); color: var(--orange); border: none; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 12px auto 0; cursor: pointer; }
   .recipe-nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; }
-  .recipe-nav-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: #12151A; flex-shrink: 0; }
+  .recipe-nav-btn { background: var(--tile2); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: var(--fg); flex-shrink: 0; }
   .recipe-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .recipe-note-box { font-size: 11.5px; color: #B8720A; line-height: 1.5; margin-top: 18px; background: #FBF3E6; border: 1px solid #F0DDB8; border-radius: 10px; padding: 10px 12px; }
-  .recipe-macro-box { font-size: 11.5px; color: #94A0AE; line-height: 1.6; margin-top: 10px; }
-  /* iOS Safari auto-zooms on focus when font-size < 16px */
+  .recipe-note-box { font-size: 13px; color: var(--orange); line-height: 1.5; margin-top: 18px; background: color-mix(in srgb, var(--orange) 14%, transparent); border-radius: 14px; padding: 10px 12px; }
+  .recipe-macro-box { font-size: 13px; color: var(--fg2); line-height: 1.6; margin-top: 10px; }
+
+  /* iOS Safari odaklanınca 16px altını büyütür */
   input, textarea, select { font-size: 16px !important; }
-  html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
-  input:focus, textarea:focus { outline: 2px solid #4DD8C7; outline-offset: 1px; }
-  button:focus-visible { outline: 2px solid #4DD8C7; outline-offset: 2px; }
+  input:focus, textarea:focus { outline: 2px solid var(--lime); outline-offset: 1px; }
+  button:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
 
-  .phase-banner { background: #EAF7E2; border: 1px solid #C7E6B8; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px; }
-  .phase-banner-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #3F7A1F; font-weight: 700; }
-  .phase-banner-sub { font-size: 12.5px; color: #5B6B4A; line-height: 1.45; }
-  .rotation-note { font-size: 11.5px; color: #6B7280; background: #F3F5F7; border-radius: 8px; padding: 8px 10px; margin-top: 12px; line-height: 1.45; }
-  .cardio-note { font-size: 12.5px; color: #B8720A; background: #FFF3E0; border: 1px solid #FBD9A8; border-radius: 8px; padding: 8px 10px; margin-top: 12px; }
-  .sg-neglect { font-size: 12px; color: #B8720A; background: #FFF8EB; border: 1px solid #FBD9A8; border-radius: 8px; padding: 8px 10px; margin-top: 10px; }
-  .sg-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .sg-chip { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; color: #3A4048; cursor: pointer; }
-  .sg-chip.active { background: #4DD8C7; border-color: #4DD8C7; color: #12151A; }
-  .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-  .sg-card { display: flex; flex-direction: column; align-items: stretch; gap: 3px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 6px; cursor: pointer; text-align: left; min-width: 0; }
+  .phase-banner { background: var(--tile); border-radius: 24px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+  .phase-banner-title { font-size: 20px; font-weight: 700; color: var(--purple); }
+  .phase-banner-sub { font-size: 14px; color: var(--fg2); line-height: 1.45; }
+  .rotation-note { font-size: 13px; color: var(--fg2); background: var(--tile2); border-radius: 14px; padding: 10px 12px; margin-top: 12px; line-height: 1.45; }
+  .cardio-note { font-size: 14px; color: var(--cyan); background: color-mix(in srgb, var(--cyan) 14%, transparent); border-radius: 14px; padding: 10px 12px; margin-top: 12px; }
+  .sg-neglect { font-size: 13px; color: var(--orange); background: color-mix(in srgb, var(--orange) 14%, transparent); border-radius: 14px; padding: 10px 12px; margin-top: 10px; }
+  .sg-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .sg-chip { background: var(--tile2); border: none; border-radius: 999px; height: 34px; padding: 0 14px; font-size: 14px; font-weight: 600; color: var(--fg2); cursor: pointer; }
+  .sg-chip.active { background: var(--orange); color: #000; }
+  .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .sg-card { display: flex; flex-direction: column; align-items: stretch; gap: 3px; background: var(--tile2); border: none; border-radius: 18px; padding: 8px; cursor: pointer; text-align: left; min-width: 0; }
   .sg-card .sg-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
-  .sg-thumb { width: 58px; height: 58px; object-fit: cover; border-radius: 8px; background: #E4E8ED; flex-shrink: 0; }
-  .sg-name { display: block; font-size: 12.5px; font-weight: 600; color: #12151A; line-height: 1.3; }
-  .sg-region { display: block; font-size: 10.5px; color: #0F9E8C; margin-top: 1px; }
-  .sg-why { display: block; font-size: 11.5px; color: #6B7280; margin-top: 3px; line-height: 1.4; }
+  .sg-thumb { width: 58px; height: 58px; object-fit: cover; border-radius: 12px; background: var(--tile3); flex-shrink: 0; }
+  .sg-name { display: block; font-size: 14px; font-weight: 600; color: var(--fg); line-height: 1.3; margin-top: 4px; }
+  .sg-region { display: block; font-size: 12px; color: var(--cyan); margin-top: 1px; }
+  .sg-why { display: block; font-size: 12px; color: var(--fg2); margin-top: 3px; line-height: 1.4; }
   .sg-result { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-  .sg-result-head { font-size: 12px; color: #94A0AE; font-family: 'JetBrains Mono', monospace; }
-  .sg-intro { font-size: 13px; color: #3A4048; line-height: 1.5; }
-  .sg-row { display: flex; align-items: center; gap: 8px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 6px 8px 6px 6px; }
-  .sg-row-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; cursor: pointer; }
-  .version-tag { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #B7BEC7; margin-top: 4px; }
+  .sg-result-head { font-size: 13px; color: var(--fg3); }
+  .sg-intro { font-size: 14px; color: var(--fg); opacity: .9; line-height: 1.5; }
+  .sg-row { display: flex; align-items: center; gap: 8px; background: var(--tile2); border: none; border-radius: 16px; padding: 8px 10px 8px 8px; }
+  .sg-row-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; cursor: pointer; text-align: left; }
+  .version-tag { text-align: center; font-size: 11px; color: var(--fg3); margin-top: 4px; }
 
-  .profile-edit-btn { display: flex; align-items: center; gap: 5px; background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 7px; padding: 6px 10px; color: #0F9E8C; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; flex-shrink: 0; }
-  .status-chip { display: inline-block; margin-top: 8px; font-size: 10.5px; font-family: 'JetBrains Mono', monospace; color: #B8720A; background: #FFF3E0; border: 1px solid #FBD9A8; border-radius: 6px; padding: 3px 8px; }
+  /* profil */
+  .profile-edit-btn { display: flex; align-items: center; gap: 5px; background: color-mix(in srgb, var(--lime) 20%, #1C1C1E); border: none; border-radius: 16px; height: 32px; padding: 0 12px; color: var(--lime); font-size: 14px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+  .status-chip { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--orange); background: color-mix(in srgb, var(--orange) 18%, transparent); border-radius: 999px; padding: 4px 10px; }
   .gauge-wrap { margin-top: 16px; }
-  .gauge-head-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-  .gauge-label { font-size: 12.5px; color: #6B7280; }
-  .gauge-value { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 700; }
-  .gauge-track { position: relative; display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
-  .gauge-marker { position: absolute; top: -3px; width: 3px; height: 14px; background: #EDEFF2; border-radius: 2px; transform: translateX(-50%); }
-  .gauge-zone-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9.5px; color: #94A0AE; font-family: 'JetBrains Mono', monospace; }
-  .mini-stats-row { display: flex; gap: 8px; margin-top: 16px; }
-  .mini-stat { flex: 1; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 10px 12px; }
-  .mini-stat-label { font-size: 10.5px; color: #6B7280; }
-  .mini-stat-value { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: #12151A; margin-top: 3px; }
+  .gauge-head-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .gauge-label { font-size: 15px; color: var(--fg); }
+  .gauge-value { font-family: var(--round); font-size: 15px; font-weight: 700; }
+  .gauge-track { position: relative; display: flex; gap: 2px; height: 8px; border-radius: 4px; }
+  .gauge-track > div:not(.gauge-marker) { border-radius: 4px; }
+  .gauge-marker { position: absolute; top: -4px; width: 16px; height: 16px; background: #fff; border: 3px solid var(--tile); border-radius: 50%; transform: translateX(-50%); }
+  .gauge-zone-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--fg3); }
+  .mini-stat { background: var(--tile); border-radius: 24px; padding: 14px 16px; }
+  .mini-stat-label { font-size: 15px; font-weight: 700; color: var(--fg); }
+  .mini-stat-value { font-family: var(--round); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 600; margin-top: 6px; }
 
-  .calorie-hero { font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 700; color: #0F9E8C; margin-top: 6px; }
-  .calorie-hero-unit { font-size: 16px; color: #6B7280; }
+  /* beslenme */
+  .calorie-hero { font-family: var(--round); font-variant-numeric: tabular-nums; font-size: 46px; font-weight: 600; color: var(--pink); margin-top: 6px; line-height: 1.05; }
+  .calorie-hero-unit { font-size: 22px; font-weight: 700; color: var(--pink); text-transform: uppercase; }
   .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 16px; }
-  .macro-block { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 10px; }
-  .macro-label-row { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #6B7280; }
-  .macro-value { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 700; margin-top: 4px; }
-  .macro-kcal { font-size: 10.5px; color: #94A0AE; margin-top: 2px; }
-  .meal-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-  .meal-row { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px; }
-  .meal-head-row { display: flex; justify-content: space-between; align-items: baseline; }
-  .meal-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; color: #12151A; }
-  .meal-macro { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #0F9E8C; }
-  .meal-items { font-size: 12.5px; color: #6B7280; margin-top: 6px; line-height: 1.5; }
-  .meal-footnote { font-size: 11px; color: #94A0AE; margin-top: 10px; line-height: 1.5; }
+  .macro-block { background: var(--tile2); border: none; border-radius: 18px; padding: 12px; min-width: 0; }
+  .macro-label-row { font-size: 13px; color: var(--fg2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .macro-value { font-family: var(--round); font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .macro-kcal { font-size: 12px; color: var(--fg3); margin-top: 2px; }
+  .meal-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .meal-row { background: var(--tile2); border: none; border-radius: 18px; padding: 14px; min-width: 0; display: flex; flex-direction: column; }
+  .meal-head-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .meal-name { font-weight: 700; font-size: 17px; color: var(--fg); }
+  .meal-macro { font-family: var(--round); font-size: 13px; font-weight: 600; color: var(--pink); }
+  .meal-items { font-size: 13px; color: var(--fg2); margin-top: 6px; line-height: 1.45; }
+  .meal-footnote { font-size: 12px; color: var(--fg3); margin-top: 12px; line-height: 1.5; }
   .remaining-row { display: flex; gap: 10px; margin-top: 12px; }
-  .remaining-block { flex: 1; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px 14px; text-align: center; }
-  .remaining-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: #0F9E8C; }
-  .remaining-label { font-size: 11px; color: #6B7280; margin-top: 3px; }
-  .meal-analyzing { font-size: 12.5px; color: #6B7280; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
-  .meal-result-card { background: #ECFAF5; border: 1px solid #BEE9DC; border-radius: 10px; padding: 12px; margin-top: 12px; }
-  .meal-result-head { display: flex; justify-content: space-between; align-items: baseline; }
-  .meal-result-title { font-size: 12.5px; color: #0F9E8C; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-  .meal-result-advice { font-size: 13px; color: #3A4048; line-height: 1.5; margin-top: 8px; }
-  .logged-meal-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-  .logged-meal-row { display: flex; align-items: center; gap: 8px; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 9px 10px 9px 12px; }
-  .logged-meal-text { font-size: 13px; color: #12151A; }
-  .logged-meal-macro { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6B7280; margin-top: 2px; }
-  .logged-meal-remove { background: none; border: none; cursor: pointer; padding: 4px; flex-shrink: 0; color: #94A0AE; font-size: 14px; }
-  .chat-error { font-size: 12px; color: #DC2626; margin-top: 10px; }
+  .remaining-block { flex: 1; background: var(--tile2); border-radius: 18px; padding: 12px 14px; text-align: center; }
+  .remaining-value { font-family: var(--round); font-size: 22px; font-weight: 700; color: var(--lime); }
+  .remaining-label { font-size: 12px; color: var(--fg2); margin-top: 3px; }
+  .meal-analyzing { font-size: 14px; color: var(--lime); margin-top: 10px; }
+  .meal-result-card { background: color-mix(in srgb, var(--green) 12%, var(--tile2)); border-radius: 18px; padding: 14px; margin-top: 12px; }
+  .meal-result-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .meal-result-title { font-size: 15px; color: var(--green); font-weight: 700; }
+  .meal-result-advice { font-size: 14px; color: var(--fg); opacity: .9; line-height: 1.5; margin-top: 8px; }
+  .logged-meal-list { display: flex; flex-direction: column; margin-top: 12px; }
+  .logged-meal-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-top: .5px solid var(--line); }
+  .logged-meal-text { font-size: 16px; font-weight: 600; color: var(--fg); }
+  .logged-meal-macro { font-family: var(--round); font-size: 13px; font-weight: 600; color: var(--pink); margin-top: 3px; }
+  .logged-meal-remove { background: var(--tile2); border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; flex-shrink: 0; color: var(--fg2); font-size: 12px; }
+  .chat-error { font-size: 13px; color: var(--red); margin-top: 10px; line-height: 1.4; }
 
-  .chat-scroll { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; max-height: 260px; overflow-y: auto; padding-right: 2px; flex: 1; }
-  .chat-bubble { font-size: 13px; line-height: 1.5; padding: 9px 12px; border-radius: 12px; max-width: 85%; white-space: pre-wrap; }
-  .chat-bubble.user { align-self: flex-end; background: #E3F7F3; color: #12151A; border-bottom-right-radius: 3px; margin-left: auto; }
-  .chat-bubble.assistant { align-self: flex-start; background: #F3F5F7; color: #3A4048; border-bottom-left-radius: 3px; }
-  .chat-input-row { display: flex; gap: 8px; margin-top: 12px; }
-  .chat-input { flex: 1; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 11px 12px; color: #12151A; font-size: 13px; font-family: 'Inter', sans-serif; }
-  .chat-send-btn { background: #4DD8C7; border: none; border-radius: 10px; width: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #0C1512; font-weight: 700; }
+  /* sohbet ve giriş kutuları */
+  .chat-scroll { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; overflow-y: auto; padding-right: 2px; flex: 1 1 auto; min-height: 60px; }
+  .chat-bubble { font-size: 16px; line-height: 1.35; padding: 8px 13px; border-radius: 20px; max-width: 82%; white-space: pre-wrap; }
+  .chat-bubble.user { align-self: flex-end; background: var(--blue); color: #fff; margin-left: auto; }
+  .chat-bubble.assistant { align-self: flex-start; background: var(--tile2); color: var(--fg); }
+  .chat-input-row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+  .chat-input { flex: 1; min-width: 0; height: 44px; background: var(--tile2); border: .5px solid var(--glass-edge); border-radius: 22px; padding: 0 16px; color: var(--fg); font-family: var(--font); }
+  .chat-input::placeholder, .form-input::placeholder, .log-input::placeholder, .gemini-key-input::placeholder { color: var(--fg3); }
+  .chat-send-btn { background: var(--lime); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #000; font-weight: 700; font-size: 16px; }
 
-  .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #FFFFFF; border-top: 1px solid #E4E8ED; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 40; }
-  .tab-bar-inner { max-width: 480px; margin: 0 auto; display: flex; }
-  .tab-btn { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; cursor: pointer; color: #94A0AE; font-size: 18px; }
-  .tab-btn.active { color: #0F9E8C; }
-  .tab-label { font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
-
-  .coach-fab { position: fixed; bottom: 78px; right: 16px; width: 52px; height: 52px; border-radius: 26px; background: #4DD8C7; border: none; box-shadow: 0 6px 18px rgba(77,216,199,0.35); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 45; font-size: 22px; }
-  .coach-fab-badge { position: absolute; top: -4px; right: -4px; background: #F5A344; color: #12151A; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; border-radius: 9px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
-  .coach-panel { position: fixed; bottom: 78px; left: 12px; right: 12px; max-width: 456px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 14px; padding: 16px; max-height: 66vh; display: none; flex-direction: column; z-index: 45; box-shadow: 0 -8px 28px rgba(16,24,40,0.15); }
-  .coach-panel.open { display: flex; }
-  .coach-panel-head { display: flex; justify-content: space-between; align-items: flex-start; }
-  .coach-panel-sub { font-size: 12px; color: #6B7280; margin-top: 4px; max-width: 280px; }
-  .rest-fab { position: fixed; bottom: 78px; left: 16px; width: 52px; height: 52px; border-radius: 26px; background: #12151A; border: none; box-shadow: 0 6px 18px rgba(18,21,26,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 45; font-size: 20px; color: #FFFFFF; flex-direction: column; }
-  .rest-fab-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; line-height: 1; margin-top: 1px; }
-  .rest-panel { position: fixed; bottom: 78px; left: 12px; right: 12px; max-width: 456px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 14px; padding: 18px; display: none; flex-direction: column; align-items: center; z-index: 45; box-shadow: 0 -8px 28px rgba(16,24,40,0.15); }
+  /* mola sayacı */
+  .rest-fab { position: fixed; bottom: calc(96px + env(safe-area-inset-bottom)); left: 16px; width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 45; font-size: 18px; color: var(--orange); flex-direction: column; }
+  .rest-fab-time { font-family: var(--round); font-size: 11px; font-weight: 700; line-height: 1; margin-top: 2px; }
+  .rest-panel { position: fixed; bottom: calc(8px + env(safe-area-inset-bottom)); left: 8px; right: 8px; max-width: 464px; margin: 0 auto; background: rgba(28,28,30,.9); border-radius: 32px; padding: 20px; display: none; flex-direction: column; align-items: center; z-index: 60; }
   .rest-panel.open { display: flex; }
   .rest-panel-head { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-  .rest-panel-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; color: #12151A; }
-  .rest-display { font-family: 'JetBrains Mono', monospace; font-size: 46px; font-weight: 700; color: #12151A; margin: 14px 0 6px; }
+  .rest-panel-title { font-weight: 700; font-size: 20px; color: var(--fg); }
+  .rest-display { font-family: var(--round); font-variant-numeric: tabular-nums; font-size: 60px; font-weight: 600; color: var(--orange); margin: 10px 0 8px; }
   .rest-preset-row { display: flex; gap: 8px; width: 100%; }
-  .rest-preset-btn { flex: 1; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 8px; padding: 8px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #6B7280; cursor: pointer; }
-  .rest-preset-btn.active { background: #E1F5F1; border-color: #4DD8C7; color: #0F9E8C; }
+  .rest-preset-btn { flex: 1; height: 38px; background: var(--tile2); border: none; border-radius: 19px; font-family: var(--round); font-size: 14px; font-weight: 700; color: var(--fg2); cursor: pointer; }
+  .rest-preset-btn.active { background: color-mix(in srgb, var(--orange) 24%, #1C1C1E); color: var(--orange); }
   .rest-adjust-row { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
-  .rest-adjust-btn { width: 34px; height: 34px; border-radius: 8px; background: #ECEFF2; border: none; color: #12151A; font-size: 16px; font-weight: 700; cursor: pointer; }
-  .rest-main-btn { width: 100%; background: #4DD8C7; border: none; border-radius: 10px; padding: 12px 0; color: #0C1512; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 16px; }
-  .rest-reset-link { background: none; border: none; color: #94A0AE; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; cursor: pointer; margin-top: 8px; text-decoration: underline; }
-  .ex-block { display: flex; flex-direction: column; }
-  .log-btn { background: #F3F0FB; border: 1px solid #DDD3F5; border-radius: 7px; height: 28px; padding: 0 7px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #7E5BC4; font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-  .log-btn.has-sets { background: #7E5BC4; border-color: #7E5BC4; color: #FFFFFF; }
-  .log-panel { background: #FAF8FE; border: 1px solid #DDD3F5; border-top: none; border-radius: 0 0 10px 10px; padding: 10px 12px 12px; margin-top: -4px; }
-  .log-last { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #7E5BC4; margin-bottom: 8px; }
-  .log-set-row { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #3A4048; padding: 4px 0; }
-  .log-set-idx { color: #94A0AE; font-size: 10.5px; width: 22px; flex-shrink: 0; }
-  .log-set-val { flex: 1; }
-  .log-set-del { background: none; border: none; color: #C0C6CE; cursor: pointer; font-size: 12px; padding: 2px 4px; flex-shrink: 0; }
-  .log-input-row { display: flex; gap: 6px; margin-top: 8px; }
-  .log-input { flex: 1; min-width: 0; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 8px; padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; text-align: center; outline: none; color: #12151A; }
-  .log-input:focus { border-color: #7E5BC4; }
-  .log-add-btn { background: #7E5BC4; border: none; border-radius: 8px; width: 40px; flex-shrink: 0; color: #FFFFFF; font-size: 17px; font-weight: 700; cursor: pointer; }
-  .log-empty { font-size: 11.5px; color: #94A0AE; }
-  .log-volume { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #6B7280; margin-top: 8px; }
-  .auto-plan-banner { background: #E3F7F3; border: 1px solid #BEE9E0; border-radius: 10px; padding: 10px 12px; font-size: 12.5px; color: #0F9E8C; font-weight: 600; }
-  .auto-plan-note { background: #FBF3E6; border: 1px solid #F0DDB8; border-radius: 10px; padding: 10px 30px 10px 12px; font-size: 12.5px; color: #B8720A; line-height: 1.45; position: relative; }
-  .auto-plan-dismiss { position: absolute; top: 6px; right: 6px; background: none; border: none; color: #C9A464; cursor: pointer; font-size: 12px; padding: 4px; }
-  .auto-plan-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6B7280; padding: 2px 2px 0; cursor: pointer; }
-  .auto-plan-toggle input { width: 16px; height: 16px; accent-color: #0F9E8C; flex-shrink: 0; }
-  .rings-card { display: flex; align-items: center; gap: 16px; }
-  .rings-svg { flex-shrink: 0; }
-  .ring-bg { fill: none; opacity: 0.18; }
-  .ring-fg { fill: none; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dasharray 0.5s ease; }
-  .rings-legend { display: flex; flex-direction: column; gap: 9px; flex: 1; min-width: 0; }
-  .ring-legend-item { display: flex; align-items: center; gap: 8px; }
-  .ring-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
-  .ring-legend-text { flex: 1; min-width: 0; }
-  .ring-legend-label { font-size: 11.5px; color: #6B7280; }
-  .ring-legend-value { white-space: nowrap; }
-  .ring-legend-sub { font-size: 10.5px; color: #94A0AE; font-family: 'JetBrains Mono', monospace; }
-  .fat-warn { font-size: 12.5px; color: #B42318; background: #FEF3F2; border: 1px solid #FECDCA; border-radius: 10px; padding: 9px 12px; margin-top: 12px; line-height: 1.45; }
-  .ring-legend-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #12151A; }
-  .ring-legend-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-  .metric-ring-row { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
-  .metric-ring-pct { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; }
-  .setup-toggle-btn { width: 100%; background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 11px 0; color: #6B7280; font-size: 12.5px; font-weight: 600; cursor: pointer; margin-top: 16px; }
-  .coach-close-btn { background: #ECEFF2; border: none; border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #6B7280; }
-  .gemini-setup { background: #F3F5F7; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 12.5px; color: #6B7280; line-height: 1.5; }
-  .gemini-setup a { color: #0F9E8C; }
-  .gemini-key-row { display: flex; gap: 8px; margin-top: 8px; }
-  .gemini-key-input { flex: 1; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 8px; padding: 8px 10px; color: #12151A; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-  .gemini-key-save { background: #4DD8C7; border: none; border-radius: 8px; padding: 0 12px; color: #0C1512; font-weight: 700; cursor: pointer; font-size: 12px; }
-  .gemini-key-link { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #94A0AE; background: none; border: none; cursor: pointer; margin-top: 8px; text-decoration: underline; padding: 0; }
+  .rest-adjust-btn { width: 60px; height: 38px; border-radius: 19px; background: var(--tile2); border: none; color: var(--fg); font-size: 15px; font-weight: 700; cursor: pointer; }
+  .rest-main-btn { width: 100%; height: 52px; background: color-mix(in srgb, var(--orange) 26%, #1C1C1E); border: none; border-radius: 26px; color: var(--orange); font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+  .rest-reset-link { background: none; border: none; color: var(--fg2); font-size: 13px; cursor: pointer; margin-top: 10px; text-decoration: underline; }
 
-  .onboarding-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
-  .onboarding-card { max-width: 420px; width: 100%; }
-  .onboarding-sub { font-size: 13px; color: #6B7280; margin-top: 8px; margin-bottom: 20px; line-height: 1.5; }
-  .gender-row { display: flex; gap: 8px; margin-bottom: 18px; }
-  .gender-btn { flex: 1; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px 0; color: #6B7280; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; }
-  .gender-btn.active { background: #E1F5F1; border-color: #4DD8C7; color: #0F9E8C; }
+  /* set kaydı */
+  .log-btn { background: color-mix(in srgb, var(--purple) 20%, #1C1C1E); border: none; border-radius: 15px; height: 30px; padding: 0 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: var(--purple); font-size: 12px; font-weight: 700; }
+  .log-btn.has-sets { background: var(--purple); color: #000; }
+  .log-panel { background: var(--tile2); border-radius: 16px; padding: 12px; margin: 0 0 12px; }
+  .log-last { font-size: 12px; color: var(--purple); margin-bottom: 8px; }
+  .log-set-row { display: flex; align-items: center; gap: 8px; font-family: var(--round); font-size: 14px; color: var(--fg); padding: 4px 0; }
+  .log-set-idx { color: var(--fg3); font-size: 12px; width: 24px; flex-shrink: 0; }
+  .log-set-val { flex: 1; }
+  .log-set-del { background: none; border: none; color: var(--fg3); cursor: pointer; font-size: 13px; padding: 2px 4px; flex-shrink: 0; }
+  .log-input-row { display: flex; gap: 6px; margin-top: 8px; }
+  .log-input { flex: 1; min-width: 0; height: 40px; background: var(--tile3); border: 1px solid transparent; border-radius: 12px; padding: 0 8px; font-family: var(--round); text-align: center; outline: none; color: var(--fg); }
+  .log-input:focus { border-color: var(--purple); }
+  .log-add-btn { background: var(--purple); border: none; border-radius: 12px; width: 44px; flex-shrink: 0; color: #000; font-size: 20px; font-weight: 700; cursor: pointer; }
+  .log-empty { font-size: 13px; color: var(--fg3); }
+  .log-volume { font-family: var(--round); font-size: 12px; color: var(--fg2); margin-top: 8px; }
+
+  /* otomatik plan */
+  .auto-plan-banner { background: color-mix(in srgb, var(--lime) 14%, var(--tile)); border-radius: 18px; padding: 12px 14px; font-size: 14px; color: var(--lime); font-weight: 600; }
+  .auto-plan-note { background: color-mix(in srgb, var(--orange) 14%, var(--tile)); border-radius: 18px; padding: 12px 40px 12px 14px; font-size: 14px; color: var(--orange); line-height: 1.45; position: relative; }
+  .auto-plan-dismiss { position: absolute; top: 8px; right: 8px; background: var(--tile2); border: none; border-radius: 50%; width: 26px; height: 26px; color: var(--fg2); cursor: pointer; font-size: 11px; }
+  .auto-plan-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15px; color: var(--fg); background: var(--tile); border-radius: 24px; padding: 14px 18px; cursor: pointer; }
+  .auto-plan-toggle span { order: -1; }
+  .auto-plan-toggle input { appearance: none; -webkit-appearance: none; width: 51px; height: 31px; border-radius: 999px; background: var(--tile3); position: relative; flex-shrink: 0; cursor: pointer; transition: background .2s; margin: 0; }
+  .auto-plan-toggle input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .auto-plan-toggle input:checked { background: var(--green); }
+  .auto-plan-toggle input:checked::after { transform: translateX(20px); }
+  .auto-plan-toggle input:focus { outline: none; }
+
+  /* halkalar */
+  .rings-card { display: flex; align-items: center; gap: 18px; }
+  .rings-svg { flex-shrink: 0; }
+  .ring-bg { fill: none; opacity: 0.22; }
+  .ring-fg { fill: none; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dasharray 0.6s cubic-bezier(.3,.7,.3,1); }
+  .rings-legend { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 0; }
+  .ring-legend-item { display: flex; align-items: center; gap: 8px; }
+  .ring-legend-dot { display: none; }
+  .ring-legend-text { flex: 1; min-width: 0; }
+  .ring-legend-label { font-size: 15px; color: var(--fg); font-weight: 500; }
+  .ring-legend-value { font-family: var(--round); font-variant-numeric: tabular-nums; font-size: 18px; font-weight: 600; color: var(--fg); white-space: normal; line-height: 1.15; }
+  .ring-legend-sub { font-size: 12px; color: var(--fg3); }
+  .ring-legend-pct { font-family: var(--round); font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .fat-warn { font-size: 14px; color: var(--red); background: color-mix(in srgb, var(--red) 14%, transparent); border-radius: 14px; padding: 10px 12px; margin-top: 14px; line-height: 1.45; }
+  .fat-warn.near { color: var(--orange); background: color-mix(in srgb, var(--orange) 14%, transparent); }
+  .metric-ring-row { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+  .metric-ring-pct { font-family: var(--round); font-size: 11px; font-weight: 700; }
+  .setup-toggle-btn { width: 100%; height: 46px; background: var(--tile2); border: none; border-radius: 23px; color: var(--fg); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+
+  /* Gemini anahtarı */
+  .gemini-setup { background: var(--tile2); border-radius: 18px; padding: 14px; margin-top: 12px; font-size: 14px; color: var(--fg2); line-height: 1.5; }
+  .gemini-setup a { color: var(--lime); }
+  .gemini-key-row { display: flex; gap: 8px; margin-top: 10px; }
+  .gemini-key-input { flex: 1; min-width: 0; height: 42px; background: var(--tile3); border: none; border-radius: 12px; padding: 0 12px; color: var(--fg); }
+  .gemini-key-save { background: var(--lime); border: none; border-radius: 12px; padding: 0 14px; color: #000; font-weight: 700; cursor: pointer; font-size: 14px; }
+  .gemini-key-link { font-size: 12px; color: var(--fg3); background: none; border: none; cursor: pointer; margin-top: 8px; text-decoration: underline; padding: 0; align-self: center; }
+
+  /* ilk kurulum / profil düzenleme */
+  .onboarding-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: calc(24px + env(safe-area-inset-top)) 0 24px; }
+  .onboarding-card { max-width: 440px; width: 100%; }
+  .onboarding-card h1 { font-size: 30px; font-weight: 700; color: var(--fg); }
+  .onboarding-sub { font-size: 15px; color: var(--fg2); margin-top: 8px; margin-bottom: 20px; line-height: 1.5; }
+  .gender-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 18px; background: var(--tile); border-radius: 26px; padding: 4px; }
+  .gender-btn { height: 46px; background: none; border: none; border-radius: 23px; color: var(--fg2); font-weight: 600; font-size: 15px; cursor: pointer; }
+  .gender-btn.active { background: color-mix(in srgb, var(--lime) 24%, #1C1C1E); color: var(--lime); }
   .form-field { margin-bottom: 14px; }
-  .form-label { font-size: 12.5px; color: #6B7280; margin-bottom: 6px; display: block; }
-  .form-input-row { display: flex; align-items: center; justify-content: space-between; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 10px; padding: 12px 14px; }
-  .form-input { background: transparent; border: none; color: #12151A; font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 700; width: 100%; padding: 0; outline: none; }
-  .form-unit { font-size: 12px; color: #94A0AE; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; margin-left: 8px; }
+  .form-label { font-size: 14px; color: var(--fg2); margin-bottom: 6px; display: block; }
+  .form-input-row { display: flex; align-items: center; justify-content: space-between; background: var(--tile); border: none; border-radius: 16px; padding: 12px 16px; }
+  .form-input { background: transparent; border: none; color: var(--fg); font-family: var(--round); font-weight: 600; width: 100%; padding: 0; outline: none; }
+  .form-input-row:focus-within { box-shadow: 0 0 0 2px var(--lime); }
+  .form-input:focus { outline: none; }
+  .card .form-input-row { background: var(--tile2); }
+  .form-unit { font-size: 14px; color: var(--fg3); flex-shrink: 0; margin-left: 8px; }
   .option-col { display: flex; flex-direction: column; gap: 8px; }
-  .option-row { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 10px; padding: 10px 14px; cursor: pointer; text-align: left; width: 100%; }
-  .option-row.active { background: #E1F5F1; border-color: #4DD8C7; }
-  .option-row-label { font-size: 13.5px; color: #12151A; font-weight: 600; }
-  .option-row-sub { font-size: 11px; color: #6B7280; }
+  .option-row { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; background: var(--tile); border: none; border-radius: 16px; padding: 12px 16px; cursor: pointer; text-align: left; width: 100%; }
+  .option-row.active { background: color-mix(in srgb, var(--lime) 18%, #1C1C1E); box-shadow: inset 0 0 0 1.5px var(--lime); }
+  .option-row-label { font-size: 16px; color: var(--fg); font-weight: 600; }
+  .option-row-sub { font-size: 13px; color: var(--fg2); }
   .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .day-btn { background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 8px; padding: 10px 0; color: #6B7280; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; cursor: pointer; }
-  .day-btn.active { background: #E1F5F1; border-color: #4DD8C7; color: #0F9E8C; }
-  .day-preview { font-size: 11.5px; color: #94A0AE; margin-top: 8px; line-height: 1.5; }
+  .day-btn { background: var(--tile); border: none; border-radius: 12px; height: 42px; color: var(--fg2); font-size: 13px; font-weight: 700; cursor: pointer; }
+  .day-btn.active { background: var(--lime); color: #000; }
+  .day-preview { font-size: 13px; color: var(--fg3); margin-top: 8px; line-height: 1.5; }
   .onboarding-actions { display: flex; gap: 10px; margin-top: 20px; }
-  .onboarding-cancel-btn { flex: 1; background: #FFFFFF; border: 1px solid #E4E8ED; border-radius: 10px; padding: 13px 0; color: #6B7280; font-size: 14px; font-weight: 600; cursor: pointer; }
-  .onboarding-save-btn { flex: 2; background: #4DD8C7; border: none; border-radius: 10px; padding: 13px 0; color: #0C1512; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .onboarding-cancel-btn { flex: 1; height: 52px; background: var(--tile); border: none; border-radius: 26px; color: var(--fg); font-size: 16px; font-weight: 600; cursor: pointer; }
+  .onboarding-save-btn { flex: 2; height: 52px; background: var(--lime); border: none; border-radius: 26px; color: #000; font-size: 16px; font-weight: 700; cursor: pointer; }
   .onboarding-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ===== Taslak tasarımın birebir kuralları ===== */
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.29;letter-spacing:-.4px;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.num{font-family:var(--round);font-variant-numeric:tabular-nums;letter-spacing:0}
+.app{max-width:460px;margin:0 auto;padding:0 16px calc(120px + env(safe-area-inset-bottom,0px))}
+.hdr{position:sticky;top:0;z-index:5;margin:0 -16px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  background:rgba(0,0,0,.55);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);border-bottom:.5px solid transparent;transition:border-color .2s}
+.hdr.scrolled{border-bottom-color:var(--line)}
+.hdr h1{font-size:17px;font-weight:600;margin:0;text-align:center}
+.datepill{justify-self:start;display:flex;align-items:center;gap:2px;height:34px;padding:0 4px;border-radius:17px;background:var(--glass);border:.5px solid var(--glass-edge);font-size:14px;font-weight:600}
+.datepill button{width:26px;height:26px;display:grid;place-items:center;color:var(--fg2)}
+.datepill .dl{width:auto;padding:0 2px;color:var(--fg);white-space:nowrap}
+.avatar{justify-self:end;width:38px;height:38px;border-radius:50%;background:conic-gradient(from 200deg,var(--orange),var(--pink),var(--orange));display:grid;place-items:center;font-weight:700;font-size:13px;position:relative}
+.avatar::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:#2a1a12}
+.avatar span{position:relative;z-index:1;display:flex;align-items:center;gap:1px}
+main.grid{margin-top:14px}
+/* tiles */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--tile);border-radius:24px;padding:16px 18px 18px;min-width:0;position:relative;text-align:left;display:block;width:100%}
+.wide{grid-column:1/-1}
+.th{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.th h2{font-size:20px;font-weight:700;margin:0;letter-spacing:.2px;line-height:1.2}
+.go{width:24px;height:24px;border-radius:50%;background:var(--tile2);display:grid;place-items:center;color:var(--fg2);flex:none}
+.cap{font-size:15px;color:var(--fg);margin-top:4px}
+.big{font-size:38px;font-weight:600;line-height:1.1}
+.big small{font-size:22px;font-weight:700;text-transform:uppercase}
+.mid{font-size:28px;font-weight:600;line-height:1.1}
+.mid small{font-size:16px;font-weight:700;text-transform:uppercase}
+.sub{font-size:13px;color:var(--fg2);margin-top:4px;line-height:1.35}
+.empty{font-size:15px;color:var(--fg2);text-align:center;padding:26px 6px}
+
+/* tinted pill buttons like "Özeti Düzenle" */
+.tint{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;border-radius:26px;font-weight:600;font-size:17px}
+.tint.lime{background:color-mix(in srgb,var(--lime) 22%,#1C1C1E);color:var(--lime)}
+.tint.orange{background:color-mix(in srgb,var(--orange) 22%,#1C1C1E);color:var(--orange)}
+.daychoice{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--tile2);border-radius:26px;padding:4px}
+.daychoice button{height:44px;border-radius:22px;font-weight:600;font-size:15px;color:var(--fg2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,color .2s}
+.daychoice button[aria-pressed="true"].tr{background:color-mix(in srgb,var(--lime) 24%,#1C1C1E);color:var(--lime)}
+.daychoice button[aria-pressed="true"].rs{background:color-mix(in srgb,var(--purple) 26%,#1C1C1E);color:var(--purple)}
+
+/* rings */
+.ringrow{display:flex;align-items:center;gap:18px;margin-top:8px}
+.ringrow svg{flex:none}
+.ringrow circle{fill:none;stroke-linecap:round;transition:stroke-dasharray .7s cubic-bezier(.3,.7,.3,1)}
+.leg{display:grid;gap:10px;min-width:0}
+.leg .l{font-size:15px;font-weight:500}
+.leg .v{font-size:22px;font-weight:600;line-height:1.1}
+.leg .v small{font-size:15px;font-weight:700;text-transform:uppercase}
+
+/* hourly charts */
+.hours{margin-top:12px;height:86px;position:relative;display:grid;grid-template-columns:repeat(24,1fr);align-items:end;gap:0;
+  background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px calc(100%/24));border-bottom:.5px solid var(--line)}
+.hours i{display:block;width:3px;margin:0 auto;border-radius:2px;min-height:3px}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--fg3);margin-top:5px;padding-right:20%}
+.days{margin-top:12px;height:86px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end}
+.days i{display:block;border-radius:4px;min-height:4px}
+.dlab{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;font-size:11px;color:var(--fg3);text-align:center;margin-top:5px}
+
+/* stepper */
+.steps{display:flex;gap:8px;margin-top:12px}
+.steps button{flex:1;height:36px;border-radius:18px;background:var(--tile2);font-size:20px;font-weight:500;display:grid;place-items:center}
+.steps button:active{transform:scale(.96)}
+
+/* gauge */
+.gauge{height:8px;border-radius:4px;display:flex;gap:2px;margin:14px 0 6px;position:relative}
+.gauge span{height:100%;border-radius:4px}
+.mk{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--bg);transform:translateX(-50%)}
+
+/* inputs */
+.compose{display:flex;gap:8px;align-items:center;margin-top:10px}
+.field{flex:1;min-width:0;height:44px;border-radius:22px;border:.5px solid var(--glass-edge);background:var(--tile2);padding:0 16px;font:inherit;font-size:16px;color:var(--fg)}
+.field::placeholder{color:var(--fg3)}
+.send{width:44px;height:44px;border-radius:50%;background:var(--lime);color:#000;display:grid;place-items:center;flex:none}
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr 44px;gap:8px;margin-top:8px}
+.trio input{min-width:0;height:40px;border-radius:12px;border:0;background:var(--tile2);padding:0 10px;font:inherit;font-size:16px;color:var(--fg)}
+.trio button{height:40px;border-radius:12px;background:var(--tile2);color:var(--lime);font-size:22px}
+.meal{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:.5px solid var(--line)}
+.meal:first-of-type{margin-top:12px}
+.meal .t{flex:1;min-width:0}
+.meal .t b{font-weight:600;font-size:16px}
+.chipline{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;font-family:var(--round)}
+.chip.k{color:var(--pink);background:color-mix(in srgb,var(--pink) 18%,transparent)}
+.chip.p{color:var(--green);background:color-mix(in srgb,var(--green) 18%,transparent)}
+.chip.f{color:var(--yellow);background:color-mix(in srgb,var(--yellow) 18%,transparent)}
+.x{width:28px;height:28px;border-radius:50%;background:var(--tile2);color:var(--fg2);display:grid;place-items:center;flex:none;font-size:13px}
+
+/* meal plan tiles */
+.mealtile .emoji{font-size:30px;line-height:1;margin:6px 0 10px}
+.mealtile .items{font-size:14px;color:var(--fg2);line-height:1.35;min-height:38px}
+.mealtile .kc{font-size:22px;font-weight:600;color:var(--pink);margin-top:8px}
+.mealtile .kc small{font-size:13px;font-weight:700}
+.swap{position:absolute;right:14px;bottom:14px;width:30px;height:30px;border-radius:50%;background:var(--tile2);display:grid;place-items:center;color:var(--fg2)}
+
+/* exercises */
+.exb{border-top:.5px solid var(--line)}
+.exlist{margin-top:8px}
+.ex{display:flex;align-items:center;gap:10px;padding:12px 0}
+.ck{width:30px;height:30px;border-radius:50%;border:2px solid var(--fg3);display:grid;place-items:center;flex:none;transition:all .2s}
+.ck svg{opacity:0;color:#000}
+.ex.done .ck{background:var(--orange);border-color:var(--orange)}
+.ex.done .ck svg{opacity:1}
+.ex .t{flex:1;min-width:0;text-align:left}
+.ex .t b{display:block;font-weight:600;font-size:16px}
+.ex.done .t b{color:var(--fg2);text-decoration:line-through}
+.ex .t span{font-size:13px;color:var(--fg2)}
+.sm{width:30px;height:30px;border-radius:50%;background:var(--tile2);display:grid;place-items:center;color:var(--orange);flex:none;font-weight:700;font-size:14px}
+.switch{appearance:none;-webkit-appearance:none;margin:0;width:51px;height:31px;border-radius:999px;background:var(--tile2);position:relative;flex:none;transition:background .2s;cursor:pointer}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;transition:transform .2s}
+.switch:checked{background:var(--green)}
+.switch:checked::after{transform:translateX(20px)}
+.switch:focus{outline:none}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:8px -18px 4px;padding:0 18px}
+.chips button{white-space:nowrap;height:34px;padding:0 14px;border-radius:17px;background:var(--tile2);font-size:15px;font-weight:600;color:var(--fg2)}
+.chips button[aria-pressed="true"]{background:var(--orange);color:#000}
+.sug{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:.5px solid var(--line);width:100%;text-align:left}
+.sug .t{flex:1}
+.sug .plus{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--orange) 22%,#1C1C1E);color:var(--orange);display:grid;place-items:center;font-size:20px}
+
+/* floating glass tab bar */
+.dock{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:10;display:flex;justify-content:center;gap:10px;padding:0 16px;pointer-events:none}
+.glass{background:var(--glass);backdrop-filter:saturate(200%) blur(26px);-webkit-backdrop-filter:saturate(200%) blur(26px);border:.5px solid var(--glass-edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.45)}
+.tabs{pointer-events:auto;display:grid;grid-template-columns:repeat(3,1fr);padding:5px;border-radius:34px;width:min(100%,330px);position:relative}
+.tabs .hl{position:absolute;top:5px;bottom:5px;left:5px;width:calc((100% - 10px)/3);border-radius:29px;background:rgba(255,255,255,.1);transition:transform .35s cubic-bezier(.3,.8,.3,1.1)}
+.tabs button{position:relative;z-index:1;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;color:var(--fg)}
+.tabs button svg{width:26px;height:26px}
+.tabs button[aria-selected="true"]{color:var(--lime)}
+.coachbtn{pointer-events:auto;width:66px;height:66px;border-radius:50%;display:grid;place-items:center;color:var(--lime);flex:none}
+.coachbtn svg{width:28px;height:28px}
+
+
+/* koç penceresi */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:61;max-width:444px;margin:0 auto;height:min(76vh,620px);border-radius:32px;transform:translateY(110%);transition:transform .4s cubic-bezier(.3,.8,.3,1),visibility .4s;display:flex;flex-direction:column;overflow:hidden;background:rgba(28,28,30,.82);visibility:hidden}
+.sheet.on{transform:none;visibility:visible}
+.sheet-h{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:14px 14px 8px}
+.sheet-h b{text-align:center;font-size:17px}
+.sheet-h button{width:34px;height:34px;border-radius:50%;background:var(--tile2);color:var(--fg2);display:grid;place-items:center;justify-self:end}
+.msgs{flex:1;overflow-y:auto;padding:8px 16px;display:flex;flex-direction:column;gap:5px}
+.bub{max-width:80%;padding:8px 13px;border-radius:20px;font-size:16px;line-height:1.32;white-space:pre-wrap}
+.bub.me{align-self:flex-end;background:var(--blue);color:#fff}
+.bub.them{align-self:flex-start;background:var(--tile2)}
+.stamp{text-align:center;font-size:11px;color:var(--fg3);margin:6px 0}
+.sheet .compose{padding:10px 14px 6px;margin:0}
+.sheet .keylink{display:block;margin:0 auto 12px;font-size:12px;color:var(--fg3);text-decoration:underline}
+.sheet .gemini-setup{margin:0}
+.coachbtn{position:relative}
+.coachbtn .badge{position:absolute;top:4px;right:4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--pink);color:#fff;font-family:var(--round);font-size:11px;font-weight:700;display:grid;place-items:center}
+
+/* taslakta olmayan ama uygulamada gereken parçalar, aynı dille */
+.tile .card-sub,.tile .rest-note{font-size:13px}
+.tile .meal-analyzing,.tile .chat-error,.tile .meal-result-card,.tile .fat-warn,.tile .sg-neglect{margin-top:10px}
+.tile .log-panel{margin:0 0 12px}
+.tile .sg-result{margin-top:12px}
+.tile .mark-all-btn{margin-top:12px}
+.relink{display:block;margin:10px auto 0;font-size:13px;color:var(--fg2);text-decoration:underline}
+.mealtile[data-open-recipe]{cursor:pointer}
+.mealtile .slot-time{font-size:12px;color:var(--fg3);margin-left:6px;font-weight:600}
+.ex .kg{color:var(--purple)}
+.ex .kg.has{background:var(--purple);color:#000}
+.ex .rm{color:var(--fg2)}
+.ex .t .rg{color:var(--cyan)}
+.ex .t .extra-tag{font-size:12px;font-weight:600;color:var(--lime)}
+.modal-card .card{background:none;padding:0;border-radius:0}
+.sug .thumb{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--tile2);flex:none}
+.sug .t .sub{margin-top:2px}
+.version-tag{grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -314,7 +533,7 @@
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "3.0.1";
+const APP_VERSION = "4.1.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -1605,6 +1824,75 @@ function flushPendingRender() {
 }
 document.addEventListener("focusout", () => setTimeout(flushPendingRender, 300));
 
+// ---------------------------------------------------------------------------
+// Fitness tarzı kutucuk arayüzü (onaylanan taslağın birebir yerleşimi)
+// ---------------------------------------------------------------------------
+const UI_GO = `<span class="go"><svg width="7" height="11" viewBox="0 0 7 11"><path d="M1.5 1.5l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+const UI_SEND = `<svg width="16" height="16" viewBox="0 0 14 14"><path d="M7 12V2M2.5 6.5 7 2l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const UI_TICK = `<svg width="16" height="16" viewBox="0 0 14 14"><path d="m3 7.2 2.6 2.6L11 4.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const UI_CHEV_L = `<svg width="8" height="13" viewBox="0 0 8 13"><path d="M6.5 1.5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const UI_CHEV_R = `<svg width="8" height="13" viewBox="0 0 8 13"><path d="M1.5 1.5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const UI_TAB_ICONS = {
+  home: `<svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="9" fill="none" stroke="currentColor" stroke-width="4"/></svg>`,
+  nutrition: `<svg viewBox="0 0 26 26" aria-hidden="true"><path d="M8 3v8a2.6 2.6 0 0 0 1.9 2.5V23h2.4v-9.5A2.6 2.6 0 0 0 14.2 11V3h-1.6v6.8h-1.1V3H10v6.8H9V3Zm11.3 0c-2.4 0-3.9 3.2-3.9 7 0 2.5 1 4 2.7 4.5V23h2.4V3Z" fill="currentColor"/></svg>`,
+  training: `<svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="15.5" cy="4.5" r="2.4" fill="currentColor"/><path d="M8 23l3.5-6.2 3.4 2.8V24M9.2 11.5l3.6-3 4 1.4 2 3.4M12.8 8.5 11 15.5M6 12.5l3.2-1" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};
+const UI_COACH_ICON = `<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 4C8 4 3.2 8.1 3.2 13.2c0 2.6 1.3 5 3.4 6.6-.2 1.4-.9 2.8-2 3.7 2.2.1 4.1-.6 5.4-1.8 1.3.4 2.6.6 4 .6 6 0 10.8-4.1 10.8-9.1S20 4 14 4Z" fill="currentColor"/></svg>`;
+
+function fmtN(n, digits) { return Number(n || 0).toLocaleString("tr-TR", { maximumFractionDigits: digits ?? 0 }); }
+function dayShort(d) { return new Date(d + "T00:00:00").toLocaleDateString("tr-TR", { weekday: "short" }).slice(0, 2); }
+function lastNDates(n, endDate) { const out = []; for (let i = n - 1; i >= 0; i--) out.push(addDays(endDate, -i)); return out; }
+function uiRings(rows, size, sw, gap) {
+  let r = size / 2 - sw / 2, out = "";
+  rows.forEach(x => {
+    const c = 2 * Math.PI * r, f = Math.max(0.001, Math.min(1, (x.pct || 0) / 100)) * c;
+    out += `<circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${x.c}" stroke-opacity=".2" stroke-width="${sw}"/><circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${x.c}" stroke-width="${sw}" stroke-dasharray="${f} ${c}" transform="rotate(-90 ${size/2} ${size/2})"/>`;
+    r -= sw + gap;
+  });
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">${out}</svg>`;
+}
+function uiLeg(rows) {
+  return `<div class="leg">${rows.map(x => `<div><div class="l">${x.l}</div><div class="v num" style="color:${x.c}">${x.v}<small> ${x.u}</small></div></div>`).join("")}</div>`;
+}
+function uiHours(arr, color) {
+  const m = Math.max(...arr) || 1;
+  return `<div class="hours">${arr.map(v => `<i style="height:${v ? Math.max(8, v / m * 100) : 0}%;background:${color}"></i>`).join("")}</div><div class="axis num"><span>00</span><span>06</span><span>12</span><span>18</span></div>`;
+}
+function uiDays(vals, color, labels, hi) {
+  const m = Math.max(...vals) || 1;
+  return `<div class="days">${vals.map((v, i) => `<i style="height:${v / m * 100}%;background:${color};opacity:${i === hi ? 1 : .55}"></i>`).join("")}</div><div class="dlab">${labels.map((d, i) => `<span style="${i === hi ? `color:${color};font-weight:700` : ""}">${d}</span>`).join("")}</div>`;
+}
+function bmiLabel(b) { return b < 18.5 ? "Zayıf" : b < 25 ? "Normal" : b < 30 ? "Fazla kilolu" : "Obez"; }
+function estimateMinutes(exercises) {
+  const sets = exercises.reduce((s, ex) => { const m = String(ex.scheme || "").match(/^\s*(\d+)\s*[×x]/); return s + (m ? Number(m[1]) : 3); }, 0);
+  return Math.max(5, Math.round(sets * 2.5 / 5) * 5);
+}
+
+// Antrenman kutucuğundaki oktan açılan takvim
+function openCalendarSheet() {
+  calViewMonth = activeDate.slice(0, 7);
+  renderCalendarSheet();
+  document.getElementById("modalBackdrop").classList.add("open");
+}
+function renderCalendarSheet() {
+  document.getElementById("modalCard").innerHTML = `
+    <div class="modal-head">
+      <div><div class="card-eyebrow">Takvim</div><div class="modal-title">Antrenman günlerin</div></div>
+      <button class="modal-close" id="modalCloseBtn">✕</button>
+    </div>
+    ${renderCalendarHtml()}`;
+  document.getElementById("modalCloseBtn").addEventListener("click", closeModal);
+  document.getElementById("calPrev").addEventListener("click", () => { calViewMonth = shiftMonth(calViewMonth, -1); renderCalendarSheet(); });
+  document.getElementById("calNext").addEventListener("click", () => { calViewMonth = shiftMonth(calViewMonth, 1); renderCalendarSheet(); });
+  document.querySelectorAll("#modalCard [data-select-date]").forEach(el => {
+    el.addEventListener("click", () => { activeDate = el.dataset.selectDate; closeModal(); render(); });
+  });
+}
+document.addEventListener("scroll", () => {
+  const h = document.getElementById("hdr");
+  if (h) h.classList.toggle("scrolled", window.scrollY > 10);
+}, { passive: true });
+
 function render() {
   if (shouldDeferRender()) { pendingRender = true; return; }
   pendingRender = false;
@@ -1628,33 +1916,25 @@ function render() {
   else if (activeTab === "nutrition") bodyHtml = renderNutrition(entry, targets);
   else bodyHtml = renderTraining(entry, phase, weeksRemaining);
 
+  const tabIdx = activeTab === "home" ? 0 : activeTab === "nutrition" ? 1 : 2;
+  const dDiff = daysBetween(activeDate, today);
+  const dLabel = dDiff === 0 ? "Bugün" : dDiff === 1 ? "Dün" : dDiff === -1 ? "Yarın" : new Date(activeDate + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
   root.innerHTML = `
     <div class="app">
-      <div class="container">
-        <div class="header">
-          <div>
-            <div class="eyebrow">ENTİ COACH · v${APP_VERSION}</div>
-            <h1>${activeTab === "home" ? "Ana Sayfa" : activeTab === "nutrition" ? "Beslenme" : "Antrenman"}</h1>
-          </div>
-          <div class="streak-badge"><span style="font-size:15px;">🔥</span><span class="streak-num">${streakStats.done}</span><span class="streak-label">antrenman<br/>bu hafta</span></div>
-        </div>
-        <div class="date-nav">
-          <button class="nav-btn" id="navPrev">‹</button>
-          <div style="text-align:center; flex:1;">
-            <div class="date-label">${turkishDate(activeDate)}</div>
-            ${activeDate !== today ? `<button class="today-link" id="navToday">bugüne dön</button>` : ""}
-          </div>
-          <button class="nav-btn" id="navNext">›</button>
-        </div>
-        ${bodyHtml}
-      </div>
+      <header class="hdr ${window.scrollY > 10 ? "scrolled" : ""}" id="hdr">
+        <div class="datepill"><button id="navPrev" aria-label="Önceki gün">${UI_CHEV_L}</button><button class="dl" id="navToday" title="${turkishDate(activeDate)}">${dLabel}</button><button id="navNext" aria-label="Sonraki gün">${UI_CHEV_R}</button></div>
+        <h1>${activeTab === "home" ? "Özet" : activeTab === "nutrition" ? "Beslenme" : "Antrenman"}</h1>
+        <div class="avatar" title="Bu hafta ${streakStats.done} antrenman"><span class="num">🔥${streakStats.done}</span></div>
+      </header>
+      <main class="grid">${bodyHtml}</main>
     </div>
-    <div class="tab-bar">
-      <div class="tab-bar-inner">
-        <button class="tab-btn ${activeTab==='home'?'active':''}" data-tab="home">🏠<span class="tab-label">Ana Sayfa</span></button>
-        <button class="tab-btn ${activeTab==='nutrition'?'active':''}" data-tab="nutrition">🍽️<span class="tab-label">Beslenme</span></button>
-        <button class="tab-btn ${activeTab==='training'?'active':''}" data-tab="training">🏋️<span class="tab-label">Antrenman</span></button>
-      </div>
+    <div class="dock">
+      <nav class="tabs glass" role="tablist"><span class="hl" style="transform:translateX(${tabIdx * 100}%)"></span>
+        <button role="tab" class="tab-btn" data-tab="home" aria-selected="${activeTab === "home"}">${UI_TAB_ICONS.home}Özet</button>
+        <button role="tab" class="tab-btn" data-tab="nutrition" aria-selected="${activeTab === "nutrition"}">${UI_TAB_ICONS.nutrition}Beslenme</button>
+        <button role="tab" class="tab-btn" data-tab="training" aria-selected="${activeTab === "training"}">${UI_TAB_ICONS.training}Antrenman</button>
+      </nav>
+      <button class="coachbtn glass" id="coachFabBtn" aria-label="Koçuna Sor">${UI_COACH_ICON}${coachMessages.length ? `<span class="badge">${coachMessages.length}</span>` : ""}</button>
     </div>
   `;
 
@@ -1662,7 +1942,9 @@ function render() {
   document.getElementById("navNext").addEventListener("click", () => { activeDate = addDays(activeDate, 1); render(); });
   const navToday = document.getElementById("navToday");
   if (navToday) navToday.addEventListener("click", () => { activeDate = today; render(); });
-  document.querySelectorAll(".tab-btn").forEach(b => b.addEventListener("click", () => { activeTab = b.dataset.tab; render(); }));
+  document.querySelectorAll(".tab-btn").forEach(b => b.addEventListener("click", () => { if (activeTab !== b.dataset.tab) window.scrollTo(0, 0); activeTab = b.dataset.tab; render(); }));
+  document.querySelectorAll("[data-goto]").forEach(b => b.addEventListener("click", () => { activeTab = b.dataset.goto; window.scrollTo(0, 0); render(); }));
+  document.getElementById("coachFabBtn").addEventListener("click", () => { coachOpen = true; renderCoachWidget(); });
   document.querySelectorAll("[data-edit-profile]").forEach(b => b.addEventListener("click", () => { editingProfile = true; render(); }));
 
   if (activeTab === "home") attachHomeHandlers(entry, targets);
@@ -1692,44 +1974,42 @@ function renderCoachWidget() {
   const targets = computeNutritionTargets(profile);
   const dayCtx = todayContext();
 
+  const wasOpen = !!widget.querySelector(".sheet.on");
+  const shown = coachOpen && wasOpen ? "on" : "";
   widget.innerHTML = `
-    <button class="coach-fab" id="coachFabBtn" style="${coachOpen ? 'display:none;' : ''}">
-      💬${coachMessages.length ? `<span class="coach-fab-badge">${coachMessages.length}</span>` : ""}
-    </button>
-    <div class="coach-panel ${coachOpen ? 'open' : ''}">
-      <div class="coach-panel-head">
-        <div>
-          <div class="card-eyebrow">KOÇUNA SOR</div>
-          <div class="coach-panel-sub">Beslenme, antrenman, ilerleme — ne sorarsan sor.</div>
-        </div>
-        <button class="coach-close-btn" id="coachCloseBtn">✕</button>
-      </div>
-
+    <div class="scrim ${shown}" id="coachScrim"></div>
+    <div class="sheet glass ${shown}" role="dialog" aria-label="Koçuna Sor">
+      <div class="sheet-h"><span></span><b>Koçun</b><button id="coachCloseBtn" aria-label="Kapat">✕</button></div>
       ${!key ? `
-        <div class="gemini-setup">
-          AI özelliklerini kullanmak için ücretsiz bir Gemini API key gerekiyor.
-          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> adresinden alabilirsin (kredi kartı istemiyor).
-          <div class="gemini-key-row">
-            <input class="gemini-key-input" id="geminiKeyInput" placeholder="API key'ini yapıştır" />
-            <button class="gemini-key-save" id="geminiKeySave">Kaydet</button>
+        <div class="msgs">
+          <div class="gemini-setup">
+            AI özelliklerini kullanmak için ücretsiz bir Gemini API key gerekiyor.
+            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> adresinden alabilirsin (kredi kartı istemiyor).
+            <div class="gemini-key-row">
+              <input class="gemini-key-input" id="geminiKeyInput" placeholder="API key'ini yapıştır" />
+              <button class="gemini-key-save" id="geminiKeySave">Kaydet</button>
+            </div>
           </div>
         </div>
       ` : `
-        <div class="chat-scroll" id="chatScroll">
-          ${coachMessages.map(m => `<div class="chat-bubble ${m.role}">${esc(m.content)}</div>`).join("")}
-          ${coachLoading ? `<div class="chat-bubble assistant">düşünüyor…</div>` : ""}
+        <div class="msgs" id="chatScroll">
+          ${coachMessages.length ? "" : `<div class="stamp">Beslenme, antrenman, ilerleme. Ne sorarsan sor.</div>`}
+          ${coachMessages.map(m => `<div class="bub ${m.role === "user" ? "me" : "them"}">${esc(m.content)}</div>`).join("")}
+          ${coachLoading ? `<div class="bub them">düşünüyor…</div>` : ""}
+          ${coachError ? `<div class="chat-error">${esc(coachError)}</div>` : ""}
         </div>
-        ${coachError ? `<div class="chat-error">${esc(coachError)}</div>` : ""}
-        <div class="chat-input-row">
-          <input type="text" class="chat-input" id="chatInput" placeholder="örn. bugün ne yesem?" value="${esc(coachInputText).replace(/"/g, "&quot;")}" />
-          <button class="chat-send-btn" id="chatSend">➤</button>
-        </div>
-        <button class="gemini-key-link" id="changeKeyBtn">API key'i değiştir</button>
+        <div class="compose"><input type="text" class="field" id="chatInput" placeholder="Koçuna bir şey sor" aria-label="Koçuna mesaj" value="${esc(coachInputText).replace(/"/g, "&quot;")}" /><button class="send" id="chatSend" aria-label="Gönder">${UI_SEND}</button></div>
+        <button class="keylink" id="changeKeyBtn">API key'i değiştir</button>
       `}
     </div>
   `;
+  if (coachOpen && !wasOpen) requestAnimationFrame(() => requestAnimationFrame(() => {
+    widget.querySelectorAll(".sheet, .scrim").forEach(el => el.classList.add("on"));
+  }));
+  const fabBtn = document.getElementById("coachFabBtn");
+  if (fabBtn) { const bd = fabBtn.querySelector(".badge"); if (bd) bd.remove(); if (coachMessages.length) fabBtn.insertAdjacentHTML("beforeend", `<span class="badge">${coachMessages.length}</span>`); }
+  document.getElementById("coachScrim").addEventListener("click", () => { coachOpen = false; renderCoachWidget(); });
 
-  document.getElementById("coachFabBtn").addEventListener("click", () => { coachOpen = true; renderCoachWidget(); });
   document.getElementById("coachCloseBtn").addEventListener("click", () => { coachOpen = false; renderCoachWidget(); });
 
   if (!key) {
@@ -1809,8 +2089,8 @@ function renderCalendarHtml() {
     const isToday = dateStr === today;
     const isPast = dateStr <= today;
     const isSelected = dateStr === activeDate;
-    let bg = "transparent", border = "none", textColor = "#6B7280";
-    if (completed) { bg = "#4DD8C7"; border = "1px solid #4DD8C7"; textColor = "#12151A"; }
+    let bg = "transparent", border = "none", textColor = "rgba(235,235,245,.7)";
+    if (completed) { bg = "#B4FF1A"; border = "none"; textColor = "#000"; }
     return `
       <button class="cal-cell ${isSelected?'selected':''}" data-select-date="${dateStr}">
         <span class="cal-dot" style="background:${bg}; border:${border};">
@@ -1829,8 +2109,8 @@ function renderCalendarHtml() {
       <div class="cal-week-header"><span>Pt</span><span>Sa</span><span>Ça</span><span>Pe</span><span>Cu</span><span>Ct</span><span>Pz</span></div>
       <div class="cal-grid">${blanks}${cells}</div>
       <div class="cal-legend">
-        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:#4DD8C7"></span> Antrenman yaptığın gün</span>
-        <div class="cal-legend-note">Bir güne dokun → o güne gidersin. Antrenman sekmesinden işaretleyince o gün maviye döner.</div>
+        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--lime)"></span> Antrenman yaptığın gün</span>
+        <div class="cal-legend-note">Bir güne dokun, o güne gidersin. Antrenman sekmesinde hareketleri bitirince o gün yeşile döner.</div>
       </div>
     </section>`;
 }
@@ -1839,92 +2119,92 @@ function renderHome(entry, targets, streak) {
   const bmi = calcBMI(profile);
   const fz = bodyFatZones(profile.gender);
   const bounds = [fz.min, ...fz.bp, fz.max];
-  const widths = bounds.slice(0,-1).map((b,i) => ((bounds[i+1]-b)/(fz.max-fz.min))*100);
-  const colors = ["#5BA8F5","#4DD8C7","#F5A344","#F0576B"];
-  const textColors = ["#1D74C9","#0F9E8C","#B8720A","#DC2626"];
-  const markerPct = clamp(((profile.bodyFatPct - fz.min)/(fz.max-fz.min))*100, 1, 99);
+  const zoneColors = ["var(--blue)", "var(--green)", "var(--orange)", "var(--red)"];
+  const markerPct = clamp(((profile.bodyFatPct - fz.min) / (fz.max - fz.min)) * 100, 1, 99);
   let zoneIdx = fz.bp.findIndex(b => profile.bodyFatPct < b);
   if (zoneIdx === -1) zoneIdx = fz.bp.length;
 
-  const last7 = [];
-  for (let i = 6; i >= 0; i--) { const d = addDays(today, -i); const e = logs[d] || null; last7.push({ date: d, calories: e?.calories ?? null }); }
-  const weekHtml = last7.map(d => {
-    const pct = d.calories ? Math.min(100, Math.round((d.calories/targets.calorieTarget)*100)) : 0;
-    const isToday = d.date === today;
-    const wd = new Date(d.date+"T00:00:00").toLocaleDateString("tr-TR",{weekday:"short"}).slice(0,2);
-    return `<div class="week-col"><div class="week-bar-track"><div class="week-bar-fill" style="height:${pct}%"></div></div><div class="week-label ${isToday?'today':''}">${wd}</div></div>`;
-  }).join("");
-
   const td = profile.trainingDays || DEFAULT_TRAINING_DAYS;
   const isTrainingDay = isEffectiveTrainingDay(activeDate, td, profile.trainingDayOverrides || {});
+  const info = effectiveDayInfo(entry, entry.dayType, activeDate);
+  const allEx = [...info.exercises, ...(entry.customExercises || [])];
+  const doneCount = allEx.filter(ex => entry.doneExercises[ex.id]).length;
+  const isRest = entry.dayType === "rest";
+  const kcal = Math.round(sumMeals(entry.meals).kcal);
+  const water = entry.water ?? 0;
+  const isToday = activeDate === today;
+
+  const rings = [
+    { l: "Kalori", c: "var(--pink)", pct: kcal / targets.calorieTarget * 100, v: `${fmtN(kcal)}/${fmtN(targets.calorieTarget)}`, u: "kcal" },
+    isRest && !allEx.length
+      ? { l: "Dinlenme", c: "var(--lime)", pct: 100, v: "Toparlan", u: "" }
+      : { l: "Antrenman", c: "var(--lime)", pct: allEx.length ? doneCount / allEx.length * 100 : 0, v: `${doneCount}/${allEx.length}`, u: "hareket" },
+    { l: "Su", c: "var(--cyan)", pct: water / WATER_TARGET_ML * 100, v: `${fmtN(water)}/${fmtN(WATER_TARGET_ML)}`, u: "ml" },
+  ];
+
+  const waterHours = Array.from({ length: 24 }, (_, h) => (entry.waterHours || {})[h] || 0);
+  const d7 = lastNDates(7, today);
+  const d7labels = d7.map(dayShort);
+  const sleep7 = d7.map(d => d === activeDate ? (entry.sleep ?? 0) : ((logs[d] && logs[d].sleep) || 0));
+  const kcal7 = d7.map(d => d === activeDate ? kcal : Math.round((logs[d] && logs[d].calories) || 0));
+  const kcalDays = kcal7.filter(v => v > 0);
+  const kcalAvg = kcalDays.length ? Math.round(kcalDays.reduce((a, b) => a + b, 0) / kcalDays.length) : 0;
+  const ws = weekStats(today);
+  const weekDates = lastNDates(7, addDays(ws.monday, 6));
+  const weekVals = weekDates.map(d => didTrainOn(d) ? 1 : 0);
+  const todayIdx = weekDates.indexOf(today);
+  const sleepTxt = entry.sleep == null ? "—" : fmtN(entry.sleep, 1);
 
   return `
-    <section class="day-choice-card">
-      <div class="day-choice-btn-row">
-        <button class="day-choice-big-btn ${isTrainingDay ? 'active-train' : ''}" data-day-choice="train">
-          <span class="day-choice-icon">🏋️</span>
-          <span class="day-choice-big-label">Antrenman Günü</span>
-        </button>
-        <button class="day-choice-big-btn ${!isTrainingDay ? 'active-rest' : ''}" data-day-choice="rest">
-          <span class="day-choice-icon">🌙</span>
-          <span class="day-choice-big-label">Dinlenme Günü</span>
-        </button>
+    <section class="tile wide"><div class="th"><h2>${isToday ? "Bugün ne yapıyorsun?" : "O gün ne yaptın?"}</h2></div>
+      <div class="daychoice" role="group" aria-label="Gün tipi">
+        <button class="tr" data-day-choice="train" aria-pressed="${isTrainingDay}">🏋️ Antrenman</button>
+        <button class="rs" data-day-choice="rest" aria-pressed="${!isTrainingDay}">🌙 Dinlenme</button>
       </div>
     </section>
 
-    ${homeRingsHtml(entry)}
-
-    <section class="card">
-      <div class="card-eyebrow">SU & UYKU</div>
-      <div class="metrics-grid">
-        ${metricCellHtml("water", "💧 Su", "ml", WATER_TARGET_ML, entry.water, 250)}
-        ${metricCellHtml("sleep", "🌙 Uyku", "saat", SLEEP_TARGET_H, entry.sleep, 0.5)}
-      </div>
+    <section class="tile wide"><div class="th"><h2>${isToday ? "Günlük Halkalar" : "O Günün Halkaları"}</h2></div>
+      <div class="ringrow">${uiRings(rings, 150, 20, 3)}${uiLeg(rings)}</div>
     </section>
 
-    <section class="card">
-      <div class="card-head-row">
-        <div>
-          <div class="card-eyebrow">PROFİL</div>
-          <div class="card-title">${profile.weightKg} kg</div>
-          <div class="card-sub">${profile.gender==='kadin'?'Kadın':'Erkek'} · ${profile.age} yaş · ${profile.heightCm} cm</div>
-          <div class="status-chip">${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}</div>
-        </div>
-        <button class="profile-edit-btn" data-edit-profile="1">✎ düzenle</button>
-      </div>
-      <div class="gauge-wrap">
-        <div class="gauge-head-row"><span class="gauge-label">Yağ oranı</span><span class="gauge-value" style="color:${textColors[zoneIdx]}">${profile.bodyFatPct}% · ${fz.labels[zoneIdx]}</span></div>
-        <div class="gauge-track">${widths.map((w,i)=>`<div style="width:${w}%; background:${colors[i]}; height:100%;"></div>`).join("")}<div class="gauge-marker" style="left:${markerPct}%"></div></div>
-        <div class="gauge-zone-labels">${fz.labels.map(l=>`<span>${l}</span>`).join("")}</div>
-      </div>
-      <div class="mini-stats-row">
-        <div class="mini-stat"><div class="mini-stat-label">BMI</div><div class="mini-stat-value">${bmi.toFixed(1)}</div></div>
-        ${profile.musclePct != null ? `<div class="mini-stat"><div class="mini-stat-label">Kas Oranı</div><div class="mini-stat-value">%${profile.musclePct}</div></div>` : ""}
-        <div class="mini-stat"><div class="mini-stat-label">Bazal Metabolizma</div><div class="mini-stat-value">${targets.bmr} kcal</div></div>
-      </div>
+    <section class="tile"><div class="th"><h2>Su</h2>${UI_GO}</div><div class="cap">${isToday ? "Bugün" : "O gün"}</div>
+      <button class="big num" data-edit-metric="water" style="color:var(--cyan)">${fmtN(water / 1000, 2)}<small> L</small></button>
+      <input class="stepper-input" type="number" inputmode="decimal" step="250" placeholder="ml" value="${entry.water ?? ""}" data-metric="water" style="display:none;" />
+      ${uiHours(waterHours, "var(--cyan)")}
+      <div class="steps"><button data-step="water" data-dir="dec" aria-label="Su azalt">−</button><button data-step="water" data-dir="inc" aria-label="Su arttır">+</button></div>
     </section>
 
-    ${renderCalendarHtml()}
-
-    <section class="card">
-      <div class="card-head-row"><div class="card-eyebrow">SON 7 GÜN · KALORİ</div></div>
-      <div class="week-grid">${weekHtml}</div>
+    <section class="tile"><div class="th"><h2>Uyku</h2>${UI_GO}</div><div class="cap">${isToday ? "Dün gece" : "O gece"}</div>
+      <button class="big num" data-edit-metric="sleep" style="color:var(--purple)">${sleepTxt}<small> sa</small></button>
+      <input class="stepper-input" type="number" inputmode="decimal" step="0.5" placeholder="saat" value="${entry.sleep ?? ""}" data-metric="sleep" style="display:none;" />
+      ${uiDays(sleep7, "var(--purple)", d7labels, 6)}
+      <div class="steps"><button data-step="sleep" data-dir="dec" aria-label="Uyku azalt">−</button><button data-step="sleep" data-dir="inc" aria-label="Uyku arttır">+</button></div>
     </section>
+
+    <section class="tile" data-goto="nutrition" style="cursor:pointer"><div class="th"><h2>Kalori</h2>${UI_GO}</div><div class="cap">Son 7 gün</div>
+      <div class="mid num" style="color:var(--pink)">${fmtN(kcalAvg)}<small> ort</small></div>
+      ${uiDays(kcal7, "var(--pink)", d7labels, 6)}
+    </section>
+
+    <section class="tile" data-open-cal style="cursor:pointer"><div class="th"><h2>Antrenman</h2>${UI_GO}</div><div class="cap">Bu hafta</div>
+      <div class="mid num" style="color:var(--lime)">${ws.done}<small> / ${ws.planned} gün</small></div>
+      ${uiDays(weekVals, "var(--lime)", ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"], todayIdx)}
+    </section>
+
+    <section class="tile" data-edit-profile="1" style="cursor:pointer"><div class="th"><h2>Kilo</h2>${UI_GO}</div><div class="cap">${profile.gender === "kadin" ? "Kadın" : "Erkek"} · ${profile.age} · ${profile.heightCm} cm</div>
+      <div class="mid num" style="color:var(--blue)">${fmtN(profile.weightKg, 1)}<small> kg</small></div>
+      <div class="sub">${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}</div>
+    </section>
+
+    <section class="tile"><div class="th"><h2>Yağ Oranı</h2>${UI_GO}</div><div class="cap">${fz.labels[zoneIdx]} aralıkta</div>
+      <div class="mid num" style="color:${zoneColors[zoneIdx]}">%${fmtN(profile.bodyFatPct, 1)}</div>
+      <div class="gauge">${bounds.slice(0, -1).map((b, i) => `<span style="flex:${bounds[i + 1] - b};background:${zoneColors[i]}"></span>`).join("")}<i class="mk" style="left:${markerPct}%"></i></div>
+    </section>
+
+    <section class="tile"><div class="th"><h2>BMI</h2></div><div class="mid num" style="color:var(--yellow)">${fmtN(bmi, 1)}</div><div class="sub">${bmiLabel(bmi)}</div></section>
+    <section class="tile"><div class="th"><h2>Bazal</h2></div><div class="mid num" style="color:var(--orange)">${fmtN(targets.bmr)}<small> kcal</small></div><div class="sub">${profile.musclePct != null ? `Kas oranı %${fmtN(profile.musclePct, 1)}` : "Dinlenirken yakılan"}</div></section>
+    <button class="tint lime wide" data-edit-profile="1">Profili Düzenle</button>
   `;
-}
-
-function metricCellHtml(key, label, unit, target, value, step) {
-  return `
-    <div class="metric-cell">
-      <div class="metric-label-row">${label}</div>
-      <div class="stepper-row">
-        <button class="stepper-btn" data-step="${key}" data-dir="dec">−</button>
-        <button class="stepper-value" data-edit-metric="${key}">${value ?? "—"}</button>
-        <input class="stepper-input" type="number" inputmode="decimal" step="${step}" value="${value ?? ""}" data-metric="${key}" style="display:none;" />
-        <button class="stepper-btn" data-step="${key}" data-dir="inc">+</button>
-      </div>
-      <div class="metric-target-row"><span>${unit}</span><span class="unit-mono">hedef ${target}</span></div>
-    </div>`;
 }
 
 // --- Apple-Watch style progress rings ---------------------------------------
@@ -2043,7 +2323,15 @@ function attachHomeHandlers(entry, targets) {
       const step = stepValues[key] || 1;
       const current = entry[key] ?? 0;
       const next = el.dataset.dir === "inc" ? +(current + step).toFixed(1) : Math.max(0, +(current - step).toFixed(1));
-      updateEntry(activeDate, { [key]: next });
+      const patch = { [key]: next };
+      if (key === "water") {
+        // saatlik su grafiği için hangi saatte içildiğini tut
+        const hours = { ...(entry.waterHours || {}) };
+        if (el.dataset.dir === "inc") { const h = activeDate === today ? new Date().getHours() : 12; hours[h] = (hours[h] || 0) + step; }
+        else { let left = current - next; Object.keys(hours).map(Number).sort((a, b) => b - a).forEach(h => { const take = Math.min(hours[h], left); hours[h] -= take; left -= take; if (!hours[h]) delete hours[h]; }); }
+        patch.waterHours = hours;
+      }
+      updateEntry(activeDate, patch);
       render();
     });
   });
@@ -2070,13 +2358,7 @@ function attachHomeHandlers(entry, targets) {
       render();
     });
   });
-  const calPrev = document.getElementById("calPrev");
-  const calNext = document.getElementById("calNext");
-  if (calPrev) calPrev.addEventListener("click", () => { calViewMonth = shiftMonth(calViewMonth, -1); render(); });
-  if (calNext) calNext.addEventListener("click", () => { calViewMonth = shiftMonth(calViewMonth, 1); render(); });
-  document.querySelectorAll("[data-select-date]").forEach(el => {
-    el.addEventListener("click", () => { activeDate = el.dataset.selectDate; render(); });
-  });
+  document.querySelectorAll("[data-open-cal]").forEach(el => el.addEventListener("click", openCalendarSheet));
 }
 
 // ---------------------------------------------------------------------------
@@ -2110,85 +2392,86 @@ let restTimerRunning = false;
 let restTimerHandle = null;
 
 function renderNutrition(entry, targets) {
-  const totals = sumMeals(entry.meals);
+  const t = sumMeals(entry.meals);
+  const kcal = Math.round(t.kcal), left = targets.calorieTarget - kcal;
+  const prot = Math.round(t.protein), carb = Math.round(t.carbs || 0), fat = Math.round(t.fat);
+  const dayWord = activeDate === today ? "Bugün" : "O gün";
+  const fatOver = fat - targets.fatG;
+  const warn = fatOver > 0
+    ? `<div class="fat-warn">⚠️ Günlük yağ limitini <b>${fatOver}g</b> aştın. Kalan öğünlerde kızartma, tereyağı, kaşar, kuruyemiş ve yağlı et yerine haşlama/ızgara + yağsız yoğurt/lor seç.</div>`
+    : (fat >= targets.fatG * 0.85 ? `<div class="fat-warn near">Yağ limitine yaklaştın, ${targets.fatG - fat}g kaldı. Kalan öğünleri yağsız seç.</div>` : "");
+  const hours = Array(24).fill(0);
+  (entry.meals || []).forEach(m => { const ts = Number(m.id); if (ts > 1e12) hours[new Date(ts).getHours()] += m.kcal || 0; });
+  const macro = (name, color, val, target) => `
+    <section class="tile"><div class="th"><h2>${name}</h2>${UI_GO}</div><div class="cap">${dayWord}</div>
+      <div class="mid num" style="color:${color}">${val}<small> / ${target} g</small></div>
+      <div class="gauge" style="background:color-mix(in srgb,${color} 20%,transparent)"><span style="width:${Math.min(100, target ? val / target * 100 : 0)}%;background:${color}"></span></div>
+    </section>`;
+  const SLOT_EMOJI = ["🍳", "🥙", "🥣", "🐟", "🍽️"];
 
   return `
-    <section class="card">
-      <div class="card-eyebrow">GÜNLÜK HEDEF</div>
-      <div class="calorie-hero">${targets.calorieTarget}<span class="calorie-hero-unit"> kcal</span></div>
-      <div class="card-sub">Bazal metabolizma ${targets.bmr} kcal · idame ${targets.maint} kcal · hedefin: ${GOALS[profile.goal]?.label}</div>
-      <div class="macro-grid">
-        <div class="macro-block"><div class="macro-label-row">🥩 Protein</div><div class="macro-value" style="color:#0F9E8C">${targets.proteinG}g</div><div class="macro-kcal">${targets.proteinG*4} kcal</div></div>
-        <div class="macro-block"><div class="macro-label-row">🌾 Karbonhidrat</div><div class="macro-value" style="color:#B8720A">${targets.carbG}g</div><div class="macro-kcal">${targets.carbG*4} kcal</div></div>
-        <div class="macro-block"><div class="macro-label-row">💧 Yağ</div><div class="macro-value" style="color:#1D74C9">${targets.fatG}g</div><div class="macro-kcal">${targets.fatG*9} kcal</div></div>
+    <section class="tile wide"><div class="th"><h2>Günlük Hedef</h2>${UI_GO}</div>
+      <div class="ringrow">${uiRings([{ c: "var(--pink)", pct: kcal / targets.calorieTarget * 100 }], 130, 30, 0)}
+        <div class="leg">
+          <div><div class="l">Yenilen</div><div class="v num" style="color:var(--pink)">${fmtN(kcal)}/${fmtN(targets.calorieTarget)}<small> kcal</small></div></div>
+          <div><div class="l">${left >= 0 ? "Kalan" : "Aşılan"}</div><div class="v num" ${left < 0 ? `style="color:var(--red)"` : ""}>${fmtN(Math.abs(left))}<small> kcal</small></div></div>
+        </div>
       </div>
+      <div class="sub" style="margin-top:12px">Bazal ${fmtN(targets.bmr)} · idame ${fmtN(targets.maint)} · hedef: ${(GOALS[profile.goal]?.label || "").toLocaleLowerCase("tr-TR")}</div>
+      ${warn}
     </section>
 
-    ${nutritionRingsHtml(entry, targets)}
+    ${macro("Protein", "var(--green)", prot, targets.proteinG)}
+    ${macro("Karbonhidrat", "var(--orange)", carb, targets.carbG)}
+    ${macro("Yağ", "var(--yellow)", fat, targets.fatG)}
+    <section class="tile"><div class="th"><h2>Saatlik</h2>${UI_GO}</div><div class="cap">Kalori</div>
+      <div class="mid num" style="color:var(--pink)">${(entry.meals || []).length}<small> öğün</small></div>
+      ${uiHours(hours, "var(--pink)")}
+    </section>
 
-    <section class="card">
-      <div class="card-eyebrow">NE YEDİN?</div>
-      <div class="card-sub">Öğünü anlat, koç kalori/protein tahmini yapıp tavsiye versin (Gemini API key gerekir — Koçuna Sor kutusundan ekleyebilirsin). Çalışmazsa aşağıdan elle de girebilirsin.</div>
-      <div class="chat-input-row">
-        <input type="text" class="chat-input" id="mealInput" placeholder="örn. patlıcanlı patates, makarna, çorba" value="${esc(mealInputText).replace(/"/g, "&quot;")}" />
-        <button class="chat-send-btn" id="mealSend">➤</button>
-      </div>
+    <section class="tile wide"><div class="th"><h2>Ne yedin?</h2></div>
+      <div class="sub">Öğünü anlat, koç kalori ve proteini tahmin etsin. Çalışmazsa alttan elle gir.</div>
+      <div class="compose"><input type="text" class="field" id="mealInput" placeholder="örn. mercimek çorbası, 2 dilim ekmek" aria-label="Ne yedin" value="${esc(mealInputText).replace(/"/g, "&quot;")}" /><button class="send" id="mealSend" aria-label="Analiz et">${UI_SEND}</button></div>
       ${mealLoading ? `<div class="meal-analyzing">${geminiStatusNote || "öğün analiz ediliyor…"}</div>` : ""}
       ${mealError ? `<div class="chat-error">Analiz başarısız: ${esc(mealError)}. Aşağıdan elle ekleyebilirsin.</div>` : ""}
       ${lastMealResult ? `
         <div class="meal-result-card">
-          <div class="meal-result-head"><span class="meal-result-title">Eklendi</span><span class="meal-macro">${Math.round(lastMealResult.kcal)} kcal · ${Math.round(lastMealResult.protein)}g P · ${Math.round(lastMealResult.fat)}g yağ</span></div>
+          <div class="meal-result-head"><span class="meal-result-title">Eklendi</span><span class="chipline" style="margin:0"><span class="chip k">${Math.round(lastMealResult.kcal)} kcal</span><span class="chip p">${Math.round(lastMealResult.protein)} g protein</span><span class="chip f">${Math.round(lastMealResult.fat)} g yağ</span></span></div>
           ${lastMealResult.breakdown ? `<div class="meal-breakdown">${esc(lastMealResult.breakdown)}</div>` : ""}
           <div class="meal-result-advice">${esc(lastMealResult.advice)}</div>
         </div>` : ""}
-
-      <div class="form-field" style="margin-top:14px;">
-        <label class="form-label">Elle ekle (opsiyonel)</label>
-        <div style="display:flex; gap:8px;">
-          <div class="form-input-row" style="flex:1;min-width:0;padding:10px;"><input class="form-input" type="number" id="manualKcal" placeholder="kcal" style="font-size:16px;" /></div>
-          <div class="form-input-row" style="flex:1;min-width:0;padding:10px;"><input class="form-input" type="number" id="manualProtein" placeholder="prot g" style="font-size:16px;" /></div>
-          <div class="form-input-row" style="flex:1;min-width:0;padding:10px;"><input class="form-input" type="number" id="manualFat" placeholder="yağ g" style="font-size:16px;" /></div>
-          <button class="chat-send-btn" id="manualAdd" style="width:44px;">+</button>
-        </div>
+      <div class="trio">
+        <input type="number" inputmode="decimal" id="manualKcal" placeholder="kcal" aria-label="kcal" />
+        <input type="number" inputmode="decimal" id="manualProtein" placeholder="prot g" aria-label="protein" />
+        <input type="number" inputmode="decimal" id="manualFat" placeholder="yağ g" aria-label="yağ" />
+        <button id="manualAdd" aria-label="Elle ekle">+</button>
       </div>
-
-      ${entry.meals && entry.meals.length ? `
-        <div class="logged-meal-list">
-          ${entry.meals.map(m => `
-            <div class="logged-meal-row">
-              <div style="flex:1;"><div class="logged-meal-text">${esc(m.text)}</div>${m.breakdown ? `<div class="logged-meal-breakdown">${esc(m.breakdown)}</div>` : ""}<div class="logged-meal-macro">${Math.round(m.kcal)} kcal · ${Math.round(m.protein)}g protein · ${Math.round(m.fat || 0)}g yağ</div></div>
-              <button class="logged-meal-remove" data-remove-meal="${m.id}">✕</button>
-            </div>`).join("")}
-        </div>` : ""}
+      ${(entry.meals || []).map(m => `
+        <div class="meal"><div class="t"><b>${esc(m.text)}</b>${m.breakdown ? `<div class="sub">${esc(m.breakdown)}</div>` : ""}
+          <div class="chipline"><span class="chip k">${Math.round(m.kcal)} kcal</span><span class="chip p">${Math.round(m.protein)} g protein</span><span class="chip f">${Math.round(m.fat || 0)} g yağ</span></div></div>
+          <button class="x" data-remove-meal="${m.id}" aria-label="Sil">✕</button></div>`).join("")}
     </section>
 
-    <section class="card">
-      <div class="card-eyebrow">BİR YEMEK HAZIRLAYACAĞIM</div>
-      <div class="card-sub">Yemeğin adını yaz, koç kalan bütçene göre kaç gr malzeme kullanman gerektiğini ve hazırlanışını çıkarsın.</div>
-      <div class="chat-input-row">
-        <input type="text" class="chat-input" id="customRecipeInput" placeholder="örn. tavuklu makarna, mercimek çorbası" value="${esc(customRecipeInputText).replace(/"/g, "&quot;")}" />
-        <button class="chat-send-btn" id="customRecipeSend">➤</button>
-      </div>
+    ${MEAL_SLOTS.map((slot, si) => {
+      const m = slot.pool[mealPickFor(si, activeDate, entry)];
+      const rm = m.recipeId ? recipeTotalMacros(RECIPES[m.recipeId]) : null;
+      const kc = Math.round(rm ? rm.kcal : targets.calorieTarget * slot.ratio);
+      const name = slot.name.replace(/\s*\(.*\)\s*$/, "").replace(/\s*\/.*$/, "");
+      const time = (slot.name.match(/\(([^)]*)\)/) || [])[1] || "";
+      return `<div class="tile mealtile" ${m.recipeId ? `data-open-recipe="${m.recipeId}" role="button" tabindex="0"` : ""}>
+        <div class="th"><h2>${esc(name)}</h2>${m.recipeId ? UI_GO : ""}</div>
+        <div class="emoji">${SLOT_EMOJI[si] || "🍽️"}${time ? `<span class="slot-time">${esc(time)}</span>` : ""}</div>
+        <div class="items">${m.items}</div>
+        <div class="kc num">${rm ? "" : "~"}${fmtN(kc)}<small> KCAL</small></div>
+        <button class="swap" data-meal-swap="${slot.key}" aria-label="Başka öneri">↻</button>
+      </div>`;
+    }).join("")}
+
+    <section class="tile wide"><div class="th"><h2>Bir yemek hazırlayacağım</h2></div>
+      <div class="sub">Kalan bütçene göre gramajları ve tarifi çıkarır.</div>
+      <div class="compose"><input type="text" class="field" id="customRecipeInput" placeholder="örn. tavuklu makarna" aria-label="Yemek adı" value="${esc(customRecipeInputText).replace(/"/g, "&quot;")}" /><button class="send" id="customRecipeSend" aria-label="Tarif çıkar">${UI_SEND}</button></div>
       ${customRecipeLoading ? `<div class="meal-analyzing">${geminiStatusNote || "tarif hazırlanıyor…"}</div>` : ""}
       ${customRecipeError ? `<div class="chat-error">Tarif oluşturulamadı: ${esc(customRecipeError)}</div>` : ""}
-    </section>
-
-    <section class="card">
-      <div class="card-eyebrow">ÖĞÜN PLANI ÖNERİSİ · ${activeDate === today ? "BUGÜN" : "O GÜN"}</div>
-      <div class="meal-list">
-        ${MEAL_SLOTS.map((slot, si) => {
-          const m = slot.pool[mealPickFor(si, activeDate, entry)];
-          const rm = m.recipeId ? recipeTotalMacros(RECIPES[m.recipeId]) : null;
-          const kcal = Math.round(rm ? rm.kcal : targets.calorieTarget * slot.ratio);
-          const protein = Math.round(rm ? rm.protein : targets.proteinG * slot.ratio);
-          const fat = Math.round(rm ? rm.fat : targets.fatG * slot.ratio);
-          return `<div class="meal-row ${m.recipeId ? "clickable" : ""}" ${m.recipeId ? `data-open-recipe="${m.recipeId}"` : ""}>
-            <div class="meal-head-row"><span class="meal-name">${slot.name}</span><button class="meal-swap-btn" data-meal-swap="${slot.key}" title="Başka öneri">🔄</button></div>
-            <div class="meal-macro" style="margin-top:3px;">${rm ? "" : "~"}${kcal} kcal · ${protein}g P · ${fat}g yağ</div>
-            <div class="meal-items">${m.items}</div>${m.recipeId ? `<div class="recipe-chip">📖 Tarifi gör</div>` : ""}</div>`;
-        }).join("")}
-      </div>
-      <div class="meal-footnote">Her gün farklı öneri gelir; beğenmediğini 🔄 ile değiştir. Gerçek yediklerini yukarıdan kaydet. Tarifi olan öğünlere dokun.</div>
     </section>
   `;
 }
@@ -2433,85 +2716,77 @@ function logPanelHtml(entry, name) {
 function renderTraining(entry, phase, weeksRemaining) {
   const dayInfo = effectiveDayInfo(entry, entry.dayType, activeDate);
   const totalEx = dayInfo.exercises.length;
-  const doneEx = dayInfo.exercises.filter(e => entry.doneExercises[e.id]).length;
   const customExercises = entry.customExercises || [];
+  const allEx = [...dayInfo.exercises, ...customExercises];
+  const doneAll = allEx.filter(e => entry.doneExercises[e.id]).length;
+  const cardioMin = dayInfo.cardio ? (String(dayInfo.cardio).match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:dk|dakika)/) || []) : [];
 
-  const customHtml = customExercises.map(ex => {
-      const done = !!entry.doneExercises[ex.id];
-      return `
-        <div class="ex-block">
-        <div class="ex-row ex-row-custom ${done?'done':''}">
-          <button class="checkbox-btn" data-toggle="${ex.id}"><span class="checkbox ${done?'done':''}">${done?'✓':''}</span></button>
-          <button class="ex-name-btn" data-toggle="${ex.id}">
-            <span class="ex-name ${done?'done':''}">${esc(ex.name)}</span>
-            ${exRegionLine(ex)}
-            <span class="ex-scheme ex-scheme-sub">${esc(ex.scheme)}</span>
-          </button>
-          ${logBtnHtml(entry, ex.name)}
-          ${ex.dbId ? `<button class="info-btn" data-info="${ex.dbId}" data-name="${esc(ex.name)}" data-scheme="${esc(ex.scheme)}" data-tip="${esc(ex.tip || "")}">i</button>` : ""}
-          <button class="info-btn" style="background:#F3F5F7;border-color:#E4E8ED;color:#94A0AE;" data-remove-custom="${ex.id}">✕</button>
-        </div>
-        ${logPanelHtml(entry, ex.name)}
-        </div>`;
-    }).join("");
-  let exListHtml = "";
-  if (totalEx === 0) {
-    exListHtml = `<div class="rest-note">Bugün planda dinlenme var. Yine de antrenman yaptıysan Ana Sayfa'daki takvimden bu güne dokunarak işaretleyebilirsin. Aşağıdaki Hareket Önerici'den ekstra hareket de ekleyebilirsin.</div>`
-      + (customExercises.length ? `<div class="ex-list">${customHtml}</div>` : "");
-  } else {
-    const markAllBtn = `<button class="mark-all-btn" id="markAllBtn" data-set="${doneEx < totalEx}">${doneEx < totalEx ? "Tümünü tamamlandı işaretle" : "Tümünü kaldır"}</button>`;
-    exListHtml = markAllBtn + `<div class="ex-list">` + dayInfo.exercises.map(ex => {
-      const done = !!entry.doneExercises[ex.id];
-      return `
-        <div class="ex-block">
-        <div class="ex-row ${done?'done':''}">
-          <button class="checkbox-btn" data-toggle="${ex.id}"><span class="checkbox ${done?'done':''}">${done?'✓':''}</span></button>
-          <button class="ex-name-btn" data-toggle="${ex.id}"><span class="ex-name ${done?'done':''}">${esc(ex.name)}</span>${exRegionLine(ex)}<span class="ex-scheme ex-scheme-sub">${esc(ex.scheme)}</span></button>
-          ${ex.slot && ex.variants > 1 && !done ? `<button class="swap-btn" data-swap-slot="${ex.slot}" title="Başka varyasyon">⇄</button>` : ""}
-          ${logBtnHtml(entry, ex.name)}
-          <button class="info-btn" data-info="${ex.id}" data-name="${esc(ex.name)}" data-scheme="${esc(ex.scheme)}" data-tip="${esc(ex.tip || "")}">i</button>
-        </div>
-        ${logPanelHtml(entry, ex.name)}
-        </div>`;
-    }).join("") + customHtml + `</div>`;
-  }
-
-  const phaseBanner = phase === "adaptation" ? `
-    <div class="phase-banner">
-      <span class="phase-banner-title">Adaptasyon Fazı</span>
-      <span class="phase-banner-sub">${weeksRemaining > 0 ? `${weeksRemaining} hafta sonra Upper/Lower split'e geçeceksin` : "Split'e geçiş bu hafta"} — full body + kardiyo, hafif ağırlık, form odaklı.</span>
-    </div>` : "";
+  const exRow = (ex, custom) => {
+    const done = !!entry.doneExercises[ex.id];
+    const sets = getSets(entry, ex.name);
+    const lib = LIB[ex.dbId || ex.id];
+    const region = ex.region || (lib ? REGIONS[lib.r] : "");
+    const infoId = custom ? ex.dbId : ex.id;
+    return `<div class="exb"><div class="ex ${done ? "done" : ""}">
+        <button class="ck" data-toggle="${ex.id}" aria-label="${esc(ex.name)} tamamlandı">${UI_TICK}</button>
+        <button class="t" data-toggle="${ex.id}"><b>${esc(ex.name)}${custom ? ` <span class="extra-tag">· ekstra</span>` : ""}</b><span>${region ? `<span class="rg">${esc(region)}</span> · ` : ""}${esc(ex.scheme)}</span></button>
+        ${!custom && ex.slot && ex.variants > 1 && !done ? `<button class="sm" data-swap-slot="${ex.slot}" aria-label="Başka varyasyon">⇄</button>` : ""}
+        <button class="sm kg ${sets.length ? "has" : ""}" data-log="${esc(ex.name)}" aria-label="Set kaydı">${sets.length ? `${sets.length}✓` : "kg"}</button>
+        ${infoId ? `<button class="sm" data-info="${infoId}" data-name="${esc(ex.name)}" data-scheme="${esc(ex.scheme)}" data-tip="${esc(ex.tip || "")}" aria-label="Nasıl yapılır">i</button>` : ""}
+        ${custom ? `<button class="sm rm" data-remove-custom="${ex.id}" aria-label="Kaldır">✕</button>` : ""}
+      </div>${logPanelHtml(entry, ex.name)}</div>`;
+  };
 
   return `
-    ${autoGenLoading ? `<div class="auto-plan-banner">✨ ${geminiStatusNote || "Bugünün planı hazırlanıyor…"}</div>` : ""}
-    ${planAdjustLoading ? `<div class="auto-plan-banner">🍽️ Plan beslenmene göre güncelleniyor…</div>` : ""}
-    ${planAdjustNote && !planAdjustLoading ? `<div class="auto-plan-note">🍽️ ${esc(planAdjustNote)}<button class="auto-plan-dismiss" id="planNoteDismiss">✕</button></div>` : ""}
-    ${autoGenError ? `<div class="chat-error">Otomatik plan kurulamadı: ${esc(autoGenError)} — standart program gösteriliyor.</div>` : ""}
-    <button class="ai-gen-btn" id="aiGenBtn" ${aiGenLoading || autoGenLoading ? "disabled" : ""}>
-      ✨ ${aiGenLoading ? (geminiStatusNote || "planlanıyor…") : dayInfo.isAI ? "Yeniden Planla" : "Yeni Antrenman Planla"}
-    </button>
-    ${aiGenError ? `<div class="chat-error">Plan oluşturulamadı: ${esc(aiGenError)}</div>` : ""}
-    ${dayInfo.isAI ? `<button class="ai-revert-btn" id="aiRevertBtn">Standart programa dön</button>` : ""}
-    <label class="auto-plan-toggle">
-      <input type="checkbox" id="autoPlanToggle" ${autoPlanEnabled() ? "checked" : ""} />
-      <span>Her gün planı otomatik kur, öğünlerime göre güncelle</span>
-    </label>
-    ${phaseBanner}
-    <section class="card">
-      <div class="card-head-row">
-        <div><div class="card-eyebrow">${String(totalEx + customExercises.length).padStart(2,"0")} HAREKET${dayInfo.isAI ? ` <span class="ai-badge">· AI PLANI</span>` : ""}</div><div class="card-title">${dayInfo.label}</div><div class="card-sub">${dayInfo.sub}</div></div>
+    ${autoGenLoading ? `<div class="auto-plan-banner wide">✨ ${geminiStatusNote || "Bugünün planı hazırlanıyor…"}</div>` : ""}
+    ${planAdjustLoading ? `<div class="auto-plan-banner wide">🍽️ Plan beslenmene göre güncelleniyor…</div>` : ""}
+    ${planAdjustNote && !planAdjustLoading ? `<div class="auto-plan-note wide">🍽️ ${esc(planAdjustNote)}<button class="auto-plan-dismiss" id="planNoteDismiss">✕</button></div>` : ""}
+    ${autoGenError ? `<div class="chat-error wide">Otomatik plan kurulamadı: ${esc(autoGenError)}. Standart program gösteriliyor.</div>` : ""}
+
+    <section class="tile wide"><div class="th"><h2>${esc(dayInfo.label)}</h2>${dayInfo.isAI ? `<span class="chip" style="color:var(--lime);background:color-mix(in srgb,var(--lime) 18%,transparent)">AI PLANI</span>` : ""}</div>
+      ${dayInfo.sub ? `<div class="sub">${esc(dayInfo.sub)}</div>` : ""}
+      <div class="ringrow">${uiRings([{ c: allEx.length ? "var(--orange)" : "var(--purple)", pct: allEx.length ? doneAll / allEx.length * 100 : 100 }], 120, 26, 0)}
+        <div class="leg">${allEx.length
+          ? `<div><div class="l">Tamamlanan</div><div class="v num" style="color:var(--orange)">${doneAll}/${allEx.length}<small> hareket</small></div></div>
+             <div><div class="l">Tahmini süre</div><div class="v num">${estimateMinutes(allEx)}<small> dk</small></div></div>`
+          : `<div><div class="l">${activeDate === today ? "Bugün" : "O gün"}</div><div class="v" style="color:var(--purple)">Dinlenme</div></div>`}
+        </div>
       </div>
-      ${totalEx > 0 ? `<div class="progress-track"><div class="progress-fill" style="width:${(doneEx/totalEx)*100}%"></div></div>` : ""}
-      ${dayInfo.cardio ? `<div class="cardio-note">🏃 ${dayInfo.cardio}</div>` : ""}
-      ${dayInfo.rotating && totalEx > 0 ? `<div class="rotation-note">🔁 Program ${programWeekIndex(activeDate) + 1}. hafta varyasyonları — ana hareketler 3 haftada, yardımcı hareketler her hafta değişir. Beğenmediğine ⇄ bas.</div>` : ""}
-      ${exListHtml}
+      <div style="margin-top:16px;display:grid;gap:10px">
+        <button class="tint lime" id="aiGenBtn" ${aiGenLoading || autoGenLoading ? "disabled" : ""}>✨ ${aiGenLoading ? (geminiStatusNote || "Planlanıyor…") : dayInfo.isAI ? "Yeniden Planla" : "Yeni Antrenman Planla"}</button>
+      </div>
+      ${aiGenError ? `<div class="chat-error">Plan oluşturulamadı: ${esc(aiGenError)}</div>` : ""}
+      ${dayInfo.isAI ? `<button class="relink" id="aiRevertBtn">Standart programa dön</button>` : ""}
     </section>
+
+    <section class="tile"><div class="th"><h2>Kardiyo</h2>${UI_GO}</div><div class="cap">${dayInfo.cardio ? "Antrenman sonrası" : "Bugün yok"}</div>
+      <div class="mid num" style="color:var(--cyan)">${cardioMin[1] ? `${cardioMin[2] ? `${cardioMin[1]}-${cardioMin[2]}` : cardioMin[1]}<small> dk</small>` : "—"}</div>
+      <div class="sub">${dayInfo.cardio ? esc(dayInfo.cardio) : "Bu planda kardiyo yok"}</div>
+    </section>
+    <section class="tile"><div class="th"><h2>Faz</h2>${UI_GO}</div>
+      ${phase === "adaptation"
+        ? `<div class="cap">Adaptasyon</div><div class="mid num" style="color:var(--purple)">${weeksRemaining > 0 ? `${weeksRemaining}<small> hafta</small>` : "Son<small> hafta</small>"}</div><div class="sub">Sonra Upper/Lower split. Full body, hafif ağırlık, form odaklı.</div>`
+        : `<div class="cap">Upper/Lower split</div><div class="mid num" style="color:var(--purple)">${programWeekIndex(activeDate) + 1}.<small> hafta</small></div><div class="sub">Ana hareketler 3 haftada bir değişir</div>`}
+    </section>
+
+    <section class="tile wide"><div class="th"><h2>Hareketler</h2><div style="display:flex;gap:8px"><button class="sm" id="restOpenBtn" aria-label="Mola sayacı">⏱</button>${allEx.length ? `<button class="sm" id="markAllBtn" data-set="${doneAll < allEx.length}" style="width:auto;padding:0 12px;border-radius:15px;font-size:13px">${doneAll < allEx.length ? "Tümü ✓" : "Sıfırla"}</button>` : ""}</div></div>
+      ${totalEx === 0 ? `<div class="rest-note">Bugün planda dinlenme var. Yine de antrenman yaptıysan Özet'teki Antrenman kutusundan takvimi açıp bu güne dokunarak işaretleyebilirsin. Aşağıdaki Hareket Önerici'den ekstra hareket de ekleyebilirsin.</div>` : ""}
+      <div class="exlist">${dayInfo.exercises.map(e => exRow(e, false)).join("")}${customExercises.map(e => exRow(e, true)).join("")}</div>
+      ${dayInfo.rotating && totalEx > 0 ? `<div class="sub" style="margin-top:10px">🔁 Program ${programWeekIndex(activeDate) + 1}. hafta varyasyonları. Ana hareketler 3 haftada, yardımcı hareketler her hafta değişir. Beğenmediğine ⇄ bas.</div>` : ""}
+    </section>
+
+    <section class="tile wide"><div class="th"><h2>Otomatik plan</h2><input type="checkbox" class="switch" id="autoPlanToggle" aria-label="Otomatik plan" ${autoPlanEnabled() ? "checked" : ""} /></div>
+      <div class="sub">Her gün planı kendisi kurar, yediklerine göre günceller.</div>
+    </section>
+
     ${renderSuggestCard()}
     <div class="version-tag">Enti Coach v${APP_VERSION}</div>
   `;
 }
 
 function attachTrainingHandlers(entry) {
+  const restOpenBtn = document.getElementById("restOpenBtn");
+  if (restOpenBtn) restOpenBtn.addEventListener("click", () => { restTimerOpen = true; renderRestTimerWidget(); });
   attachSuggestHandlers();
   const aiGenBtn = document.getElementById("aiGenBtn");
   if (aiGenBtn) aiGenBtn.addEventListener("click", async () => {
@@ -2738,27 +3013,17 @@ function renderSuggestCard() {
   const neglected = LIB_GROUPS.filter(g => g.regions.every(r => cov.missing.includes(REGIONS[r])));
   const list = suggestGroup ? libByGroup(suggestGroup) : [];
   return `
-    <section class="card">
-      <div class="card-eyebrow">HAREKET ÖNERİCİ</div>
-      <div class="card-sub">Bölge seç, resimli varyasyonları gör; dokun → nasıl yapılır + bugüne ekle. Ya da koça ne istediğini yaz.</div>
+    <section class="tile wide"><div class="th"><h2>Hareket Önerici</h2>${UI_GO}</div>
       ${neglected.length && neglected.length < LIB_GROUPS.length ? `<div class="sg-neglect">Son 14 günde hiç çalışmadığın: <b>${neglected.map(g => g.label).join(", ")}</b></div>` : ""}
-      <div class="sg-chip-row">
-        ${LIB_GROUPS.map(g => `<button class="sg-chip ${suggestGroup === g.key ? "active" : ""}" data-sg-group="${g.key}">${g.label}</button>`).join("")}
-      </div>
-      ${suggestGroup ? `<div class="sg-grid">
-        ${list.map(e => `
-          <button class="sg-card" data-sg-open="${e.id}">
-            ${suggestThumb(e.id)}
-            <span class="sg-name">${esc(e.n)}</span>
-            <span class="sg-region">${esc(REGIONS[e.r])}</span>
-          </button>`).join("")}
-      </div>` : ""}
+      <div class="chips">${LIB_GROUPS.map(g => `<button data-sg-group="${g.key}" aria-pressed="${suggestGroup === g.key}">${g.label}</button>`).join("")}</div>
+      ${list.map(e => `
+        <div class="sug">
+          <button class="t" data-sg-open="${e.id}" style="text-align:left"><b style="font-weight:600">${esc(e.n)}</b><div class="sub">${esc(REGIONS[e.r])} · nasıl yapılır</div></button>
+          <button class="plus" data-sg-add="${e.id}" aria-label="Bugüne ekle">+</button>
+        </div>`).join("")}
 
-      <div class="form-label" style="margin-top:16px;">Koça sor</div>
-      <div class="chat-input-row" style="margin-top:0;">
-        <input type="text" class="chat-input" id="suggestInput" placeholder="örn. karın, alt karın ağırlıklı / kol kalınlığı" value="${esc(suggestText)}" />
-        <button class="chat-send-btn" id="suggestSend" ${suggestLoading ? "disabled" : ""}>➤</button>
-      </div>
+      <div class="sub" style="margin-top:14px">Ya da koça ne istediğini yaz</div>
+      <div class="compose"><input type="text" class="field" id="suggestInput" placeholder="örn. alt karın ağırlıklı, kol kalınlığı" aria-label="Koça sor" value="${esc(suggestText)}" /><button class="send" id="suggestSend" aria-label="Öner" ${suggestLoading ? "disabled" : ""}>${UI_SEND}</button></div>
       ${suggestLoading ? `<div class="meal-analyzing">${geminiStatusNote || "hareketler seçiliyor…"}</div>` : ""}
       ${suggestError ? `<div class="chat-error">${esc(suggestError)}</div>` : ""}
       ${suggestResult ? `
@@ -2766,16 +3031,9 @@ function renderSuggestCard() {
           <div class="sg-result-head">“${esc(suggestResult.request)}”</div>
           ${suggestResult.intro ? `<div class="sg-intro">${esc(suggestResult.intro)}</div>` : ""}
           ${suggestResult.exercises.map(e => `
-            <div class="sg-row">
-              <button class="sg-row-main" data-sg-open="${e.id}" data-sg-scheme="${esc(e.scheme)}" data-sg-why="${esc(e.why)}">
-                ${suggestThumb(e.id)}
-                <span style="flex:1;min-width:0;text-align:left;">
-                  <span class="sg-name">${esc(e.name)}</span>
-                  <span class="sg-region">${esc(REGIONS[LIB[e.id].r])} · ${esc(e.scheme)}</span>
-                  <span class="sg-why">${esc(e.why)}</span>
-                </span>
-              </button>
-              <button class="log-add-btn" style="height:36px;" data-sg-add="${e.id}" data-sg-scheme="${esc(e.scheme)}" data-sg-why="${esc(e.why)}">+</button>
+            <div class="sug">
+              <button class="t" data-sg-open="${e.id}" data-sg-scheme="${esc(e.scheme)}" data-sg-why="${esc(e.why)}" style="text-align:left"><b style="font-weight:600">${esc(e.name)}</b><div class="sub">${esc(REGIONS[LIB[e.id].r])} · ${esc(e.scheme)}</div><div class="sub">${esc(e.why)}</div></button>
+              <button class="plus" data-sg-add="${e.id}" data-sg-scheme="${esc(e.scheme)}" data-sg-why="${esc(e.why)}" aria-label="Bugüne ekle">+</button>
             </div>`).join("")}
           <button class="mark-all-btn" id="sgAddAll">Hepsini ${activeDate === today ? "bugünkü" : "o günkü"} antrenmana ekle</button>
         </div>` : ""}
@@ -2831,7 +3089,7 @@ function openModal(exId, name, scheme, tipArg, opts) {
     </div>` : "";
   document.getElementById("modalCard").innerHTML = `
     <div class="modal-head">
-      <div><div class="card-eyebrow">HAREKET</div><div class="modal-title">${esc(name)}</div></div>
+      <div><div class="card-eyebrow">Hareket</div><div class="modal-title">${esc(name)}</div></div>
       <button class="modal-close" id="modalCloseBtn">✕</button>
     </div>
     ${imgHtml}
@@ -2942,7 +3200,7 @@ function renderRecipeModal() {
 
   document.getElementById("recipeModalCard").innerHTML = `
     <div class="modal-head">
-      <div><div class="card-eyebrow">TARİF</div><div class="modal-title">${esc(r.title)}</div></div>
+      <div><div class="card-eyebrow">Tarif</div><div class="modal-title">${esc(r.title)}</div></div>
       <button class="modal-close" id="recipeModalCloseBtn">✕</button>
     </div>
 
@@ -3017,10 +3275,10 @@ function renderRestTimerWidget() {
   if (!profile || editingProfile || activeTab !== "training") { el.innerHTML = ""; return; }
 
   el.innerHTML = `
-    <button class="rest-fab" id="restFabBtn" style="${restTimerOpen ? "display:none;" : ""}">
+    <button class="rest-fab glass" id="restFabBtn" style="${restTimerOpen || !restTimerRunning ? "display:none;" : ""}">
       ⏱<span class="rest-fab-time">${fmtClock(restTimerLeft)}</span>
     </button>
-    <div class="rest-panel ${restTimerOpen ? "open" : ""}">
+    <div class="rest-panel glass ${restTimerOpen ? "open" : ""}">
       <div class="rest-panel-head">
         <span class="rest-panel-title">Mola Sayacı</span>
         <button class="modal-close" id="restCloseBtn">✕</button>
