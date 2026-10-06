@@ -551,7 +551,7 @@ main.grid{margin-top:14px}
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "4.2.0";
+const APP_VERSION = "4.3.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -1353,6 +1353,18 @@ function computeNutritionTargets(p) {
   const carbG = Math.max(0, Math.round((calorieTarget - proteinG*4 - fatG*9) / 4));
   return { bmr: Math.round(safeBmr), maint: Math.round(maint), calorieTarget, proteinG, fatG, carbG };
 }
+// Yağ oranı opsiyonel. Girilmediyse BMI + yaş + cinsiyetten tahmin edilir (Deurenberg).
+function hasBodyFat(p) { return p && p.bodyFatPct != null && p.bodyFatPct !== "" && Number(p.bodyFatPct) > 0; }
+function bodyFatOf(p) {
+  if (hasBodyFat(p)) return { pct: Number(p.bodyFatPct), estimated: false };
+  const est = 1.2 * calcBMI(p) + 0.23 * p.age - 10.8 * (p.gender === "kadin" ? 0 : 1) - 5.4;
+  return { pct: Number.isFinite(est) ? Math.max(3, Math.round(est * 10) / 10) : null, estimated: true };
+}
+function bodyFatPromptText(p) {
+  const bf = bodyFatOf(p);
+  if (!bf.estimated) return `yağ oranı %${bf.pct}`;
+  return bf.pct != null ? `yağ oranı bilinmiyor (BMI'ye göre kaba tahmin ~%${bf.pct})` : "yağ oranı bilinmiyor";
+}
 function bodyFatZones(gender) {
   return gender === "kadin"
     ? { min: 10, max: 45, bp: [16,27,32], labels: ["Düşük","Sağlıklı","Yüksek","Obez"] }
@@ -1529,7 +1541,7 @@ async function analyzeMealAndAdvise(description, profile, targets, dayCtx, prior
   const remainingFat = Math.round(targets.fatG - (priorTotals.fat || 0));
   const systemPrompt = `Sen Enti Coach'sun, Türk mutfağına aşina bir beslenme koçusun.
 Kullanıcı az önce yediği bir öğünü anlatıyor. 1) Türk ev yemeği porsiyonlarına göre YAKLAŞIK kalori/makro tahmin et. 2) Günün geri kalanı için kısa somut tavsiye yaz (bugünün antrenmanını da hesaba kat).
-KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, yağ oranı %${profile.bodyFatPct}. Antrenman geçmişi: ${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}.
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, ${bodyFatPromptText(profile)}. Antrenman geçmişi: ${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}.
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein. BU ÖĞÜNDEN ÖNCE ALINAN: ${Math.round(priorTotals.kcal)} kcal, ${Math.round(priorTotals.protein)}g protein. KALAN BÜTÇE: ${Math.round(remainingKcal)} kcal, ${Math.round(remainingProtein)}g protein.
 YAĞ: günlük limit ${targets.fatG}g, bu öğünden önce ${Math.round(priorTotals.fat || 0)}g alındı, ${remainingFat >= 0 ? `${remainingFat}g kaldı` : `limit ${-remainingFat}g AŞILMIŞ`}. Yağ tahminini dikkatli yap (pişirme yağı, tereyağı, peynir, kıyma yağı dahil). Bu öğünle limit aşılıyorsa tavsiyede açıkça söyle.
 BUGÜNÜN ANTRENMANI: ${dayCtx.dayLabel}${dayCtx.totalEx > 0 ? ` (${dayCtx.doneEx}/${dayCtx.totalEx} tamamlandı)` : " (dinlenme günü)"}.
@@ -1611,7 +1623,7 @@ async function generateTodayWorkout(dayCtx, historyLines, lastPerfLines) {
 
   const systemPrompt = `Sen Enti Coach'sun, deneyimli bir antrenman koçusun. Kullanıcının GERÇEK geçmişine ve bugünkü durumuna göre BUGÜN İÇİN kişiye özel bir antrenman planı oluşturacaksın — sabit bir programı tekrarlama, gerçekten analiz et.
 
-KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, yağ oranı %${profile.bodyFatPct}.
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, ${bodyFatPromptText(profile)}.
 ANTRENMAN GEÇMİŞİ (genel): ${statusLine}.
 BUGÜN (${dayCtx.dateLabel}): program fazı ${dayCtx.phase === "adaptation" ? "adaptasyon (hafif ağırlık, form odaklı)" : "split (normal yoğunluk)"}.
 BUGÜNE KADAR ALINAN BESLENME: ${dayCtx.calories != null ? `${dayCtx.calories} kcal` : "henüz girilmedi"}, ${dayCtx.protein != null ? `${dayCtx.protein}g protein` : "henüz girilmedi"}. Günlük hedef: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein.
@@ -1706,7 +1718,7 @@ async function askCoach(userMessage, profile, targets, history, dayCtx) {
     dayCtx.sleep != null ? `${dayCtx.sleep} saat uyudu` : "uyku henüz girilmedi",
   ].join(", ");
   const systemPrompt = `Sen Enti Coach'sun, kullanıcıyı tanıyan samimi bir Türkçe fitness/beslenme koçusun. "aga" gibi samimi hitap kullanabilirsin ama saygılı kal.
-PROFİL: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.heightCm}cm, ${profile.weightKg}kg, yağ %${profile.bodyFatPct}${profile.musclePct ? `, kas %${profile.musclePct}` : ""}.
+PROFİL: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.heightCm}cm, ${profile.weightKg}kg, ${bodyFatPromptText(profile)}${profile.musclePct ? `, kas %${profile.musclePct}` : ""}.
 ANTRENMAN GEÇMİŞİ: ${statusLine}. Hedef: ${GOALS[profile.goal]?.label}.
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein, ${targets.carbG}g karbonhidrat, ${targets.fatG}g yağ.
 ANTRENMAN PROGRAMI: ${dayCtx.phase === "adaptation" ? "adaptasyon fazında — full body + kardiyo, hafif ağırlık (sonra split'e geçecek)" : "haftada 4 gün Upper/Lower split"}.
@@ -2138,8 +2150,10 @@ function renderHome(entry, targets, streak) {
   const fz = bodyFatZones(profile.gender);
   const bounds = [fz.min, ...fz.bp, fz.max];
   const zoneColors = ["var(--blue)", "var(--green)", "var(--orange)", "var(--red)"];
-  const markerPct = clamp(((profile.bodyFatPct - fz.min) / (fz.max - fz.min)) * 100, 1, 99);
-  let zoneIdx = fz.bp.findIndex(b => profile.bodyFatPct < b);
+  const bf = bodyFatOf(profile);
+  const bfPct = bf.pct ?? fz.bp[1];
+  const markerPct = clamp(((bfPct - fz.min) / (fz.max - fz.min)) * 100, 1, 99);
+  let zoneIdx = fz.bp.findIndex(b => bfPct < b);
   if (zoneIdx === -1) zoneIdx = fz.bp.length;
 
   const td = profile.trainingDays || DEFAULT_TRAINING_DAYS;
@@ -2185,14 +2199,14 @@ function renderHome(entry, targets, streak) {
       <div class="ringrow">${uiRings(rings, 150, 20, 3)}${uiLeg(rings)}</div>
     </section>
 
-    <section class="tile"><div class="th"><h2>Su</h2>${UI_GO}</div><div class="cap">${isToday ? "Bugün" : "O gün"}</div>
+    <section class="tile"><div class="th"><h2>Su</h2></div><div class="cap">${isToday ? "Bugün" : "O gün"}</div>
       <button class="big num" data-edit-metric="water" style="color:var(--cyan)">${fmtN(water / 1000, 2)}<small> L</small></button>
       <input class="stepper-input" type="number" inputmode="decimal" step="250" placeholder="ml" value="${entry.water ?? ""}" data-metric="water" style="display:none;" />
       ${uiHours(waterHours, "var(--cyan)")}
       <div class="steps"><button data-step="water" data-dir="dec" aria-label="Su azalt">−</button><button data-step="water" data-dir="inc" aria-label="Su arttır">+</button></div>
     </section>
 
-    <section class="tile"><div class="th"><h2>Uyku</h2>${UI_GO}</div><div class="cap">${isToday ? "Dün gece" : "O gece"}</div>
+    <section class="tile"><div class="th"><h2>Uyku</h2></div><div class="cap">${isToday ? "Dün gece" : "O gece"}</div>
       <button class="big num" data-edit-metric="sleep" style="color:var(--purple)">${sleepTxt}<small> sa</small></button>
       <input class="stepper-input" type="number" inputmode="decimal" step="0.5" placeholder="saat" value="${entry.sleep ?? ""}" data-metric="sleep" style="display:none;" />
       ${uiDays(sleep7, "var(--purple)", d7labels, 6)}
@@ -2214,9 +2228,10 @@ function renderHome(entry, targets, streak) {
       <div class="sub">${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}</div>
     </section>
 
-    <section class="tile"><div class="th"><h2>Yağ Oranı</h2>${UI_GO}</div><div class="cap">${fz.labels[zoneIdx]} aralıkta</div>
-      <div class="mid num" style="color:${zoneColors[zoneIdx]}">%${fmtN(profile.bodyFatPct, 1)}</div>
+    <section class="tile"${bf.estimated ? ` data-edit-profile="1" style="cursor:pointer"` : ""}><div class="th"><h2>Yağ Oranı</h2>${bf.estimated ? UI_GO : ""}</div><div class="cap">${bf.estimated ? `Tahmini · ${fz.labels[zoneIdx]}` : `${fz.labels[zoneIdx]} aralıkta`}</div>
+      <div class="mid num" style="color:${zoneColors[zoneIdx]}">${bf.pct != null ? `${bf.estimated ? "~" : ""}%${fmtN(bf.pct, 1)}` : "—"}</div>
       <div class="gauge">${bounds.slice(0, -1).map((b, i) => `<span style="flex:${bounds[i + 1] - b};background:${zoneColors[i]}"></span>`).join("")}<i class="mk" style="left:${markerPct}%"></i></div>
+      ${bf.estimated ? `<div class="sub" style="margin-top:8px">Boy-kilodan tahmin. Biliyorsan dokunup gir.</div>` : ""}
     </section>
 
     <section class="tile"><div class="th"><h2>BMI</h2></div><div class="mid num" style="color:var(--yellow)">${fmtN(bmi, 1)}</div><div class="sub">${bmiLabel(bmi)}</div></section>
@@ -2421,14 +2436,14 @@ function renderNutrition(entry, targets) {
   const hours = Array(24).fill(0);
   (entry.meals || []).forEach(m => { const ts = Number(m.id); if (ts > 1e12) hours[new Date(ts).getHours()] += m.kcal || 0; });
   const macro = (name, color, val, target) => `
-    <section class="tile"><div class="th"><h2>${name}</h2>${UI_GO}</div><div class="cap">${dayWord}</div>
+    <section class="tile"><div class="th"><h2>${name}</h2></div><div class="cap">${dayWord}</div>
       <div class="mid num" style="color:${color}">${val}<small> / ${target} g</small></div>
       <div class="gauge" style="background:color-mix(in srgb,${color} 20%,transparent)"><span style="width:${Math.min(100, target ? val / target * 100 : 0)}%;background:${color}"></span></div>
     </section>`;
   const SLOT_EMOJI = ["🍳", "🥙", "🥣", "🐟", "🍽️"];
 
   return `
-    <section class="tile wide"><div class="th"><h2>Günlük Hedef</h2>${UI_GO}</div>
+    <section class="tile wide"><div class="th"><h2>Günlük Hedef</h2></div>
       <div class="ringrow">${uiRings([{ c: "var(--pink)", pct: kcal / targets.calorieTarget * 100 }], 130, 30, 0)}
         <div class="leg">
           <div><div class="l">Yenilen</div><div class="v num" style="color:var(--pink)">${fmtN(kcal)}/${fmtN(targets.calorieTarget)}<small> kcal</small></div></div>
@@ -2442,7 +2457,7 @@ function renderNutrition(entry, targets) {
     ${macro("Protein", "var(--green)", prot, targets.proteinG)}
     ${macro("Karbonhidrat", "var(--orange)", carb, targets.carbG)}
     ${macro("Yağ", "var(--yellow)", fat, targets.fatG)}
-    <section class="tile"><div class="th"><h2>Saatlik</h2>${UI_GO}</div><div class="cap">Kalori</div>
+    <section class="tile"><div class="th"><h2>Saatlik</h2></div><div class="cap">Kalori</div>
       <div class="mid num" style="color:var(--pink)">${(entry.meals || []).length}<small> öğün</small></div>
       ${uiHours(hours, "var(--pink)")}
     </section>
@@ -2731,6 +2746,28 @@ function logPanelHtml(entry, name) {
     </div>`;
 }
 
+// AI planındaki bir hareketin yerine geçebilecek kütüphane hareketleri:
+// önce aynı bölge, azsa aynı kas grubu. Planda zaten olanlar hariç.
+function aiSwapLibId(ex) {
+  if (ex.dbId && LIB[ex.dbId]) return ex.dbId;
+  if (LIB[ex.id]) return ex.id;
+  return LIB_BY_NAME[exKey(ex.name)] || null;
+}
+function aiSwapCandidates(ex, planExercises) {
+  const id = aiSwapLibId(ex);
+  if (!id) return [];
+  const r = LIB[id].r;
+  const inPlan = new Set(planExercises.map(e => aiSwapLibId(e)).filter(Boolean));
+  const sameRegion = LIB_RAW.map(x => x[0]).filter(x => LIB[x].r === r);
+  let pool = sameRegion;
+  if (pool.filter(x => !inPlan.has(x)).length < 2) {
+    const g = LIB_GROUPS.find(g => g.regions.includes(r));
+    if (g) pool = [...sameRegion, ...libByGroup(g.key).map(e => e.id).filter(x => !sameRegion.includes(x))];
+  }
+  // Kendisi listede kalsın ki sıradaki bulunabilsin; diğer plan hareketleri çıkar.
+  return pool.filter(x => x === id || !inPlan.has(x)).length > 1 ? pool.filter(x => x === id || !inPlan.has(x)) : [];
+}
+
 function renderTraining(entry, phase, weeksRemaining) {
   const dayInfo = effectiveDayInfo(entry, entry.dayType, activeDate);
   const totalEx = dayInfo.exercises.length;
@@ -2749,6 +2786,7 @@ function renderTraining(entry, phase, weeksRemaining) {
         <button class="ck" data-toggle="${ex.id}" aria-label="${esc(ex.name)} tamamlandı">${UI_TICK}</button>
         <button class="t" data-toggle="${ex.id}"><b>${esc(ex.name)}${custom ? ` <span class="extra-tag">· ekstra</span>` : ""}</b><span>${region ? `<span class="rg">${esc(region)}</span> · ` : ""}${esc(ex.scheme)}</span></button>
         ${!custom && ex.slot && ex.variants > 1 && !done ? `<button class="sm" data-swap-slot="${ex.slot}" aria-label="Başka varyasyon">⇄</button>` : ""}
+        ${!custom && dayInfo.isAI && !done && aiSwapCandidates(ex, dayInfo.exercises).length ? `<button class="sm" data-ai-swap="${esc(ex.id)}" aria-label="Başka hareketle değiştir">⇄</button>` : ""}
         <button class="sm kg ${sets.length ? "has" : ""}" data-log="${esc(ex.name)}" aria-label="Set kaydı">${sets.length ? `${sets.length}✓` : "kg"}</button>
         ${infoId ? `<button class="sm" data-info="${infoId}" data-name="${esc(ex.name)}" data-scheme="${esc(ex.scheme)}" data-tip="${esc(ex.tip || "")}" aria-label="Nasıl yapılır">i</button>` : ""}
         ${custom ? `<button class="sm rm" data-remove-custom="${ex.id}" aria-label="Kaldır">✕</button>` : ""}
@@ -2777,11 +2815,11 @@ function renderTraining(entry, phase, weeksRemaining) {
       ${dayInfo.isAI ? `<button class="relink" id="aiRevertBtn">Standart programa dön</button>` : ""}
     </section>
 
-    <section class="tile"><div class="th"><h2>Kardiyo</h2>${UI_GO}</div><div class="cap">${dayInfo.cardio ? "Antrenman sonrası" : "Bugün yok"}</div>
+    <section class="tile"><div class="th"><h2>Kardiyo</h2></div><div class="cap">${dayInfo.cardio ? "Antrenman sonrası" : "Bugün yok"}</div>
       <div class="mid num" style="color:var(--cyan)">${cardioMin[1] ? `${cardioMin[2] ? `${cardioMin[1]}-${cardioMin[2]}` : cardioMin[1]}<small> dk</small>` : "—"}</div>
       <div class="sub">${dayInfo.cardio ? esc(dayInfo.cardio) : "Bu planda kardiyo yok"}</div>
     </section>
-    <section class="tile"><div class="th"><h2>Faz</h2>${UI_GO}</div>
+    <section class="tile"><div class="th"><h2>Faz</h2></div>
       ${phase === "adaptation"
         ? `<div class="cap">Adaptasyon</div><div class="mid num" style="color:var(--purple)">${weeksRemaining > 0 ? `${weeksRemaining}<small> hafta</small>` : "Son<small> hafta</small>"}</div><div class="sub">Sonra Upper/Lower split. Full body, hafif ağırlık, form odaklı.</div>`
         : `<div class="cap">Upper/Lower split</div><div class="mid num" style="color:var(--purple)">${programWeekIndex(activeDate) + 1}.<small> hafta</small></div><div class="sub">Ana hareketler 3 haftada bir değişir</div>`}
@@ -2791,6 +2829,7 @@ function renderTraining(entry, phase, weeksRemaining) {
       ${totalEx === 0 ? `<div class="rest-note">Bugün planda dinlenme var. Yine de antrenman yaptıysan Özet'teki Antrenman kutusundan takvimi açıp bu güne dokunarak işaretleyebilirsin. Aşağıdaki Hareket Önerici'den ekstra hareket de ekleyebilirsin.</div>` : ""}
       <div class="exlist">${dayInfo.exercises.map(e => exRow(e, false)).join("")}${customExercises.map(e => exRow(e, true)).join("")}</div>
       ${dayInfo.rotating && totalEx > 0 ? `<div class="sub" style="margin-top:10px">🔁 Program ${programWeekIndex(activeDate) + 1}. hafta varyasyonları. Ana hareketler 3 haftada, yardımcı hareketler her hafta değişir. Beğenmediğine ⇄ bas.</div>` : ""}
+      ${dayInfo.isAI && totalEx > 0 ? `<div class="sub" style="margin-top:10px">Beğenmediğin hareketin yanındaki ⇄ ile aynı bölgeyi çalıştıran başka bir hareketle değiştir.</div>` : ""}
     </section>
 
     <section class="tile wide"><div class="th"><h2>Otomatik plan</h2><input type="checkbox" class="switch" id="autoPlanToggle" aria-label="Otomatik plan" ${autoPlanEnabled() ? "checked" : ""} /></div>
@@ -2873,6 +2912,28 @@ function attachTrainingHandlers(entry) {
       const vs = { ...(entry.variantShift || {}) };
       vs[slot] = (vs[slot] || 0) + 1;
       updateEntry(activeDate, { variantShift: vs });
+      render();
+    });
+  });
+  document.querySelectorAll("[data-ai-swap]").forEach(el => {
+    el.addEventListener("click", () => {
+      const plan = entry.aiWorkout;
+      if (!plan || !plan.exercises) return;
+      const idx = plan.exercises.findIndex(e => e.id === el.dataset.aiSwap);
+      if (idx < 0) return;
+      const old = plan.exercises[idx];
+      const pool = aiSwapCandidates(old, plan.exercises);
+      if (!pool.length) return;
+      const cur = pool.indexOf(aiSwapLibId(old));
+      const nextId = pool[(cur + 1) % pool.length];
+      const lib = LIB[nextId];
+      // Ağırlık önerisi eski harekete aitti; set × tekrar kalsın.
+      const scheme = String(old.scheme || "3 × 10-12").replace(/\s*@.*$/, "");
+      const exercises = plan.exercises.slice();
+      exercises[idx] = { id: nextId, name: lib.n, scheme, tip: lib.t, region: REGIONS[lib.r] };
+      const doneExercises = { ...entry.doneExercises };
+      delete doneExercises[old.id];
+      updateEntry(activeDate, { aiWorkout: { ...plan, exercises }, doneExercises });
       render();
     });
   });
@@ -3001,7 +3062,7 @@ async function suggestExercisesAI(request) {
   const entry = getEntry(activeDate);
   const info = effectiveDayInfo(entry, entry.dayType, activeDate);
   const systemPrompt = `Sen Enti Coach'sun, deneyimli bir kuvvet antrenörüsün. Kullanıcı belirli bir bölge/amaç için hareket önerisi istiyor.
-KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.weightKg}kg, yağ %${profile.bodyFatPct}, hedef: ${GOALS[profile.goal]?.label}. ${TRAINING_STATUS[profile.trainingStatus]?.label || ""}.
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.weightKg}kg, ${bodyFatPromptText(profile)}, hedef: ${GOALS[profile.goal]?.label}. ${TRAINING_STATUS[profile.trainingStatus]?.label || ""}.
 BUGÜNKÜ PLAN: ${info.label} — ${info.exercises.map(e => e.name).join(", ") || "dinlenme"}.
 ${cov.text}
 
@@ -3031,7 +3092,7 @@ function renderSuggestCard() {
   const neglected = LIB_GROUPS.filter(g => g.regions.every(r => cov.missing.includes(REGIONS[r])));
   const list = suggestGroup ? libByGroup(suggestGroup) : [];
   return `
-    <section class="tile wide"><div class="th"><h2>Hareket Önerici</h2>${UI_GO}</div>
+    <section class="tile wide"><div class="th"><h2>Hareket Önerici</h2></div>
       ${neglected.length && neglected.length < LIB_GROUPS.length ? `<div class="sg-neglect">Son 14 günde hiç çalışmadığın: <b>${neglected.map(g => g.label).join(", ")}</b></div>` : ""}
       <div class="chips">${LIB_GROUPS.map(g => `<button data-sg-group="${g.key}" aria-pressed="${suggestGroup === g.key}">${g.label}</button>`).join("")}</div>
       ${list.map(e => `
@@ -3462,7 +3523,7 @@ function renderOnboarding() {
     <div class="onboarding-wrap"><div class="onboarding-card">
       <div class="eyebrow">${initial ? "PROFİLİ DÜZENLE" : "TANIŞALIM"}</div>
       <h1 style="margin-bottom:4px;">${initial ? "Bilgilerini güncelle" : "Sana özel program için birkaç bilgi"}</h1>
-      <p class="onboarding-sub">${initial ? "Kilo, yağ ve kas oranını güncelle — hedeflerin otomatik yeniden hesaplanır." : "Bu veriler sadece bu cihazda/tarayıcıda saklanır."}</p>
+      <p class="onboarding-sub">${initial ? "Kilo, yağ ve kas oranını güncelle — hedeflerin otomatik yeniden hesaplanır." : "Bu veriler sadece bu cihazda/tarayıcıda saklanır."} Yağ ve kas oranını bilmiyorsan boş bırakabilirsin.</p>
       ${!initial ? backupHtml(false) : ""}
 
       <div class="gender-row">
@@ -3473,7 +3534,7 @@ function renderOnboarding() {
       ${formFieldHtml("age","Yaş","yaş","23")}
       ${formFieldHtml("heightCm","Boy","cm","182")}
       ${formFieldHtml("weightKg","Kilo","kg","91.8")}
-      ${formFieldHtml("bodyFatPct","Yağ oranı","%","27")}
+      ${formFieldHtml("bodyFatPct","Yağ oranı (opsiyonel)","%","27")}
       ${formFieldHtml("musclePct","Kas oranı (opsiyonel)","%","37.6")}
 
       ${!initial ? setupHtml : `
@@ -3499,12 +3560,15 @@ function formFieldHtml(key, label, unit, placeholder) {
       </div>
     </div>`;
 }
-function canSaveOb() { return obState.gender && obState.age && obState.heightCm && obState.weightKg && obState.bodyFatPct; }
+function canSaveOb() { return obState.gender && obState.age && obState.heightCm && obState.weightKg; }
 
 function attachOnboardingHandlers() {
   attachBackupHandlers();
   document.querySelectorAll("[data-gender]").forEach(b => b.addEventListener("click", () => { obState.gender = b.dataset.gender; render(); }));
-  document.querySelectorAll("[data-field]").forEach(inp => inp.addEventListener("input", () => { obState[inp.dataset.field] = inp.value; }));
+  document.querySelectorAll("[data-field]").forEach(inp => inp.addEventListener("input", () => {
+    obState[inp.dataset.field] = inp.value;
+    const sb = document.getElementById("obSave"); if (sb) sb.disabled = !canSaveOb(); // Kaydet yazarken açılsın
+  }));
   document.querySelectorAll("[data-status]").forEach(b => b.addEventListener("click", () => { obState.trainingStatus = b.dataset.status; render(); }));
   document.querySelectorAll("[data-activity]").forEach(b => b.addEventListener("click", () => { obState.activity = b.dataset.activity; render(); }));
   document.querySelectorAll("[data-goal]").forEach(b => b.addEventListener("click", () => { obState.goal = b.dataset.goal; render(); }));
@@ -3528,7 +3592,7 @@ function attachOnboardingHandlers() {
       breakMonths: obState.trainingStatus === "ara_verdi" && obState.breakMonths !== "" ? Number(obState.breakMonths) : null,
       programStartDate,
       age: Number(obState.age), heightCm: Number(obState.heightCm), weightKg: Number(obState.weightKg),
-      bodyFatPct: Number(obState.bodyFatPct), musclePct: obState.musclePct === "" ? null : Number(obState.musclePct),
+      bodyFatPct: obState.bodyFatPct === "" || obState.bodyFatPct == null || !(Number(obState.bodyFatPct) > 0) ? null : Number(obState.bodyFatPct), musclePct: obState.musclePct === "" ? null : Number(obState.musclePct),
       programV3Start: profile?.programV3Start || today,
       trainingDayOverrides: profile?.trainingDayOverrides || {},
       autoAiPlan: profile?.autoAiPlan,
