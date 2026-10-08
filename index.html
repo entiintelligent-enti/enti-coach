@@ -18,8 +18,8 @@
     color-scheme: dark;
     --bg: #000; --tile: #1C1C1E; --tile2: #2C2C2E; --tile3: #3A3A3C; --line: rgba(255,255,255,.08);
     --fg: #fff; --fg2: rgba(235,235,245,.62); --fg3: rgba(235,235,245,.34);
-    --pink: #FA114F; --lime: #B4FF1A; --cyan: #19E3FF; --purple: #A78BFF; --blue: #2E9BFF;
-    --orange: #FF9F0A; --yellow: #FFD60A; --green: #32D74B; --red: #FF453A;
+    --pink: #FF4818; --lime: #46D628; --cyan: #008CFF; --purple: #A78BFF; --blue: #2E9BFF;
+    --orange: #FFB020; --yellow: #FFD60A; --green: #32D74B; --red: #FF453A;
     --glass: rgba(38,38,42,.6); --glass-edge: rgba(255,255,255,.14);
     --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --round: "SF Pro Rounded", ui-rounded, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
@@ -551,7 +551,7 @@ main.grid{margin-top:14px}
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "4.3.0";
+const APP_VERSION = "4.3.1";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -2120,7 +2120,7 @@ function renderCalendarHtml() {
     const isPast = dateStr <= today;
     const isSelected = dateStr === activeDate;
     let bg = "transparent", border = "none", textColor = "rgba(235,235,245,.7)";
-    if (completed) { bg = "#B4FF1A"; border = "none"; textColor = "#000"; }
+    if (completed) { bg = "var(--lime)"; border = "none"; textColor = "#000"; }
     return `
       <button class="cal-cell ${isSelected?'selected':''}" data-select-date="${dateStr}">
         <span class="cal-dot" style="background:${bg}; border:${border};">
@@ -2244,11 +2244,11 @@ function renderHome(entry, targets, streak) {
 const WATER_TARGET_ML = 3000;
 const SLEEP_TARGET_H = 8;
 const METRIC_COLORS = {
-  calories: "#FF2D6F",  // pink
-  protein:  "#A8F000",  // lime
-  water:    "#00B8D9",  // cyan-blue
+  calories: "#FF4818",  // logo red
+  protein:  "#46D628",  // logo green
+  water:    "#008CFF",  // logo blue
   sleep:    "#7C5CE0",  // violet
-  workout:  "#FF8A1E",  // orange — kept well away from water/sleep
+  workout:  "#FFB020",  // amber — kept away from the logo red
   fat:      "#FFB020",  // amber
 };
 
