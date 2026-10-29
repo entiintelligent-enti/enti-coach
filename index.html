@@ -551,7 +551,7 @@ main.grid{margin-top:14px}
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "4.3.1";
+const APP_VERSION = "4.5.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -642,7 +642,7 @@ function effectiveDayInfo(entry, dayType, dateStr) {
   const base = (!dateStr || (profile && profile.programV3Start && dateStr < profile.programV3Start))
     ? LEGACY_DAY_TYPES[dayType]
     : buildProgramDay(dayType, dateStr, entry);
-  if (entry && entry.aiWorkout && entry.aiWorkout.exercises && entry.aiWorkout.exercises.length) {
+  if (aiPlanValid(entry, dayType, dateStr)) {
     return {
       label: entry.aiWorkout.label || base.label,
       sub: entry.aiWorkout.sub || base.sub,
@@ -1296,12 +1296,112 @@ function weekTrainingDays(dateStr, trainingDays, overrides) {
   }
   return days;
 }
-function dayTypeForDate(dateStr, trainingDays, phase, overrides) {
+// Eski sistem: haftadaki sıraya göre sabit tip. Esnek sistemden önceki günler için.
+function positionDayType(dateStr, trainingDays, phase, overrides) {
   if (!isEffectiveTrainingDay(dateStr, trainingDays, overrides)) return "rest";
   const days = weekTrainingDays(dateStr, trainingDays, overrides);
   const pos = days.indexOf(dateStr);
   const order = phase === "adaptation" ? FULL_BODY_ORDER : SPLIT_ORDER;
   return order[Math.max(0, pos) % order.length];
+}
+
+// --- Esnek rotasyon -----------------------------------------------------------
+// Gün tipi takvimdeki sıradan değil, GERÇEKTEN yapılan antrenmanlardan çıkar:
+// kaçırılan gün programı kaydırır. Kurallar:
+//  1) Dün bacak yapıldıysa bugün üst vücut.
+//  2) Yarın dinlenme ise bugün bacak (bacak hep dinlenmeden önceki güne düşer).
+//  3) Son iki antrenman da üst vücutsa bacak (bacak ihmal edilmesin).
+//  4) Yoksa üst vücut. İtiş/çekiş ve quad/hip kendi içinde sırayla döner.
+// Kullanıcı bir gün için odak seçtiyse (entry.focusType) o geçerli; antrenmana
+// başlanan gün de o anki tipiyle kilitlenir, sonradan kaymaz.
+const UPPER_TYPES = ["upper_push", "upper_pull"];
+const LOWER_TYPES = ["lower_quad", "lower_hip"];
+const FOCUS_OPTIONS = [
+  { type: "upper_push", label: "Göğüs / Omuz / Triceps" },
+  { type: "upper_pull", label: "Sırt / Biceps" },
+  { type: "lower_quad", label: "Ön bacak" },
+  { type: "lower_hip", label: "Arka bacak / Kalça" },
+  { type: "full_body_a", label: "Full Body A", adaptation: true },
+  { type: "full_body_b", label: "Full Body B", adaptation: true },
+];
+function typeCategory(t) {
+  if (UPPER_TYPES.includes(t)) return "upper";
+  if (LOWER_TYPES.includes(t)) return "lower";
+  if (FULL_BODY_ORDER.includes(t)) return "full";
+  return null;
+}
+function sessionHappened(e) {
+  if (!e) return false;
+  if (e.manualComplete) return true;
+  if (Object.values(e.doneExercises || {}).some(Boolean)) return true;
+  return Object.values(e.exerciseLogs || {}).some(sets => sets && sets.length);
+}
+let dayTypeCache = {};
+function clearDayTypeCache() { dayTypeCache = {}; }
+function flexFloor() {
+  const lookbackFloor = addDays(today, -42);
+  const start = profile && profile.flexStart;
+  return start && start > lookbackFloor ? start : lookbackFloor;
+}
+// O gün bir antrenman var mı, varsa tipi ne? Geçmişte sadece gerçekten yapılan
+// antrenman sayılır; bugün ve sonrası için planlanan antrenman sayılır.
+function sessionTypeOn(dateStr, trainingDays, overrides) {
+  if (dateStr < today) {
+    if (!sessionHappened(logs[dateStr])) return null;
+  } else if (!isEffectiveTrainingDay(dateStr, trainingDays, overrides)) return null;
+  const t = dayTypeForDate(dateStr, trainingDays, computePhase(profile, dateStr), overrides);
+  return t === "rest" ? null : t;
+}
+function flexDayType(dateStr, trainingDays, phase, overrides) {
+  if (!isEffectiveTrainingDay(dateStr, trainingDays, overrides)) return "rest";
+  const e = logs[dateStr];
+  if (e && e.focusType && PROGRAM[e.focusType]) return e.focusType;
+  const recent = [];
+  for (let i = 1; i <= 21; i++) {
+    const t = sessionTypeOn(addDays(dateStr, -i), trainingDays, overrides);
+    if (t) recent.push({ t, gap: i });
+  }
+  if (phase === "adaptation") {
+    const lastFull = recent.find(r => typeCategory(r.t) === "full");
+    return lastFull && lastFull.t === "full_body_a" ? "full_body_b" : "full_body_a";
+  }
+  const yesterday = recent[0] && recent[0].gap === 1 ? typeCategory(recent[0].t) : null;
+  const tomorrowRest = !isEffectiveTrainingDay(addDays(dateStr, 1), trainingDays, overrides);
+  const last2 = recent.slice(0, 2).map(r => typeCategory(r.t));
+  let pool;
+  if (yesterday === "lower") pool = UPPER_TYPES;
+  else if (tomorrowRest) pool = LOWER_TYPES;
+  else if (last2.length === 2 && last2.every(c => c === "upper")) pool = LOWER_TYPES;
+  else pool = UPPER_TYPES;
+  const lastSame = recent.find(r => pool.includes(r.t));
+  return lastSame ? pool[(pool.indexOf(lastSame.t) + 1) % pool.length] : pool[0];
+}
+function dayTypeForDate(dateStr, trainingDays, phase, overrides) {
+  const floor = flexFloor();
+  if (dateStr < floor) {
+    const e = logs[dateStr];
+    if (e && e.focusType && PROGRAM[e.focusType] && isEffectiveTrainingDay(dateStr, trainingDays, overrides)) return e.focusType;
+    return positionDayType(dateStr, trainingDays, phase, overrides);
+  }
+  if (dayTypeCache[dateStr]) return dayTypeCache[dateStr];
+  // Eskiden yeniye doldur: her gün sadece kendinden önceki günlere bakar.
+  for (let d = floor; d <= dateStr; d = addDays(d, 1)) {
+    if (!dayTypeCache[d]) dayTypeCache[d] = flexDayType(d, trainingDays, computePhase(profile, d), overrides);
+  }
+  return dayTypeCache[dateStr];
+}
+function focusLabel(t) { const o = FOCUS_OPTIONS.find(x => x.type === t); return o ? o.label : (PROGRAM[t] ? PROGRAM[t].label : t); }
+function dayTypeLine(dateStr) {
+  const t = getEntry(dateStr).dayType;
+  return t === "rest" ? "dinlenme" : `${PROGRAM[t] ? PROGRAM[t].label : t} (${focusLabel(t)})`;
+}
+// AI planı başka bir odak için kurulduysa (gün kaydı ya da kullanıcı odağı
+// değiştirdi) ve antrenmana henüz başlanmadıysa geçersiz say.
+function aiPlanValid(entry, dayType, dateStr) {
+  if (!entry || !entry.aiWorkout || !entry.aiWorkout.exercises || !entry.aiWorkout.exercises.length) return false;
+  if (entry.aiWorkout.focusType === dayType) return true;
+  if (!dateStr || dateStr < today) return true;
+  return sessionHappened(entry);
 }
 function emptyEntry(dateStr, trainingDays, phase, overrides) {
   return { dayType: dayTypeForDate(dateStr, trainingDays, phase, overrides), doneExercises: {}, calories: null, protein: null, water: null, sleep: null, meals: [], customExercises: [], exerciseLogs: {}, manualComplete: false };
@@ -1615,7 +1715,9 @@ function buildLastPerformanceLines(entry, dateStr) {
 async function generateTodayWorkout(dayCtx, historyLines, lastPerfLines) {
   const cov = buildRegionCoverage(today, 14);
   const baseEntry = getEntry(activeDate);
-  const baseInfo = buildProgramDay(baseEntry.dayType === "rest" ? SPLIT_ORDER[0] : baseEntry.dayType, activeDate, null);
+  const focusType = baseEntry.dayType === "rest" ? SPLIT_ORDER[0] : baseEntry.dayType;
+  const baseInfo = buildProgramDay(focusType, activeDate, null);
+  const userChose = !!baseEntry.focusType;
   const statusInfo = TRAINING_STATUS[profile.trainingStatus] || TRAINING_STATUS.yeni;
   const statusLine = profile.trainingStatus === "ara_verdi" && profile.breakMonths
     ? `${statusInfo.label} (yaklaşık ${profile.breakMonths} aydır ara vermişti)` : statusInfo.label;
@@ -1626,6 +1728,8 @@ async function generateTodayWorkout(dayCtx, historyLines, lastPerfLines) {
 KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, ${bodyFatPromptText(profile)}.
 ANTRENMAN GEÇMİŞİ (genel): ${statusLine}.
 BUGÜN (${dayCtx.dateLabel}): program fazı ${dayCtx.phase === "adaptation" ? "adaptasyon (hafif ağırlık, form odaklı)" : "split (normal yoğunluk)"}.
+BUGÜNÜN ODAĞI (KESİN): ${baseInfo.label} — ${focusLabel(focusType)}. ${userChose ? "Kullanıcı bugün bunu çalışmak istediğini KENDİSİ seçti." : "Program, kaçırılan günleri ve dinlenme günlerini hesaba katarak bugüne bunu verdi."}
+YARIN: ${dayTypeLine(addDays(activeDate, 1))}.
 BUGÜNE KADAR ALINAN BESLENME: ${dayCtx.calories != null ? `${dayCtx.calories} kcal` : "henüz girilmedi"}, ${dayCtx.protein != null ? `${dayCtx.protein}g protein` : "henüz girilmedi"}. Günlük hedef: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein.
 
 SON GÜNLERİN GERÇEK KAYDI (en eski en üstte):
@@ -1641,7 +1745,8 @@ TALİMATLAR:
 - Son günlerde belirli bir bölge çalışılmadıysa bugün ona öncelik ver.
 - ÇEŞİTLİLİK ŞART: Kullanıcı aylardır aynı hareketleri yapmaktan şikayetçi. Aynı hareket kalıbının FARKLI varyasyonlarını kullan: tutuş (geniş/dar/ters/nötr), kablo aparatı (düz bar/halat/V-bar), açı (düz/incline/decline), alet (barbell/dumbbell/kablo/makine), tek taraflı. Son 14 günde yapılan varyasyonu tekrar etme; sadece ana ağır bileşik hareketi (ilerleme takibi için) koruyabilirsin.
 - Her gün en az 1 karın/core hareketi ekle; son 14 günde çalışılmayan bölgeleri (aşağıda) öncelikle kapat.
-- Bu haftanın rotasyon önerisi (baz al, istersen değiştir): ${baseInfo.label}: ${baseInfo.exercises.map(e => `${e.name} [${e.region}]`).join(", ")}.
+- Planın TÜM ana hareketleri bugünün odağına ait olmalı; başka bir kas grubunun gününe ÇEVİRME (karın/core eklemek serbest). "label" alanı bu odağı açıkça söylesin (örn. "${baseInfo.label}").
+- Bu odak için rotasyon önerisi (baz al, varyasyonları değiştirebilirsin): ${baseInfo.exercises.map(e => `${e.name} [${e.region}]`).join(", ")}.
 ${cov.text}
 - Bugün beslenme çok düşükse, bunu antrenman yoğunluğuna yansıt ve "sub" alanında kısaca belirt.
 - Adaptasyon fazındaysa hafif ağırlık ve temel hareketler kullan.
@@ -1656,7 +1761,7 @@ ${LIB_CATALOG_TEXT}
   const clean = extractJson(raw);
   const parsed = JSON.parse(clean);
   const exercises = (parsed.exercises || []).map((ex, i) => ({ id: isKnownExId(ex.id) ? ex.id : `ai-${Date.now()}-${i}`, name: LIB[ex.id] ? LIB[ex.id].n : ex.name, scheme: ex.scheme, tip: ex.tip, region: LIB[ex.id] ? REGIONS[LIB[ex.id].r] : undefined }));
-  return { label: parsed.label, sub: parsed.sub, cardio: parsed.cardio || null, exercises };
+  return { label: parsed.label, sub: parsed.sub, cardio: parsed.cardio || null, exercises, focusType };
 }
 
 // Re-tunes an already-generated plan when the day's nutrition has moved on.
@@ -1721,13 +1826,15 @@ async function askCoach(userMessage, profile, targets, history, dayCtx) {
 PROFİL: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.heightCm}cm, ${profile.weightKg}kg, ${bodyFatPromptText(profile)}${profile.musclePct ? `, kas %${profile.musclePct}` : ""}.
 ANTRENMAN GEÇMİŞİ: ${statusLine}. Hedef: ${GOALS[profile.goal]?.label}.
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein, ${targets.carbG}g karbonhidrat, ${targets.fatG}g yağ.
-ANTRENMAN PROGRAMI: ${dayCtx.phase === "adaptation" ? "adaptasyon fazında — full body + kardiyo, hafif ağırlık (sonra split'e geçecek)" : "haftada 4 gün Upper/Lower split"}.
+ANTRENMAN PROGRAMI: ${dayCtx.phase === "adaptation" ? "adaptasyon fazında — full body + kardiyo, hafif ağırlık (sonra split'e geçecek)" : "haftada 4 gün Upper/Lower split"}. Program esnek: kaçırılan gün planı kaydırır, bacak günü dinlenmeden önceki güne denk getirilir.
+ÖNÜMÜZDEKİ GÜNLER: ${[1, 2, 3].map(i => { const d = addDays(today, i); return `${turkishDate(d)}: ${dayTypeLine(d)}`; }).join("; ")}.
 BUGÜN (${dayCtx.dateLabel}): antrenman günü ${dayCtx.dayLabel}${dayCtx.totalEx > 0 ? ` (${dayCtx.doneEx}/${dayCtx.totalEx} tamamlandı)` : ""}. Bugüne kadar: ${loggedLine}. Bu hafta tamamlanan antrenman: ${dayCtx.weekDone}/${dayCtx.weekPlanned}.
 SON ANTRENMAN KAYITLARI (beslenme + kaldırılan ağırlıklar):
 ${buildTrainingHistoryLines(profile.trainingDays || DEFAULT_TRAINING_DAYS, today, 7) || "Kayıt yok."}
 Ağırlık sorulursa bu kayıtlara dayanarak somut sayı ver, tahmin etme.
 Antrenman geçmişini dikkate al: yeni başlayana form/temel öğret, ara verene kademeli yüklenmeyi hatırlat, deneyimliye temel açıklamalarla vakit kaybettirme.
-Cevaplarını profiline, hedefine ve bugünkü duruma göre şekillendir, genel tavsiye verme. Kısa ve uygulanabilir yaz. Tıbbi teşhis koyma.`;
+Cevaplarını profiline, hedefine ve bugünkü duruma göre şekillendir, genel tavsiye verme. Kısa ve uygulanabilir yaz. Tıbbi teşhis koyma.
+BUGÜNÜN ANTRENMANINI DEĞİŞTİRME: Kullanıcı BUGÜN başka bir bölge çalışmak istediğini açıkça söylerse (örn. "bugün göğüs yapalım", "bacak yerine sırt"), cevabının EN SONUNA ayrı satırda şu etiketi ekle: [ODAK:tip]. tip şunlardan biri: ${FOCUS_OPTIONS.filter(o => dayCtx.phase === "adaptation" || !o.adaptation).map(o => `${o.type} (${o.label})`).join(", ")}. Uygulama bugünün planını buna çevirir ve sonraki günleri kendisi kaydırır. Sadece soru soruyorsa ya da emin değilsen etiket EKLEME.`;
   return callGemini(systemPrompt, toGeminiContents(history, userMessage));
 }
 
@@ -1742,6 +1849,8 @@ try { const raw = localStorage.getItem(PROFILE_KEY); profile = raw ? JSON.parse(
 const today = isoDate(new Date());
 // v3 rotating program applies from the first day this version runs; earlier days keep the old fixed program.
 if (profile && !profile.programV3Start) { profile.programV3Start = today; try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
+// Esnek rotasyon bu sürümün ilk açıldığı günden itibaren; önceki günler eski tiplerini korur.
+if (profile && !profile.flexStart) { profile.flexStart = today; try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
 let activeDate = today;
 let activeTab = "home";
 let editingProfile = false;
@@ -1751,8 +1860,8 @@ let coachInputText = "";
 let coachLoading = false;
 let coachError = "";
 
-function persistLogs() { try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) { console.error(e); } }
-function persistProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) { console.error(e); } }
+function persistLogs() { clearDayTypeCache(); try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) { console.error(e); } }
+function persistProfile() { clearDayTypeCache(); try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) { console.error(e); } }
 function setDayOverride(dateStr, value) {
   const overrides = { ...(profile.trainingDayOverrides || {}) };
   if (value === null) delete overrides[dateStr];
@@ -1770,15 +1879,27 @@ function getEntry(dateStr) {
   const base = stored || emptyEntry(dateStr, td, phase, ov);
   return { ...base, dayType };
 }
+function lockFocusIfStarted(e) {
+  if (!e.focusType && PROGRAM[e.dayType] && e.dayType !== "rest" && sessionHappened(e)) e.focusType = e.dayType;
+  return e;
+}
 function updateEntry(dateStr, patch) {
   const current = getEntry(dateStr);
-  logs[dateStr] = { ...current, ...patch };
+  logs[dateStr] = lockFocusIfStarted({ ...current, ...patch });
   persistLogs();
 }
 function toggleDayTrained(dateStr) {
   const current = getEntry(dateStr);
-  logs[dateStr] = { ...current, manualComplete: !current.manualComplete };
+  logs[dateStr] = lockFocusIfStarted({ ...current, manualComplete: !current.manualComplete });
   persistLogs();
+}
+// Kullanıcının seçtiği odak. null = otomatik. Eski odağa göre kurulmuş AI planı atılır.
+function setDayFocus(dateStr, type) {
+  if (type && !isEffectiveTrainingDay(dateStr, profile.trainingDays || DEFAULT_TRAINING_DAYS, profile.trainingDayOverrides || {})) setDayOverride(dateStr, true);
+  const current = getEntry(dateStr);
+  logs[dateStr] = { ...current, focusType: type || null, aiWorkout: null, variantShift: {} };
+  persistLogs();
+  if (dateStr === today) { autoGenAttemptedDate = null; autoGenError = ""; }
 }
 
 // Weekly streak: how many planned sessions have actually been completed in the
@@ -1926,6 +2047,7 @@ document.addEventListener("scroll", () => {
 function render() {
   if (shouldDeferRender()) { pendingRender = true; return; }
   pendingRender = false;
+  clearDayTypeCache();
   const root = document.getElementById("root");
   if (!profile || editingProfile) {
     root.innerHTML = `<div class="app">${renderOnboarding()}</div>`;
@@ -2068,7 +2190,17 @@ function renderCoachWidget() {
       renderCoachWidget();
       try {
         const priorHistory = coachMessages.slice(0, -1);
-        const reply = await askCoach(text, profile, targets, priorHistory, dayCtx);
+        let reply = await askCoach(text, profile, targets, priorHistory, dayCtx);
+        const tag = String(reply).match(/\[ODAK:\s*([a-z_]+)\s*\]/i);
+        if (tag) {
+          reply = String(reply).replace(/\s*\[ODAK:[^\]]*\]\s*/gi, " ").trim();
+          const t = tag[1].toLowerCase();
+          if (PROGRAM[t] && t !== "rest" && getEntry(today).dayType !== t) {
+            setDayFocus(today, t);
+            reply += `\n\n✅ Bugünün antrenmanını "${focusLabel(t)}" yaptım, sonraki günler buna göre kaydı.`;
+            render();
+          }
+        }
         coachMessages = [...coachMessages, { role: "assistant", content: reply }];
       } catch (e) {
         coachError = e.message === "NO_KEY" ? "API key bulunamadı." : (e.message || "Bir şeyler ters gitti, tekrar dener misin?");
@@ -2646,7 +2778,7 @@ async function maybeAutoGeneratePlan() {
   if (activeDate !== today) return;                 // only auto-plan the live day
   if (autoGenAttemptedDate === today) return;       // one attempt per day
   const entry = getEntry(today);
-  if (entry.aiWorkout && entry.aiWorkout.exercises && entry.aiWorkout.exercises.length) return;
+  if (aiPlanValid(entry, entry.dayType, today)) return;
   if (entry.dayType === "rest") return;             // nothing to plan on rest days
   if (workoutStartedOrDone(entry)) return;          // already trained today → leave it alone
   if (!getGeminiKey()) return;                      // no key → keep static program
@@ -2681,7 +2813,7 @@ async function maybeAdjustPlanForNutrition() {
   if (activeDate !== today) return;
   const entry = getEntry(today);
   const plan = entry.aiWorkout;
-  if (!plan || !plan.exercises || !plan.exercises.length) return;
+  if (!aiPlanValid(entry, entry.dayType, today)) return;
   if (!getGeminiKey()) return;
   if (workoutStartedOrDone(entry)) return;          // antrenman başladı/bitti → plana dokunma
 
@@ -2704,6 +2836,7 @@ async function maybeAdjustPlanForNutrition() {
     );
     updated.nutritionSnapshot = { kcal: totals.kcal, protein: totals.protein };
     updated.autoGenerated = true;
+    updated.focusType = plan.focusType;
     // Keep the checkmarks of anything that survived the update.
     const keptIds = new Set(updated.exercises.map(ex => ex.id));
     const doneExercises = {};
@@ -2799,8 +2932,10 @@ function renderTraining(entry, phase, weeksRemaining) {
     ${planAdjustNote && !planAdjustLoading ? `<div class="auto-plan-note wide">🍽️ ${esc(planAdjustNote)}<button class="auto-plan-dismiss" id="planNoteDismiss">✕</button></div>` : ""}
     ${autoGenError ? `<div class="chat-error wide">Otomatik plan kurulamadı: ${esc(autoGenError)}. Standart program gösteriliyor.</div>` : ""}
 
-    <section class="tile wide"><div class="th"><h2>${esc(dayInfo.label)}</h2>${dayInfo.isAI ? `<span class="chip" style="color:var(--lime);background:color-mix(in srgb,var(--lime) 18%,transparent)">AI PLANI</span>` : ""}</div>
+    <section class="tile wide"><div class="th"><h2>${esc(dayInfo.label)}</h2><div style="display:flex;gap:8px;align-items:center">${dayInfo.isAI ? `<span class="chip" style="color:var(--lime);background:color-mix(in srgb,var(--lime) 18%,transparent)">AI PLANI</span>` : ""}<button class="sm" id="focusOpenBtn" style="width:auto;padding:0 12px;border-radius:15px;font-size:13px" aria-expanded="${focusPickerOpen}">Değiştir</button></div></div>
       ${dayInfo.sub ? `<div class="sub">${esc(dayInfo.sub)}</div>` : ""}
+      ${focusPickerOpen ? `<div class="sub" style="margin-top:10px">${activeDate === today ? "Bugün" : "O gün"} ne çalışmak istiyorsun? Sonraki günler buna göre kayar.</div>
+      <div class="chips">${FOCUS_OPTIONS.filter(o => phase === "adaptation" || !o.adaptation).map(o => `<button data-focus="${o.type}" aria-pressed="${entry.dayType === o.type}">${o.label}</button>`).join("")}${entry.focusType ? `<button data-focus="">Otomatik</button>` : ""}</div>` : ""}
       <div class="ringrow">${uiRings([{ c: allEx.length ? "var(--orange)" : "var(--purple)", pct: allEx.length ? doneAll / allEx.length * 100 : 100 }], 120, 26, 0)}
         <div class="leg">${allEx.length
           ? `<div><div class="l">Tamamlanan</div><div class="v num" style="color:var(--orange)">${doneAll}/${allEx.length}<small> hareket</small></div></div>
@@ -2826,7 +2961,7 @@ function renderTraining(entry, phase, weeksRemaining) {
     </section>
 
     <section class="tile wide"><div class="th"><h2>Hareketler</h2><div style="display:flex;gap:8px"><button class="sm" id="restOpenBtn" aria-label="Mola sayacı">⏱</button>${allEx.length ? `<button class="sm" id="markAllBtn" data-set="${doneAll < allEx.length}" style="width:auto;padding:0 12px;border-radius:15px;font-size:13px">${doneAll < allEx.length ? "Tümü ✓" : "Sıfırla"}</button>` : ""}</div></div>
-      ${totalEx === 0 ? `<div class="rest-note">Bugün planda dinlenme var. Yine de antrenman yaptıysan Özet'teki Antrenman kutusundan takvimi açıp bu güne dokunarak işaretleyebilirsin. Aşağıdaki Hareket Önerici'den ekstra hareket de ekleyebilirsin.</div>` : ""}
+      ${totalEx === 0 ? `<div class="rest-note">Bugün planda dinlenme var. Antrenman yapacaksan yukarıdaki "Değiştir"den bölge seç. Yine de antrenman yaptıysan Özet'teki Antrenman kutusundan takvimi açıp bu güne dokunarak işaretleyebilirsin. Aşağıdaki Hareket Önerici'den ekstra hareket de ekleyebilirsin.</div>` : ""}
       <div class="exlist">${dayInfo.exercises.map(e => exRow(e, false)).join("")}${customExercises.map(e => exRow(e, true)).join("")}</div>
       ${dayInfo.rotating && totalEx > 0 ? `<div class="sub" style="margin-top:10px">🔁 Program ${programWeekIndex(activeDate) + 1}. hafta varyasyonları. Ana hareketler 3 haftada, yardımcı hareketler her hafta değişir. Beğenmediğine ⇄ bas.</div>` : ""}
       ${dayInfo.isAI && totalEx > 0 ? `<div class="sub" style="margin-top:10px">Beğenmediğin hareketin yanındaki ⇄ ile aynı bölgeyi çalıştıran başka bir hareketle değiştir.</div>` : ""}
@@ -2841,7 +2976,15 @@ function renderTraining(entry, phase, weeksRemaining) {
   `;
 }
 
+let focusPickerOpen = false;
 function attachTrainingHandlers(entry) {
+  const focusOpenBtn = document.getElementById("focusOpenBtn");
+  if (focusOpenBtn) focusOpenBtn.addEventListener("click", () => { focusPickerOpen = !focusPickerOpen; render(); });
+  document.querySelectorAll("[data-focus]").forEach(el => el.addEventListener("click", () => {
+    setDayFocus(activeDate, el.dataset.focus || null);
+    focusPickerOpen = false;
+    render();
+  }));
   const restOpenBtn = document.getElementById("restOpenBtn");
   if (restOpenBtn) restOpenBtn.addEventListener("click", () => { restTimerOpen = true; renderRestTimerWidget(); });
   attachSuggestHandlers();
@@ -3076,9 +3219,15 @@ KURALLAR:
 KÜTÜPHANE (id = isim [bölge]):
 ${LIB_CATALOG_TEXT}
 SADECE şu JSON ile yanıt ver, markdown fence yok:
-{"intro": "kısa açıklama", "exercises": [{"id": "kütüphane id", "scheme": "3 × 12-15", "why": "kısa gerekçe"}]}`;
+{"intro": "kısa açıklama", "dayFocus": null, "exercises": [{"id": "kütüphane id", "scheme": "3 × 12-15", "why": "kısa gerekçe"}]}
+"dayFocus": Kullanıcı BUGÜNÜN antrenmanını başka bir bölgeye ÇEVİRMEK istiyorsa (örn. "bugün göğüs yapalım", "bacak yerine sırt çalışayım") şu değerlerden biri: ${FOCUS_OPTIONS.filter(o => computePhase(profile, activeDate) === "adaptation" || !o.adaptation).map(o => `"${o.type}" (${o.label})`).join(", ")}. Sadece ekstra hareket ya da belirli bir bölge için öneri istiyorsa null.`;
   const raw = await callGemini(systemPrompt, [{ role: "user", parts: [{ text: request }] }], 3000);
   const parsed = JSON.parse(extractJson(raw));
+  const focus = String(parsed.dayFocus || "").toLowerCase();
+  if (PROGRAM[focus] && focus !== "rest") {
+    if (entry.dayType !== focus) setDayFocus(activeDate, focus);
+    return { intro: "", exercises: [], request, focusChanged: focus };
+  }
   const exercises = (parsed.exercises || []).filter(e => LIB[e.id]).map(e => ({ id: e.id, name: LIB[e.id].n, scheme: String(e.scheme || "3 × 10-12"), why: String(e.why || LIB[e.id].t) }));
   if (!exercises.length) throw new Error("Kütüphaneden uygun hareket seçilemedi, isteği biraz daha açık yazar mısın?");
   return { intro: String(parsed.intro || ""), exercises, request };
@@ -3105,7 +3254,11 @@ function renderSuggestCard() {
       <div class="compose"><input type="text" class="field" id="suggestInput" placeholder="örn. alt karın ağırlıklı, kol kalınlığı" aria-label="Koça sor" value="${esc(suggestText)}" /><button class="send" id="suggestSend" aria-label="Öner" ${suggestLoading ? "disabled" : ""}>${UI_SEND}</button></div>
       ${suggestLoading ? `<div class="meal-analyzing">${geminiStatusNote || "hareketler seçiliyor…"}</div>` : ""}
       ${suggestError ? `<div class="chat-error">${esc(suggestError)}</div>` : ""}
-      ${suggestResult ? `
+      ${suggestResult && suggestResult.focusChanged ? `
+        <div class="sg-result">
+          <div class="sg-result-head">“${esc(suggestResult.request)}”</div>
+          <div class="sg-intro">✅ ${activeDate === today ? "Bugünün" : "O günün"} antrenmanı artık <b>${esc(focusLabel(suggestResult.focusChanged))}</b>. Yukarıdaki plan buna göre değişti, sonraki günler de kaydı.</div>
+        </div>` : suggestResult ? `
         <div class="sg-result">
           <div class="sg-result-head">“${esc(suggestResult.request)}”</div>
           ${suggestResult.intro ? `<div class="sg-intro">${esc(suggestResult.intro)}</div>` : ""}
@@ -3594,6 +3747,7 @@ function attachOnboardingHandlers() {
       age: Number(obState.age), heightCm: Number(obState.heightCm), weightKg: Number(obState.weightKg),
       bodyFatPct: obState.bodyFatPct === "" || obState.bodyFatPct == null || !(Number(obState.bodyFatPct) > 0) ? null : Number(obState.bodyFatPct), musclePct: obState.musclePct === "" ? null : Number(obState.musclePct),
       programV3Start: profile?.programV3Start || today,
+      flexStart: profile?.flexStart || today,
       trainingDayOverrides: profile?.trainingDayOverrides || {},
       autoAiPlan: profile?.autoAiPlan,
     };
