@@ -524,6 +524,29 @@ main.grid{margin-top:14px}
 .tile .log-panel{margin:0 0 12px}
 .tile .sg-result{margin-top:12px}
 .tile .mark-all-btn{margin-top:12px}
+/* kan tahlili */
+.lab-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.lab-chip{font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px;font-family:var(--round)}
+.lab-chip.high,.lab-chip.low{color:var(--red);background:color-mix(in srgb,var(--red) 16%,transparent)}
+.lab-chip.near{color:var(--orange);background:color-mix(in srgb,var(--orange) 16%,transparent)}
+.lab-chip.ok{color:var(--green);background:color-mix(in srgb,var(--green) 14%,transparent)}
+.lab-sec{margin-top:14px}
+.lab-sec h3{font-size:15px;font-weight:600;margin:0 0 6px}
+.lab-sec h3.more{color:var(--green)}
+.lab-sec h3.less{color:var(--red)}
+.lab-sec ul{margin:0;padding-left:18px;font-size:14px;color:var(--fg2);line-height:1.45}
+.lab-sec li{margin:2px 0}
+.lab-why{font-size:13px;color:var(--fg2);line-height:1.45;margin-top:10px}
+.lab-why b{color:var(--fg)}
+.lab-doc{font-size:12px;color:var(--fg3);margin-top:12px;line-height:1.4}
+.lab-form{display:grid;gap:8px;margin-top:12px}
+.lab-row{display:grid;grid-template-columns:1fr 92px 54px;gap:8px;align-items:center;font-size:14px}
+.lab-row input{min-width:0;height:38px;border-radius:12px;border:0;background:var(--tile2);padding:0 10px;font:inherit;font-size:16px;color:var(--fg);text-align:right}
+.lab-row .u{font-size:11px;color:var(--fg3)}
+.lab-row .n small{display:block;font-size:11px;color:var(--fg3)}
+.lab-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.lab-btns .tint{height:44px;font-size:15px}
+.tint.gray{background:var(--tile2);color:var(--fg2)}
 .relink{display:block;margin:10px auto 0;font-size:13px;color:var(--fg2);text-decoration:underline}
 .mealtile[data-open-recipe]{cursor:pointer}
 .mealtile .slot-time{font-size:12px;color:var(--fg3);margin-left:6px;font-weight:600}
@@ -551,7 +574,7 @@ main.grid{margin-top:14px}
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const APP_VERSION = "4.5.0";
+const APP_VERSION = "4.6.0";
 const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const MEDIA = {
   bench: { dbId: "Barbell_Bench_Press_-_Medium_Grip", tip: "Sırtın bankta düz, ayaklar yerde sabit. Bar göğüs hizasına iner, dirsekler tam kilitlenmeden yukarı it." },
@@ -1473,6 +1496,138 @@ function bodyFatZones(gender) {
 function esc(s) { const d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
 
 // ---------------------------------------------------------------------------
+// Kan tahlili: değerler profile.labs = { date, values: { ldl: 107.2, ... } } içinde durur.
+// Aralıklar yetişkin genel referanslarıdır; teşhis değil, beslenme yönlendirmesi içindir.
+// ---------------------------------------------------------------------------
+const LAB_DEFS = [
+  { key: "ldl", name: "LDL kolesterol", short: "LDL", unit: "mg/dL", hint: "kötü kolesterol",
+    status: (v) => v >= 160 ? ["high", "yüksek"] : v >= 100 ? ["near", "hafif yüksek"] : ["ok", "normal"] },
+  { key: "hdl", name: "HDL kolesterol", short: "HDL", unit: "mg/dL", hint: "iyi kolesterol",
+    status: (v, g) => v < (g === "kadin" ? 50 : 40) ? ["low", "düşük"] : ["ok", "normal"] },
+  { key: "tg", name: "Trigliserit", short: "Trigliserit", unit: "mg/dL",
+    status: (v) => v >= 200 ? ["high", "yüksek"] : v >= 150 ? ["near", "sınırda"] : ["ok", "normal"] },
+  { key: "chol", name: "Total kolesterol", short: "Kolesterol", unit: "mg/dL",
+    status: (v) => v >= 240 ? ["high", "yüksek"] : v >= 200 ? ["near", "sınırda"] : ["ok", "normal"] },
+  { key: "glucose", name: "Açlık şekeri", short: "Açlık şekeri", unit: "mg/dL", hint: "glukoz",
+    status: (v) => v >= 126 ? ["high", "yüksek"] : v >= 100 ? ["near", "sınırda"] : v < 70 ? ["low", "düşük"] : ["ok", "normal"] },
+  { key: "hba1c", name: "HbA1c", short: "HbA1c", unit: "%", hint: "3 aylık şeker",
+    status: (v) => v >= 6.5 ? ["high", "yüksek"] : v >= 5.7 ? ["near", "sınırda"] : ["ok", "normal"] },
+  { key: "uric", name: "Ürik asit", short: "Ürik asit", unit: "mg/dL",
+    status: (v, g) => { const hi = g === "kadin" ? 6.0 : 8.0, near = g === "kadin" ? 5.5 : 6.8;
+      return v > hi ? ["high", "yüksek"] : v >= near ? ["near", "üst sınıra yakın"] : ["ok", "normal"]; } },
+  { key: "alt", name: "ALT", short: "ALT", unit: "U/L", hint: "karaciğer",
+    status: (v) => v > 55 ? ["high", "yüksek"] : ["ok", "normal"] },
+  { key: "hgb", name: "Hemoglobin", short: "Hemoglobin", unit: "g/dL", hint: "HGB",
+    status: (v, g) => v < (g === "kadin" ? 12 : 13.2) ? ["low", "düşük"] : ["ok", "normal"] },
+  { key: "iron", name: "Demir (serum)", short: "Demir", unit: "µg/dL",
+    status: (v) => v < 50 ? ["low", "düşük"] : ["ok", "normal"] },
+  { key: "ferritin", name: "Ferritin", short: "Ferritin", unit: "ng/mL", hint: "demir deposu",
+    status: (v) => v < 30 ? ["low", "düşük"] : ["ok", "normal"] },
+  { key: "b12", name: "B12 vitamini", short: "B12", unit: "pg/mL",
+    status: (v) => v < 200 ? ["low", "düşük"] : v < 300 ? ["near", "sınırda"] : ["ok", "normal"] },
+  { key: "vitd", name: "D vitamini", short: "D vitamini", unit: "ng/mL",
+    status: (v) => v < 20 ? ["low", "düşük"] : v < 30 ? ["near", "yetersiz"] : ["ok", "normal"] },
+];
+function parseLabNum(s) {
+  const t = String(s == null ? "" : s).trim().replace(/\s/g, "").replace(",", ".");
+  if (!t) return null;
+  const n = Number(t);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function hasLabs(p) { return !!(p && p.labs && p.labs.values && Object.keys(p.labs.values).some(k => p.labs.values[k] != null)); }
+function labResults(p) {
+  if (!hasLabs(p)) return [];
+  return LAB_DEFS.filter(d => p.labs.values[d.key] != null).map(d => {
+    const v = Number(p.labs.values[d.key]);
+    const [level, label] = d.status(v, p.gender);
+    return { ...d, value: v, level, label };
+  });
+}
+function labFlagged(p) { return labResults(p).filter(r => r.level !== "ok"); }
+function fmtLab(v) { return Number(v).toLocaleString("tr-TR", { maximumFractionDigits: 2 }); }
+// Tahlile göre yiyecek önerileri. Ürik asit işaretliyse balık/baklagil önerileri ona göre yumuşatılır.
+function labGuidance(p) {
+  const flagged = labFlagged(p);
+  const has = (...keys) => flagged.some(r => keys.includes(r.key));
+  const uric = has("uric");
+  const more = [], less = [], why = [];
+  const add = (arr, s) => { if (!arr.includes(s)) arr.push(s); };
+  const fish = uric ? "Balık haftada 2 kez (somon, levrek, çipura gibi)" : "Yağlı balık haftada 2 kez (somon, uskumru, sardalya)";
+  const legumes = uric ? "Baklagil (mercimek, nohut, kuru fasulye), ürik asit yüzünden porsiyonu ölçülü" : "Baklagil (mercimek, nohut, kuru fasulye)";
+  if (has("ldl", "chol")) {
+    why.push("<b>Kolesterol:</b> doymuş yağı azalt, lifi ve sağlıklı yağı artır.");
+    add(more, "Yulaf, bulgur, tam buğday ve çavdar ekmeği"); add(more, legumes);
+    add(more, "Zeytinyağı, bir avuç ceviz ya da badem, avokado"); add(more, fish);
+    add(more, "Bol sebze ve salata");
+    add(less, "Kızartma, tereyağı, kaymak, yağlı peynir");
+    add(less, "Sucuk, salam, sosis, yağlı kırmızı et");
+    add(less, "Hazır kek, bisküvi, paketli atıştırmalık (trans yağ)");
+  }
+  if (has("hdl")) {
+    why.push("<b>HDL düşük:</b> sağlıklı yağ ve düzenli kardiyo HDL'yi yükseltir.");
+    add(more, "Zeytinyağı, bir avuç ceviz ya da badem, avokado"); add(more, fish);
+    add(more, "Haftada 150 dk tempolu yürüyüş ya da kardiyo");
+    add(less, "Şeker ve beyaz un ürünleri");
+  }
+  if (has("tg")) {
+    why.push("<b>Trigliserit:</b> şeker, beyaz un ve alkol trigliseriti en çok yükselten şeyler.");
+    add(more, fish);
+    add(less, "Şeker, tatlı, kola, hazır meyve suyu"); add(less, "Beyaz ekmek, pirinç pilavı, hamur işi"); add(less, "Alkol");
+  }
+  if (has("glucose", "hba1c")) {
+    why.push("<b>Kan şekeri:</b> şekeri ve beyaz unu kes, her öğüne protein ve lif koy, yemekten sonra 10-15 dk yürü.");
+    add(more, "Her öğüne avuç içi kadar protein (yumurta, tavuk, hindi, balık, yoğurt, lor)");
+    if (!has("ldl", "chol")) add(more, "Lif: sebze, salata, bulgur, yulaf");
+    add(more, legumes);
+    add(more, "Meyve günde 2-3 porsiyon, bütün halde (suyu değil)");
+    add(more, "Yemekten sonra 10-15 dk yürüyüş");
+    add(less, "Şeker, tatlı, kola, hazır meyve suyu, enerji içeceği");
+    add(less, "Beyaz ekmek, pirinç pilavı, hamur işi, börek, poğaça");
+  }
+  if (uric) {
+    why.push("<b>Ürik asit:</b> bol su iç, sakatatı ve alkolü kes, kırmızı eti azalt.");
+    add(more, "Su: günde 2,5-3 litre"); add(more, "Az yağlı yoğurt, kefir, süt");
+    add(less, "Sakatat (ciğer, böbrek), kırmızı et haftada 1-2 kez");
+    add(less, "Hamsi, sardalya, midye, karides gibi pürinli deniz ürünleri");
+    add(less, "Alkol, özellikle bira"); if (!has("glucose", "hba1c", "tg")) add(less, "Şekerli ve fruktozlu içecekler");
+  }
+  if (has("alt")) {
+    why.push("<b>Karaciğer (ALT):</b> alkolü ve şekeri azalt, kilo vermek en çok yardım eden şey.");
+    add(more, "Bol sebze, kahve (şekersiz) ölçülü"); add(less, "Alkol"); add(less, "Şeker, tatlı, kızartma");
+  }
+  if (has("hgb", "iron", "ferritin")) {
+    why.push("<b>Demir:</b> demirli yiyecekleri C vitaminiyle ye, yemekle çay/kahve içme.");
+    add(more, uric ? "Demir: yumurta, tavuk but, mercimek + limon (kırmızı et ölçülü)" : "Demir: kırmızı et (yağsız), yumurta, mercimek + limon");
+    add(more, "C vitamini: biber, limon, portakal"); add(less, "Yemekle birlikte çay ve kahve (1 saat ara ver)");
+  }
+  if (has("b12")) {
+    why.push("<b>B12:</b> hayvansal gıdalarda bulunur; çok düşükse doktor takviye önerebilir.");
+    add(more, "B12: yumurta, süt ürünleri, balık, et");
+  }
+  if (has("vitd")) {
+    why.push("<b>D vitamini:</b> gıdayla yükseltmek zor; doktoruna takviye sor, öğlen güneşi al.");
+    add(more, "D vitamini: yumurta sarısı, yağlı balık, günde 15-20 dk güneş");
+  }
+  return { flagged, more, less, why };
+}
+function labsPromptText(p) {
+  const res = labResults(p);
+  if (!res.length) return "";
+  const flagged = res.filter(r => r.level !== "ok");
+  const ok = res.filter(r => r.level === "ok");
+  const g = labGuidance(p);
+  let s = `\nKAN TAHLİLİ (${p.labs.date || "tarih yok"}): `;
+  s += flagged.length ? flagged.map(r => `${r.name} ${fmtLab(r.value)} ${r.unit} (${r.label})`).join(", ") : "girilen değerler normal aralıkta";
+  if (ok.length && flagged.length) s += `. Normal olanlar: ${ok.map(r => `${r.short} ${fmtLab(r.value)}`).join(", ")}`;
+  s += ".";
+  if (g.more.length || g.less.length) {
+    s += `\nTAHLİLE GÖRE BESLENME: Öner: ${g.more.join("; ")}. Kaçın/azalt: ${g.less.join("; ")}.`;
+    s += `\nYemek önerirken, öğün yorumlarken ve tarif verirken bu tahlil sonuçlarını dikkate al; uygun olmayan bir öğün yenmişse nazikçe söyle ve daha uygun alternatif öner. Teşhis koyma, ilaç önerme; gerekirse doktoruna danışmasını söyle.`;
+  }
+  return s;
+}
+
+// ---------------------------------------------------------------------------
 // Gemini AI helpers
 // ---------------------------------------------------------------------------
 function getGeminiKey() { try { return localStorage.getItem(GEMINI_KEY_STORAGE) || ""; } catch (e) { return ""; } }
@@ -1641,7 +1796,7 @@ async function analyzeMealAndAdvise(description, profile, targets, dayCtx, prior
   const remainingFat = Math.round(targets.fatG - (priorTotals.fat || 0));
   const systemPrompt = `Sen Enti Coach'sun, Türk mutfağına aşina bir beslenme koçusun.
 Kullanıcı az önce yediği bir öğünü anlatıyor. 1) Türk ev yemeği porsiyonlarına göre YAKLAŞIK kalori/makro tahmin et. 2) Günün geri kalanı için kısa somut tavsiye yaz (bugünün antrenmanını da hesaba kat).
-KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, ${bodyFatPromptText(profile)}. Antrenman geçmişi: ${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}.
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, hedefi: ${GOALS[profile.goal]?.label}, ${bodyFatPromptText(profile)}. Antrenman geçmişi: ${TRAINING_STATUS[profile.trainingStatus]?.label || TRAINING_STATUS.yeni.label}.${labsPromptText(profile)}
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein. BU ÖĞÜNDEN ÖNCE ALINAN: ${Math.round(priorTotals.kcal)} kcal, ${Math.round(priorTotals.protein)}g protein. KALAN BÜTÇE: ${Math.round(remainingKcal)} kcal, ${Math.round(remainingProtein)}g protein.
 YAĞ: günlük limit ${targets.fatG}g, bu öğünden önce ${Math.round(priorTotals.fat || 0)}g alındı, ${remainingFat >= 0 ? `${remainingFat}g kaldı` : `limit ${-remainingFat}g AŞILMIŞ`}. Yağ tahminini dikkatli yap (pişirme yağı, tereyağı, peynir, kıyma yağı dahil). Bu öğünle limit aşılıyorsa tavsiyede açıkça söyle.
 BUGÜNÜN ANTRENMANI: ${dayCtx.dayLabel}${dayCtx.totalEx > 0 ? ` (${dayCtx.doneEx}/${dayCtx.totalEx} tamamlandı)` : " (dinlenme günü)"}.
@@ -1659,7 +1814,7 @@ async function generateCustomRecipe(dishName, profile, targets, priorTotals) {
 2) Malzemeleri ÇİĞ gramaj olarak listele.
 3) Adım adım, kısa ve net hazırlanış talimatları yaz (her adımda varsa süre; haşlama/kızartma/pişirme gibi yöntemi ve YAKLAŞIK süreyi mutlaka belirt).
 4) Tarifin toplam makrosunu ve mümkünse pişmiş toplam gramajı ile 100g'daki makroyu hesapla (meal-prep için gerekiyor).
-KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.weightKg}kg, hedefi: ${GOALS[profile.goal]?.label}.
+KULLANICI: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.weightKg}kg, hedefi: ${GOALS[profile.goal]?.label}.${labsPromptText(profile)}${hasLabs(profile) ? "\nMalzeme ve pişirme yöntemini tahlile uygun seç (gerekirse yemeği daha sağlıklı hale getir, değişikliği adımlarda belirt)." : ""}
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein. BUGÜN ŞU ANA KADAR ALINAN: ${Math.round(priorTotals.kcal)} kcal, ${Math.round(priorTotals.protein)}g protein. KALAN BÜTÇE: ${Math.round(remainingKcal)} kcal, ${Math.round(remainingProtein)}g protein.
 SADECE şu JSON formatında yanıt ver, başka hiçbir şey ekleme, markdown fence kullanma:
 {"title": "yemek adı", "ingredients": [{"name": "malzeme", "amount": sayı, "unit": "g|ml|adet"}], "steps": [{"title": "kısa başlık", "content": "talimat cümlesi", "timer_seconds": sayı_veya_null}], "macros": {"kcal": sayı, "protein": sayı, "carbs": sayı, "fat": sayı}, "cooked_yield_g": sayı_veya_null, "per_100g": {"kcal": sayı, "protein": sayı, "carbs": sayı, "fat": sayı}_veya_null}`;
@@ -1824,7 +1979,7 @@ async function askCoach(userMessage, profile, targets, history, dayCtx) {
   ].join(", ");
   const systemPrompt = `Sen Enti Coach'sun, kullanıcıyı tanıyan samimi bir Türkçe fitness/beslenme koçusun. "aga" gibi samimi hitap kullanabilirsin ama saygılı kal.
 PROFİL: ${profile.gender === "kadin" ? "Kadın" : "Erkek"}, ${profile.age} yaş, ${profile.heightCm}cm, ${profile.weightKg}kg, ${bodyFatPromptText(profile)}${profile.musclePct ? `, kas %${profile.musclePct}` : ""}.
-ANTRENMAN GEÇMİŞİ: ${statusLine}. Hedef: ${GOALS[profile.goal]?.label}.
+ANTRENMAN GEÇMİŞİ: ${statusLine}. Hedef: ${GOALS[profile.goal]?.label}.${labsPromptText(profile)}
 GÜNLÜK HEDEF: ${targets.calorieTarget} kcal, ${targets.proteinG}g protein, ${targets.carbG}g karbonhidrat, ${targets.fatG}g yağ.
 ANTRENMAN PROGRAMI: ${dayCtx.phase === "adaptation" ? "adaptasyon fazında — full body + kardiyo, hafif ağırlık (sonra split'e geçecek)" : "haftada 4 gün Upper/Lower split"}. Program esnek: kaçırılan gün planı kaydırır, bacak günü dinlenmeden önceki güne denk getirilir.
 ÖNÜMÜZDEKİ GÜNLER: ${[1, 2, 3].map(i => { const d = addDays(today, i); return `${turkishDate(d)}: ${dayTypeLine(d)}`; }).join("; ")}.
@@ -2546,6 +2701,8 @@ let customRecipeData = null; // AI-generated recipe, used when recipeId === "__c
 // AI custom recipe generator (nutrition tab)
 let customRecipeInputText = "";
 let mealInputText = "";
+let labsEditing = false;
+let labsDraft = null; // yazılırken render'lar silmesin diye
 let customRecipeLoading = false;
 let customRecipeError = "";
 
@@ -2638,7 +2795,87 @@ function renderNutrition(entry, targets) {
       ${customRecipeLoading ? `<div class="meal-analyzing">${geminiStatusNote || "tarif hazırlanıyor…"}</div>` : ""}
       ${customRecipeError ? `<div class="chat-error">Tarif oluşturulamadı: ${esc(customRecipeError)}</div>` : ""}
     </section>
+
+    ${renderLabsTile()}
   `;
+}
+
+function renderLabsTile() {
+  const doc = `<div class="lab-doc">Bu öneriler genel beslenme yönlendirmesidir, teşhis değildir. Doktorunun önerisi önceliklidir.</div>`;
+  if (labsEditing) {
+    const d = labsDraft || { date: today, values: {} };
+    return `<section class="tile wide" id="labsTile"><div class="th"><h2>Kan Tahlili</h2></div>
+      <div class="sub">Sonuç kâğıdındaki değerleri yaz. Bilmediklerini boş bırak.</div>
+      <div class="lab-form">
+        <div class="lab-row"><div class="n">Tahlil tarihi</div><input type="date" id="labDate" value="${esc(d.date || today)}" style="grid-column:2 / 4;text-align:left" /></div>
+        ${LAB_DEFS.map(def => `<div class="lab-row"><div class="n">${esc(def.name)}${def.hint ? `<small>${esc(def.hint)}</small>` : ""}</div>
+          <input type="text" inputmode="decimal" data-lab="${def.key}" value="${d.values[def.key] != null ? esc(String(d.values[def.key])) : ""}" aria-label="${esc(def.name)}" /><div class="u">${esc(def.unit)}</div></div>`).join("")}
+      </div>
+      <div class="lab-btns"><button class="tint gray" id="labCancel">Vazgeç</button><button class="tint lime" id="labSave">Kaydet</button></div>
+      ${hasLabs(profile) ? `<button class="relink" id="labClear">Tahlil değerlerini sil</button>` : ""}
+      ${doc}
+    </section>`;
+  }
+  if (!hasLabs(profile)) {
+    return `<section class="tile wide" id="labsTile"><div class="th"><h2>Kan Tahlili</h2></div>
+      <div class="sub">Kolesterol, şeker, ürik asit gibi değerlerini gir; ne yemen, neyi azaltman gerektiğini göstereyim. Koçun ve öğün analizleri de buna göre konuşur.</div>
+      <div class="lab-btns" style="grid-template-columns:1fr"><button class="tint lime" id="labEdit">Tahlil Değerlerini Gir</button></div>
+      ${doc}
+    </section>`;
+  }
+  const res = labResults(profile);
+  const g = labGuidance(profile);
+  const dateTxt = profile.labs.date ? new Date(profile.labs.date + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "";
+  const chips = (g.flagged.length ? g.flagged : res).map(r =>
+    `<span class="lab-chip ${r.level}">${esc(r.short)} ${fmtLab(r.value)} · ${esc(r.label)}</span>`).join("");
+  const okNames = res.filter(r => r.level === "ok").map(r => r.short);
+  return `<section class="tile wide" id="labsTile"><div class="th"><h2>Kan Tahlili</h2></div>
+    ${dateTxt ? `<div class="cap">${esc(dateTxt)}</div>` : ""}
+    <div class="lab-chips">${chips}</div>
+    ${g.flagged.length && okNames.length ? `<div class="sub" style="margin-top:8px">Normal: ${esc(okNames.join(", "))}</div>` : ""}
+    ${g.flagged.length ? `
+      <div class="lab-why">${g.why.join("<br>")}</div>
+      ${g.more.length ? `<div class="lab-sec"><h3 class="more">Bol ye</h3><ul>${g.more.map(s => `<li>${esc(s)}</li>`).join("")}</ul></div>` : ""}
+      ${g.less.length ? `<div class="lab-sec"><h3 class="less">Azalt</h3><ul>${g.less.map(s => `<li>${esc(s)}</li>`).join("")}</ul></div>` : ""}
+    ` : `<div class="lab-why">Girdiğin değerler normal aralıkta. Dengeli beslenmeye devam.</div>`}
+    <div class="lab-btns" style="grid-template-columns:1fr"><button class="tint gray" id="labEdit">Değerleri Düzenle</button></div>
+    ${doc}
+  </section>`;
+}
+
+function attachLabsHandlers() {
+  const editBtn = document.getElementById("labEdit");
+  if (editBtn) editBtn.addEventListener("click", () => {
+    labsEditing = true;
+    labsDraft = { date: profile.labs?.date || today, values: { ...(profile.labs?.values || {}) } };
+    render();
+    const t = document.getElementById("labsTile"); if (t) t.scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+  if (!labsEditing) return;
+  document.querySelectorAll("[data-lab]").forEach(inp => {
+    inp.addEventListener("input", () => { labsDraft.values[inp.dataset.lab] = inp.value; });
+  });
+  const dateInp = document.getElementById("labDate");
+  if (dateInp) dateInp.addEventListener("input", () => { labsDraft.date = dateInp.value; });
+  document.getElementById("labCancel").addEventListener("click", () => { labsEditing = false; labsDraft = null; render(); });
+  document.getElementById("labSave").addEventListener("click", () => {
+    const values = {};
+    document.querySelectorAll("[data-lab]").forEach(inp => { const n = parseLabNum(inp.value); if (n != null) values[inp.dataset.lab] = n; });
+    const date = (dateInp && dateInp.value) || today;
+    profile = { ...profile, labs: Object.keys(values).length ? { date, values } : null };
+    persistProfile();
+    labsEditing = false; labsDraft = null;
+    render();
+    const t = document.getElementById("labsTile"); if (t) t.scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+  const clearBtn = document.getElementById("labClear");
+  if (clearBtn) clearBtn.addEventListener("click", () => {
+    if (!confirm("Tahlil değerleri silinsin mi?")) return;
+    profile = { ...profile, labs: null };
+    persistProfile();
+    labsEditing = false; labsDraft = null;
+    render();
+  });
 }
 
 function addMeal(entry, newMeal) {
@@ -2730,6 +2967,7 @@ function attachNutritionHandlers(entry, targets) {
   };
   document.getElementById("customRecipeSend").addEventListener("click", submitCustomRecipe);
   customRecipeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") submitCustomRecipe(); });
+  attachLabsHandlers();
 }
 
 // ---------------------------------------------------------------------------
@@ -3750,6 +3988,7 @@ function attachOnboardingHandlers() {
       flexStart: profile?.flexStart || today,
       trainingDayOverrides: profile?.trainingDayOverrides || {},
       autoAiPlan: profile?.autoAiPlan,
+      labs: profile?.labs || null,
     };
     persistProfile();
     editingProfile = false;
